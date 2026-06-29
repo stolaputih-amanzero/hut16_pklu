@@ -9,6 +9,7 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  turbopack: {},
 };
 
 const exportConfig = process.env.NODE_ENV === "production" 

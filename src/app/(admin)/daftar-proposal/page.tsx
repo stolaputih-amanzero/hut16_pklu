@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2 } from 'lucide-react'
+import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getNextNumber } from '@/lib/numbering'
@@ -602,7 +602,7 @@ export default function DaftarProposalPage() {
                                 {formData.id && (
                                     <Button
                                         variant="outline"
-                                        onClick={handleDelete}
+                                        onClick={() => handleDelete()}
                                         disabled={modalSubmitting}
                                         className="border-red-500/50 text-red-400 hover:bg-red-500/20 hover:text-red-400"
                                     >

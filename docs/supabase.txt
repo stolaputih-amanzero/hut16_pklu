@@ -1,0 +1,40 @@
+
+SUPABASE
+manafeapps@gmail.com's org
+
+
+GITHUB
+stolaputih-amanzero/hut16_pklu (private)
+
+
+Project Url
+https://gxkbxuksdfaqfmrwyuno.supabase.co
+
+Publishable Key
+sb_publishable_Yr9XjKA9Cetu0jN2LZ-MbA_DQ0P_COG
+
+Anon Public
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4a2J4dWtzZGZhcWZtcnd5dW5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDAxNDMsImV4cCI6MjA5ODMxNjE0M30.IZcOvw2UoocpHWSAUTw3ESPlJp7wcgUlq6BJ1L20lDE
+
+Service_role
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4a2J4dWtzZGZhcWZtcnd5dW5vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4Mjc0MDE0MywiZXhwIjoyMDk4MzE2MTQzfQ.ghRBsOA0Kbi1QJ5cLggtTpEYVeB4hNlAe0deOb480Z4
+
+
+
+
+
+
+Direct Connection String
+postgresql://postgres:[YOUR-PASSWORD]@db.gxkbxuksdfaqfmrwyuno.supabase.co:5432/postgres
+
+CLI Setup Command
+supabase login
+supabase init
+supabase link --project-ref gxkbxuksdfaqfmrwyuno
+
+
+
+
+
+
+

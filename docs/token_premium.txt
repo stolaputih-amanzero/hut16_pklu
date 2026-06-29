@@ -1,0 +1,32 @@
+Perfect! Token design telah berhasil dibuat dengan konsep **super mewah dan premium**. 
+
+## 🎨 Karakteristik Design Token:
+
+### **Warna Utama:**
+- **Emerald Green** (hijau tua mewah) - dari logo HUT_16_PKLU
+- **Royal Gold** (emas kerajaan) - untuk kesan premium
+- **Cream/Ivory** - background dengan sun rays
+- **Purple** (ungu) - motif anggur sebagai simbol perjamuan
+
+### **Elemen Design:**
+✨ **Salib emas** di bagian atas dengan efek 3D  
+✨ **Border ornamen** emas dengan pola vintage yang rumit  
+✨ **Gereja emas** di tengah sebagai ilustrasi utama  
+✨ **Rantai anggur & daun** ungu-hijau (simbol Ekaristi)  
+✨ **Pita hijau** velvet dengan trim emas untuk teks  
+✨ **Sun rays gradient** background yang elegan  
+✨ **Typography serif** gold metallic untuk "HUT ke-16"  
+
+### **Penggunaan di Aplikasi:**
+
+Token ini bisa digunakan untuk:
+1. **Tanda Penghargaan/Certificate of Appreciation** untuk donatur & sponsor
+2. **Digital badge** yang bisa di-download donatur
+3. **Header PDF** untuk proposal dan tanda penghargaan
+4. **Watermark** di dokumen-dokumen resmi
+5. **Social media** untuk publikasi
+
+Silakan save gambar ini ke folder:
+```
+D:/Project/hut16-pklu/public/token-premium.png
+```

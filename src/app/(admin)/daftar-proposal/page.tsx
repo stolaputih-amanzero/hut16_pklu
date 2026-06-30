@@ -289,6 +289,8 @@ export default function DaftarProposalPage() {
                         message: formData.message || null,
                         donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
                         lang: formData.lang,
+                        payment_status: formData.payment_status,
+                        confirmed_at: formData.payment_status === 'confirmed' ? (selectedProposal?.confirmed_at || new Date().toISOString()) : null,
                         committee_id: formData.committee_id
                     })
                     .eq('id', formData.id)
@@ -326,7 +328,8 @@ export default function DaftarProposalPage() {
                         message: formData.message || null,
                         donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
                         lang: formData.lang,
-                        payment_status: 'pending',
+                        payment_status: formData.payment_status || 'pending',
+                        confirmed_at: formData.payment_status === 'confirmed' ? new Date().toISOString() : null,
                         committee_id: formData.committee_id
                     })
                     .select()
@@ -728,6 +731,23 @@ export default function DaftarProposalPage() {
                                         <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
                                             <SelectItem value="id">Indonesia</SelectItem>
                                             <SelectItem value="en">English</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label className="text-xs text-[#D4AF37]">Status Pembayaran</Label>
+                                    <Select 
+                                        disabled={!isEditMode}
+                                        value={formData.payment_status} 
+                                        onValueChange={(val) => setFormData({ ...formData, payment_status: val })}
+                                    >
+                                        <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                            <SelectItem value="pending">Terkirim / Dicatat</SelectItem>
+                                            <SelectItem value="confirmed">Lunas</SelectItem>
+                                            <SelectItem value="cancelled">Batal</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

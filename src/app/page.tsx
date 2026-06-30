@@ -139,7 +139,7 @@ export default function Home() {
           transition={{ duration: 1, delay: 0.8 }}
           className="w-full flex justify-center gap-6 mb-24 relative z-20"
         >
-          <Link href="/proposal-donatur">
+          <Link href="/buat-proposal">
             <button className="group relative overflow-hidden rounded-full bg-transparent px-10 py-5 transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
               {/* Button Background Gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] opacity-90 transition-opacity group-hover:opacity-100" />

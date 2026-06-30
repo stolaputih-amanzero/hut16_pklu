@@ -53,7 +53,7 @@ export default function LaporanLpjPublicPage() {
         .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
     const totalDana = totalDanaDonatur + totalDanaSponsor
 
-    const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+    const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
     if (loading) {
         return (

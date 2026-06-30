@@ -206,7 +206,7 @@ interface Props {
 
 export function LaporanLpjPDF({ proposals, totalDanaDonatur, totalDanaSponsor, totalDana, logoUrl = "/logo_hut16_pklu.png", origin = "https://pklu.amanloka.com" }: Props) {
     const qrImageUrl = `https://quickchart.io/qr?size=100&text=${encodeURIComponent(origin + '/laporan-lpj')}`
-    const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+    const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
     return (
         <Document>

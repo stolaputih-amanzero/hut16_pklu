@@ -823,7 +823,7 @@ export default function DaftarProposalPage() {
                                         className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] focus:ring-[#D4AF37]"
                                     />
                                 </div>
-                                {formData.id && formData.contribution_value && Number(formData.contribution_value) > 0 && (
+                                {formData.id && (
                                     <div className="md:col-span-2 border-t border-[#D4AF37]/25 pt-4 space-y-2">
                                         <Label className="text-xs text-[#D4AF37] font-semibold flex items-center gap-1.5">
                                             <FileText className="h-4 w-4" /> Bukti Pembayaran

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import React from 'react'
+import fs from 'fs'
+import path from 'path'
 import { LaporanLpjPDF } from '@/components/pdf/LaporanLpjPDF'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
@@ -24,7 +26,17 @@ export async function GET(req: NextRequest) {
             .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
         const totalDana = totalDanaDonatur + totalDanaSponsor
 
-        const logoUrl = `https://pklu.amanloka.com/logo_hut16_pklu.png`
+        const getBase64Logo = () => {
+            try {
+                const fullPath = path.join(process.cwd(), 'public', 'logo_hut16_pklu.png')
+                const imageBuffer = fs.readFileSync(fullPath)
+                return `data:image/png;base64,${imageBuffer.toString('base64')}`
+            } catch (e) {
+                return `https://pklu.amanloka.com/logo_hut16_pklu.png`
+            }
+        }
+
+        const logoUrl = getBase64Logo()
 
         const buffer = await renderToBuffer(
             React.createElement(LaporanLpjPDF, {

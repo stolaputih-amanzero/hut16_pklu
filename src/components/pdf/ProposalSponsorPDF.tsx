@@ -1040,7 +1040,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     {/* Verification QR Code in the middle */}
                     <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -8 }}>
                         <Image 
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${origin}/verify/${data.id}`)}`} 
+                            src={`https://quickchart.io/qr?size=100&text=${encodeURIComponent(`${origin}/verify/${data.id}`)}`} 
                             style={{ width: 40, height: 40, marginBottom: 2 }} 
                         />
                         <Text style={{ fontSize: 5.5, color: '#D4AF37', textAlign: 'center', fontWeight: 'bold' }}>

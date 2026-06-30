@@ -10,9 +10,10 @@ const styles = StyleSheet.create({
     },
     backgroundLogo: {
         position: 'absolute',
-        top: '25%',
-        left: '35%',
-        width: '30%',
+        top: 148,
+        left: 296,
+        width: 250,
+        height: 250,
         opacity: 0.03, // Very subtle watermark
     },
     outerBorder: {

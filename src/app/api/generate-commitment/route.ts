@@ -1,6 +1,8 @@
-import React from 'react'
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
+import React from 'react'
+import fs from 'fs'
+import path from 'path'
 import { CommitmentPDF } from '@/components/pdf/CommitmentPDF'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
@@ -22,8 +24,18 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Render PDF
-        const logoUrl = `https://pklu.amanloka.com/logo_hut16_pklu.png`
-        const gpibLogoUrl = `https://pklu.amanloka.com/logo_gpib.png`
+        const getBase64Image = (filename: string) => {
+            try {
+                const fullPath = path.join(process.cwd(), 'public', filename)
+                const imageBuffer = fs.readFileSync(fullPath)
+                return `data:image/png;base64,${imageBuffer.toString('base64')}`
+            } catch (e) {
+                return `https://pklu.amanloka.com/${filename}`
+            }
+        }
+
+        const logoUrl = getBase64Image('logo_hut16_pklu.png')
+        const gpibLogoUrl = getBase64Image('logo_gpib.png')
 
         const buffer = await renderToBuffer(React.createElement(CommitmentPDF, { data: proposal, lang, logoUrl, gpibLogoUrl, origin: req.nextUrl.origin }) as any)
 

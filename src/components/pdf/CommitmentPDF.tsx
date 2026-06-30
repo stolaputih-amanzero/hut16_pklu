@@ -7,23 +7,24 @@ const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/'
 
 const styles = StyleSheet.create({
     page: {
-        padding: 25,
+        padding: 20,
         backgroundColor: '#FFFFFF',
         fontFamily: 'Times-Roman',
         color: '#1a1a1a',
     },
     backgroundLogo: {
         position: 'absolute',
-        top: '30%',
-        left: '25%',
-        width: '50%',
+        top: 250,
+        left: 148,
+        width: 300,
+        height: 300,
         opacity: 0.04,
         zIndex: -1,
     },
     container: {
         flex: 1,
         border: '1pt solid #D4AF37',
-        padding: 25,
+        padding: 15,
         position: 'relative',
     },
     header: {
@@ -31,21 +32,21 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     logo: {
-        width: 55,
-        height: 55,
-        marginBottom: 12,
+        width: 45,
+        height: 45,
+        marginBottom: 8,
     },
     headerTitle: {
         fontFamily: 'Helvetica-Bold',
-        fontSize: 10.5,
+        fontSize: 10,
         color: '#022c22',
         letterSpacing: 1.5,
-        marginBottom: 4,
+        marginBottom: 2,
         textAlign: 'center',
     },
     headerSubtitle: {
         fontFamily: 'Helvetica',
-        fontSize: 7.5,
+        fontSize: 7,
         color: '#718096',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -54,15 +55,16 @@ const styles = StyleSheet.create({
     divider: {
         borderBottom: '1pt solid #D4AF37',
         marginHorizontal: 30,
-        marginBottom: 15,
+        marginBottom: 8,
     },
     titleSection: {
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 8,
     },
     docTitle: {
-        fontFamily: 'Times-Bold',
-        fontSize: 14,
+        fontFamily: 'Times-Roman',
+        fontWeight: 'bold',
+        fontSize: 12.5,
         color: '#022c22',
         textAlign: 'center',
         letterSpacing: 1,
@@ -82,72 +84,74 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     salutation: {
-        fontSize: 11,
-        marginBottom: 10,
+        fontSize: 10,
+        marginBottom: 6,
         lineHeight: 1.5,
     },
     bodyParagraph: {
-        fontSize: 10.5,
+        fontSize: 9.5,
         lineHeight: 1.5,
         color: '#374151',
-        marginBottom: 12,
+        marginBottom: 8,
         textAlign: 'justify',
     },
     detailContainer: {
-        marginVertical: 8,
+        marginVertical: 4,
         paddingHorizontal: 20,
-        paddingVertical: 12,
+        paddingVertical: 8,
         backgroundColor: '#FAFAFA',
         borderRadius: 4,
         border: '0.5pt solid #E5E7EB',
     },
     detailRow: {
         flexDirection: 'row',
-        paddingVertical: 4,
+        paddingVertical: 2,
         borderBottom: '0.5pt solid #F3F4F6',
     },
     detailLabel: {
         width: '35%',
         fontFamily: 'Helvetica-Bold',
-        fontSize: 7.5,
+        fontSize: 7,
         color: '#6B7280',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     detailValue: {
         width: '65%',
-        fontFamily: 'Times-Bold',
-        fontSize: 10.5,
+        fontFamily: 'Times-Roman',
+        fontWeight: 'bold',
+        fontSize: 9.5,
         color: '#111827',
     },
     detailValueHighlight: {
-        fontFamily: 'Times-Bold',
-        fontSize: 11.5,
+        fontFamily: 'Times-Roman',
+        fontWeight: 'bold',
+        fontSize: 10.5,
         color: '#022c22',
     },
     bankCard: {
         backgroundColor: '#F8FBF9',
         borderLeft: '3pt solid #022c22',
-        padding: 12,
-        marginTop: 8,
-        marginBottom: 12,
+        padding: 8,
+        marginTop: 4,
+        marginBottom: 8,
     },
     bankTitle: {
         fontFamily: 'Helvetica-Bold',
-        fontSize: 8.5,
+        fontSize: 8,
         color: '#022c22',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        marginBottom: 6,
+        marginBottom: 4,
     },
     bankText: {
-        fontSize: 9.5,
+        fontSize: 8.5,
         color: '#374151',
         lineHeight: 1.5,
     },
     footerContainer: {
         marginTop: 'auto',
-        paddingTop: 20,
+        paddingTop: 10,
     },
     signatureRow: {
         flexDirection: 'row',
@@ -163,7 +167,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Helvetica-Bold',
         fontSize: 8.5,
         color: '#374151',
-        marginBottom: 25,
+        marginBottom: 20,
         textAlign: 'center',
     },
     signatureLine: {
@@ -172,8 +176,9 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     signatureName: {
-        fontFamily: 'Times-Bold',
-        fontSize: 11,
+        fontFamily: 'Times-Roman',
+        fontWeight: 'bold',
+        fontSize: 10,
         color: '#111827',
     },
     signatureRole: {
@@ -204,7 +209,7 @@ const styles = StyleSheet.create({
         fontSize: 7.5,
         color: '#D4AF37',
         textAlign: 'center',
-        marginTop: 20,
+        marginTop: 10,
         letterSpacing: 2,
         textTransform: 'uppercase',
     }
@@ -282,7 +287,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
     const committeeRole = data.committees?.role || (isId ? 'Ketua Panitia' : 'Committee Chairperson')
 
     const verifyUrl = `${origin}/verify/${data.id}`
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(verifyUrl)}`
+    const qrImageUrl = `https://quickchart.io/qr?size=120&text=${encodeURIComponent(verifyUrl)}`
 
     return (
         <Document>

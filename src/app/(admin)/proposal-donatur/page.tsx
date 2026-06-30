@@ -13,7 +13,8 @@ import {
     Users,
     CheckCircle,
     Send,
-    Loader2
+    Loader2,
+    FileText
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { WhatsAppButton } from '@/components/whatsapp/WhatsAppButton'
@@ -27,7 +28,9 @@ export default function ProposalDonaturPage() {
     const [formData, setFormData] = useState({
         name: '',
         display_name: '',
+        company_name: '',
         phone: '',
+        email: '',
         congregation: '',
         contribution_value: '',
         specific_support: '',
@@ -35,7 +38,8 @@ export default function ProposalDonaturPage() {
         language: 'id',
         donatur_category: '',
         payment_status: 'pending',
-        committee_id: ''
+        committee_id: '',
+        payment_proof_url: ''
     })
 
     const [loading, setLoading] = useState(false)
@@ -51,6 +55,9 @@ export default function ProposalDonaturPage() {
     const [committees, setCommittees] = useState<any[]>([])
     const [pendingProposals, setPendingProposals] = useState<any[]>([])
     const [selectedVerificationId, setSelectedVerificationId] = useState('')
+    const [isEditingCommitment, setIsEditingCommitment] = useState(false)
+    const [savingCommitment, setSavingCommitment] = useState(false)
+    const [uploadingProof, setUploadingProof] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -84,12 +91,25 @@ export default function ProposalDonaturPage() {
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/\D/g, '')
-        setFormData({ ...formData, [e.target.name]: rawValue })
+        let category = ''
+        const val = Number(rawValue)
+        if (val) {
+            if (val >= 10000000) category = 'sahabat_kasih'
+            else if (val >= 5000000) category = 'sahabat_berkat'
+            else if (val >= 2500000) category = 'sahabat_pelayanan'
+            else if (val >= 1000000) category = 'sahabat_teladan'
+            else category = 'sahabat_bakti'
+        }
+        setFormData(prev => ({ 
+            ...prev, 
+            [e.target.name]: rawValue,
+            donatur_category: category || prev.donatur_category
+        }))
     }
 
     const handleGenerateProposal = async () => {
-        if (!formData.name || !formData.phone || !formData.contribution_value || !formData.committee_id) {
-            toast.error('Silakan lengkapi data yang diperlukan, termasuk Panitia Penanggung Jawab')
+        if (!formData.name || !formData.phone || !formData.committee_id) {
+            toast.error('Silakan lengkapi data wajib (Nama, WhatsApp, dan Panitia Penanggung Jawab)')
             return
         }
 
@@ -108,12 +128,14 @@ export default function ProposalDonaturPage() {
                     number: number,
                     name: formData.name,
                     display_name: formData.display_name || formData.name,
+                    company_name: formData.company_name || null,
                     phone: formData.phone,
+                    email: formData.email || null,
                     congregation: formData.congregation,
-                    contribution_value: Number(formData.contribution_value),
-                    specific_support: formData.specific_support,
-                    message: formData.message,
-                    donatur_category: formData.donatur_category,
+                    contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
+                    specific_support: formData.specific_support || null,
+                    message: formData.message || null,
+                    donatur_category: formData.donatur_category || null,
                     lang: formData.language,
                     payment_status: 'pending',
                     committee_id: formData.committee_id
@@ -129,6 +151,15 @@ export default function ProposalDonaturPage() {
             // 3. Generate PDF proposal
             const pdfUrl = await generateProposalPDF(proposal.id)
             setProposalPdfUrl(pdfUrl)
+
+            // Refresh pending list
+            const { data: pends } = await supabase
+                .from('proposals')
+                .select('*')
+                .eq('type', 'donatur')
+                .eq('payment_status', 'pending')
+                .order('number', { ascending: false })
+            if (pends) setPendingProposals(pends)
         } catch (error: any) {
             toast.error('Gagal membuat proposal: ' + error.message)
         } finally {
@@ -241,6 +272,7 @@ export default function ProposalDonaturPage() {
 
     const handleVerificationSelect = (id: string) => {
         setSelectedVerificationId(id)
+        setIsEditingCommitment(false)
         const selected = pendingProposals.find(p => p.id === id)
         if (selected) {
             setProposalId(selected.id)
@@ -249,7 +281,180 @@ export default function ProposalDonaturPage() {
             setProposalPdfUrl(selected.proposal_pdf_url || '')
             setIsConfirmed(selected.payment_status === 'confirmed')
             // Set language to proposal's language
-            setFormData(prev => ({ ...prev, language: selected.lang || 'id', name: selected.name, display_name: selected.display_name || selected.name, phone: selected.phone, congregation: selected.congregation || '', contribution_value: selected.contribution_value?.toString() || '', donatur_category: selected.donatur_category || '', message: selected.message || '' }))
+            setFormData(prev => ({ 
+                ...prev, 
+                language: selected.lang || 'id', 
+                name: selected.name, 
+                display_name: selected.display_name || selected.name, 
+                company_name: selected.company_name || '',
+                phone: selected.phone, 
+                email: selected.email || '',
+                congregation: selected.congregation || '', 
+                contribution_value: selected.contribution_value?.toString() || '', 
+                donatur_category: selected.donatur_category || '', 
+                message: selected.message || '',
+                specific_support: selected.specific_support || '',
+                committee_id: selected.committee_id || '',
+                payment_proof_url: selected.payment_proof_url || ''
+            }))
+        }
+    }
+
+    const handleSaveCommitment = async () => {
+        if (!proposalId) return
+        const val = Number(formData.contribution_value)
+        if (!val || val <= 0) {
+            toast.error('Nilai komitmen harus diisi lebih dari 0')
+            return
+        }
+
+        try {
+            setSavingCommitment(true)
+
+            let category = formData.donatur_category
+            if (!category) {
+                if (val >= 10000000) category = 'sahabat_kasih'
+                else if (val >= 5000000) category = 'sahabat_berkat'
+                else if (val >= 2500000) category = 'sahabat_pelayanan'
+                else if (val >= 1000000) category = 'sahabat_teladan'
+                else category = 'sahabat_bakti'
+            }
+
+            const { error } = await supabase
+                .from('proposals')
+                .update({
+                    contribution_value: val,
+                    donatur_category: category,
+                    display_name: formData.display_name || formData.name,
+                    specific_support: formData.specific_support || null,
+                    message: formData.message || null
+                })
+                .eq('id', proposalId)
+
+            if (error) throw error
+
+            // Regenerate PDF
+            const newPdfUrl = await generateProposalPDF(proposalId)
+            setProposalPdfUrl(newPdfUrl)
+
+            // Refresh pending list
+            const { data: pends } = await supabase
+                .from('proposals')
+                .select('*')
+                .eq('type', 'donatur')
+                .eq('payment_status', 'pending')
+                .order('number', { ascending: false })
+            if (pends) {
+                setPendingProposals(pends)
+                const updated = pends.find(p => p.id === proposalId)
+                if (updated) {
+                    setFormData(prev => ({
+                        ...prev,
+                        contribution_value: updated.contribution_value?.toString() || '',
+                        donatur_category: updated.donatur_category || '',
+                        display_name: updated.display_name || updated.name,
+                        company_name: updated.company_name || '',
+                        specific_support: updated.specific_support || '',
+                        message: updated.message || '',
+                        payment_proof_url: updated.payment_proof_url || ''
+                    }))
+                }
+            }
+
+            toast.success('Komitmen donatur berhasil dicatat & PDF diperbarui!')
+            setIsEditingCommitment(false)
+        } catch (err: any) {
+            toast.error('Gagal menyimpan komitmen: ' + err.message)
+        } finally {
+            setSavingCommitment(false)
+        }
+    }
+
+    const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file || !proposalId) return
+
+        try {
+            setUploadingProof(true)
+
+            const fileExt = file.name.split('.').pop()
+            const filePath = `proofs/${proposalId}_proof.${fileExt}`
+            
+            const { data, error: uploadError } = await supabase.storage
+                .from('proposals')
+                .upload(filePath, file, {
+                    upsert: true
+                })
+
+            if (uploadError) throw uploadError
+
+            const { data: urlData } = supabase.storage
+                .from('proposals')
+                .getPublicUrl(filePath)
+
+            const publicUrl = urlData.publicUrl
+
+            const { error: updateError } = await supabase
+                .from('proposals')
+                .update({
+                    payment_proof_url: publicUrl
+                })
+                .eq('id', proposalId)
+
+            if (updateError) throw updateError
+
+            setFormData(prev => ({ ...prev, payment_proof_url: publicUrl }))
+            
+            // Refresh pendingProposals list
+            const { data: pends } = await supabase
+                .from('proposals')
+                .select('*')
+                .eq('type', 'donatur')
+                .eq('payment_status', 'pending')
+                .order('number', { ascending: false })
+            if (pends) setPendingProposals(pends)
+
+            toast.success('Bukti pembayaran berhasil diunggah!')
+        } catch (err: any) {
+            console.error(err)
+            toast.error('Gagal mengunggah bukti pembayaran: ' + err.message)
+        } finally {
+            setUploadingProof(false)
+        }
+    }
+
+    const handleRemoveProof = async () => {
+        if (!proposalId) return
+
+        try {
+            setUploadingProof(true)
+
+            const { error: updateError } = await supabase
+                .from('proposals')
+                .update({
+                    payment_proof_url: null
+                })
+                .eq('id', proposalId)
+
+            if (updateError) throw updateError
+
+            setFormData(prev => ({ ...prev, payment_proof_url: '' }))
+            
+            // Refresh pendingProposals list
+            const { data: pends } = await supabase
+                .from('proposals')
+                .select('*')
+                .eq('type', 'donatur')
+                .eq('payment_status', 'pending')
+                .order('number', { ascending: false })
+            if (pends) setPendingProposals(pends)
+
+            toast.success('Bukti pembayaran berhasil dihapus!')
+        } catch (err: any) {
+            console.error(err)
+            toast.error('Gagal menghapus bukti pembayaran: ' + err.message)
+        } finally {
+            setUploadingProof(false)
         }
     }
 
@@ -362,106 +567,366 @@ export default function ProposalDonaturPage() {
                             />
                         </div>
 
-                        {selectedVerificationId && (
-                            <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="p-6 bg-black/20 rounded-xl border border-[#D4AF37]/20 space-y-4"
-                            >
-                                <h3 className="font-semibold text-[#D4AF37] border-b border-[#D4AF37]/20 pb-2">Rincian Proposal Terpilih</h3>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <p className="text-white/40 text-xs">Nomor Proposal</p>
-                                        <p className="text-[#FDFBF7] font-medium">{proposalNumber}</p>
+                        {selectedVerificationId && (() => {
+                            const selectedProposal = pendingProposals.find(p => p.id === selectedVerificationId)
+                            const hasCommitment = selectedProposal && selectedProposal.contribution_value && Number(selectedProposal.contribution_value) > 0
+                            
+                            return (
+                                <motion.div 
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    className="p-6 bg-black/20 rounded-xl border border-[#D4AF37]/20 space-y-6"
+                                >
+                                    <div className="flex justify-between items-center border-b border-[#D4AF37]/20 pb-2">
+                                        <h3 className="font-semibold text-[#D4AF37]">
+                                            {!hasCommitment || isEditingCommitment ? 'Catat Komitmen Donatur' : 'Rincian Proposal Terpilih'}
+                                        </h3>
+                                        {hasCommitment && !isEditingCommitment && !isConfirmed && (
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => setIsEditingCommitment(true)}
+                                                className="h-7 px-3 text-xs border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/20 rounded-full"
+                                            >
+                                                Edit Komitmen
+                                            </Button>
+                                        )}
                                     </div>
-                                    <div>
-                                        <p className="text-white/40 text-xs">Nama Donatur</p>
-                                        <p className="text-[#FDFBF7] font-medium">{formData.name}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-white/40 text-xs">Nomor WhatsApp</p>
-                                        <p className="text-[#FDFBF7] font-medium">{formData.phone}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-white/40 text-xs">Nilai Dukungan</p>
-                                        <p className="text-[#D4AF37] font-bold">Rp {Number(formData.contribution_value)?.toLocaleString('id-ID')}</p>
-                                    </div>
-                                </div>
 
-                                {!isConfirmed ? (
-                                    <div className="flex flex-col gap-4 mt-4">
-                                        <Button
-                                            type="button"
-                                            onClick={confirmPayment}
-                                            disabled={loading}
-                                            className="emerald-button w-full"
-                                        >
-                                            {loading ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Memproses Verifikasi...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <CheckCircle className="mr-2 h-4 w-4 text-[#022c22]" />
-                                                    Konfirmasi Pembayaran Lunas
-                                                </>
-                                            )}
-                                        </Button>
-                                        {proposalPdfUrl && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={() => window.open(proposalPdfUrl, '_blank')}
-                                                className="w-full rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
-                                            >
-                                                <DollarSign className="mr-2 h-4 w-4" />
-                                                Lihat PDF Proposal
-                                            </Button>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="pt-4 border-t border-[#D4AF37]/20 space-y-4">
-                                        <div className="p-3 bg-[#047857]/30 rounded-lg text-sm text-[#FDFBF7]/90 border border-[#D4AF37]/20">
-                                            Status: Pembayaran Lunas & Terkonfirmasi
-                                        </div>
-                                        {proposalPdfUrl && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={() => window.open(proposalPdfUrl, '_blank')}
-                                                className="w-full rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors mb-2"
-                                            >
-                                                <DollarSign className="mr-2 h-4 w-4" />
-                                                Lihat PDF Proposal
-                                            </Button>
-                                        )}
-                                        <div className="flex gap-4">
-                                            {tokenUrl && (
-                                                <>
-                                                    <Button
-                                                        type="button"
-                                                        onClick={sendTokenViaWA}
-                                                        disabled={isSending}
-                                                        className="bg-[#25D366] hover:bg-[#128C7E] text-white flex-1 rounded-full font-semibold transition-all shadow-[0_4px_14px_0_rgba(37,211,102,0.39)]"
+                                    {!hasCommitment || isEditingCommitment ? (
+                                        // Form Pencatatan Komitmen
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="edit_contribution_value" className="text-[#FDFBF7]/85 text-xs">Nilai Dukungan (Rp)</Label>
+                                                    <Input
+                                                        id="edit_contribution_value"
+                                                        name="contribution_value"
+                                                        type="text"
+                                                        value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
+                                                        onChange={handleCurrencyChange}
+                                                        placeholder="Contoh: 500.000"
+                                                        className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="edit_display_name" className="text-[#FDFBF7]/85 text-xs">Nama yang Dicantumkan</Label>
+                                                    <Input
+                                                        id="edit_display_name"
+                                                        name="display_name"
+                                                        value={formData.display_name}
+                                                        onChange={handleInputChange}
+                                                        placeholder="Kosongkan jika sama dengan nama donatur"
+                                                        className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Kategori Donatur */}
+                                            <div className="space-y-2">
+                                                <Label className="text-[#FDFBF7]/85 text-xs">Kategori Donatur</Label>
+                                                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                                    {['sahabat_bakti', 'sahabat_teladan', 'sahabat_pelayanan', 'sahabat_berkat', 'sahabat_kasih'].map((cat) => {
+                                                        const labels: Record<string, string> = {
+                                                            sahabat_bakti: 'Sahabat Bakti',
+                                                            sahabat_teladan: 'Sahabat Teladan',
+                                                            sahabat_pelayanan: 'Sahabat Pelayan',
+                                                            sahabat_berkat: 'Sahabat Berkat',
+                                                            sahabat_kasih: 'Sahabat Kasih'
+                                                        }
+                                                        const sublabels: Record<string, string> = {
+                                                            sahabat_bakti: 'Rp500Rb+',
+                                                            sahabat_teladan: 'Rp1Jt+',
+                                                            sahabat_pelayanan: 'Rp2.5Jt+',
+                                                            sahabat_berkat: 'Rp5Jt+',
+                                                            sahabat_kasih: 'Rp10Jt+'
+                                                        }
+                                                        const active = formData.donatur_category === cat
+                                                        return (
+                                                            <Button
+                                                                key={cat}
+                                                                type="button"
+                                                                variant={active ? 'default' : 'outline'}
+                                                                className={`h-auto py-2 px-1 flex flex-col items-center text-center justify-center border-[#D4AF37]/30 ${active ? 'bg-[#D4AF37] text-[#022c22] hover:bg-[#D4AF37]/90' : 'bg-transparent text-[#FDFBF7] hover:bg-[#D4AF37]/20 hover:text-[#D4AF37]'}`}
+                                                                onClick={() => handleCategoryChange(cat)}
+                                                            >
+                                                                <span className="font-semibold text-[10px] mb-0.5">{labels[cat]}</span>
+                                                                <span className="text-[8px] opacity-80">{sublabels[cat]}</span>
+                                                            </Button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="edit_specific_support" className="text-[#FDFBF7]/85 text-xs">Dukungan Spesifik</Label>
+                                                    <Select
+                                                        value={formData.specific_support}
+                                                        onValueChange={(value) => setFormData({ ...formData, specific_support: value })}
                                                     >
-                                                        <Send className="mr-2 h-4 w-4" /> Kirim Token via WA
-                                                    </Button>
+                                                        <SelectTrigger id="edit_specific_support" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
+                                                            <SelectValue placeholder="Pilih dukungan spesifik" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                            <SelectItem value="konsumsi_lansia">Konsumsi Lansia</SelectItem>
+                                                            <SelectItem value="hadiah_lomba">Hadiah Lomba</SelectItem>
+                                                            <SelectItem value="souvenir_peserta">Souvenir Peserta</SelectItem>
+                                                            <SelectItem value="dokumentasi">Dokumentasi</SelectItem>
+                                                            <SelectItem value="webinar">Webinar</SelectItem>
+                                                            <SelectItem value="peserta_lansia">Dukung Peserta Lansia</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="edit_language" className="text-[#FDFBF7]/85 text-xs">Bahasa PDF</Label>
+                                                    <Select
+                                                        value={formData.language}
+                                                        onValueChange={(value) => setFormData({ ...formData, language: value })}
+                                                    >
+                                                        <SelectTrigger id="edit_language" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                            <SelectItem value="id">Bahasa Indonesia</SelectItem>
+                                                            <SelectItem value="en">English</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="edit_message" className="text-[#FDFBF7]/85 text-xs">Ucapan Singkat (25-40 kata)</Label>
+                                                <Textarea
+                                                    id="edit_message"
+                                                    name="message"
+                                                    value={formData.message}
+                                                    onChange={handleInputChange}
+                                                    placeholder="Tulis ucapan singkat untuk buku acara..."
+                                                    rows={3}
+                                                    className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]"
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-4 pt-2">
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleSaveCommitment}
+                                                    disabled={savingCommitment}
+                                                    className="emerald-button flex-1"
+                                                >
+                                                    {savingCommitment ? (
+                                                        <>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Menyimpan...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <CheckCircle className="mr-2 h-4 w-4 text-[#022c22]" />
+                                                            Simpan Komitmen & Buat Ulang PDF
+                                                        </>
+                                                    )}
+                                                </Button>
+                                                {hasCommitment && (
                                                     <Button
                                                         type="button"
                                                         variant="outline"
-                                                        onClick={() => window.open(tokenUrl, '_blank')}
-                                                        className="flex-1 rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
+                                                        onClick={() => setIsEditingCommitment(false)}
+                                                        className="rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22]"
                                                     >
-                                                        Lihat Token
+                                                        Batal
                                                     </Button>
-                                                </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // View Rincian Komitmen
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <p className="text-white/40 text-xs">Nomor Proposal</p>
+                                                    <p className="text-[#FDFBF7] font-medium">{proposalNumber}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-white/40 text-xs">Nama Donatur</p>
+                                                    <p className="text-[#FDFBF7] font-medium">{formData.name}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-white/40 text-xs">Nomor WhatsApp</p>
+                                                    <p className="text-[#FDFBF7] font-medium">{formData.phone}</p>
+                                                </div>
+                                                {formData.email && (
+                                                    <div>
+                                                        <p className="text-white/40 text-xs">Email Donatur</p>
+                                                        <p className="text-[#FDFBF7] font-medium">{formData.email}</p>
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <p className="text-white/40 text-xs">Asal Jemaat / Wilayah</p>
+                                                    <p className="text-[#FDFBF7] font-medium">{formData.congregation || '-'}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-white/40 text-xs">Nilai Dukungan</p>
+                                                    <p className="text-[#D4AF37] font-bold">
+                                                        Rp {Number(formData.contribution_value)?.toLocaleString('id-ID')} 
+                                                        <span className="text-white/60 text-xs font-normal ml-2">
+                                                            ({formData.donatur_category ? formData.donatur_category.replace('_', ' ').toUpperCase() : '-'})
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                                {formData.specific_support && (
+                                                    <div>
+                                                        <p className="text-white/40 text-xs">Dukungan Spesifik</p>
+                                                        <p className="text-[#FDFBF7] font-medium">{formData.specific_support.replace('_', ' ')}</p>
+                                                    </div>
+                                                )}
+                                                {formData.message && (
+                                                    <div className="col-span-2">
+                                                        <p className="text-white/40 text-xs">Ucapan Singkat</p>
+                                                        <p className="text-[#FDFBF7] italic">"{formData.message}"</p>
+                                                    </div>
+                                                )}
+                                                <div className="col-span-2 border-t border-[#D4AF37]/20 pt-4 space-y-2">
+                                                    <p className="text-[#D4AF37] font-semibold text-xs flex items-center gap-1.5">
+                                                        <FileText className="h-4 w-4" /> Bukti Pembayaran
+                                                    </p>
+                                                    {formData.payment_proof_url ? (
+                                                        <div className="p-3 bg-black/40 rounded-lg border border-[#D4AF37]/20 space-y-3">
+                                                            {formData.payment_proof_url.match(/\.(jpeg|jpg|gif|png|webp)/i) ? (
+                                                                <div className="relative group rounded-lg overflow-hidden border border-emerald-500/10 max-h-48 bg-black/60 flex justify-center items-center p-2">
+                                                                    <img 
+                                                                        src={formData.payment_proof_url} 
+                                                                        alt="Bukti Pembayaran" 
+                                                                        className="max-h-44 object-contain hover:scale-102 transition-transform duration-200"
+                                                                    />
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex items-center gap-2.5 p-3 bg-[#022c22]/40 rounded-lg border border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                                    <FileText className="h-5 w-5 text-[#D4AF37] shrink-0" />
+                                                                    <div className="text-xs truncate flex-1 font-medium">Dokumen Bukti Pembayaran</div>
+                                                                </div>
+                                                            )}
+                                                            <div className="flex gap-2.5 pt-1">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => window.open(formData.payment_proof_url, '_blank')}
+                                                                    className="flex-1 text-xs border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/15 h-8 rounded-full font-medium"
+                                                                >
+                                                                    Buka / Unduh
+                                                                </Button>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={handleRemoveProof}
+                                                                    disabled={uploadingProof}
+                                                                    className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 rounded-full"
+                                                                >
+                                                                    {uploadingProof ? 'Menghapus...' : 'Hapus Bukti'}
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="p-4 bg-black/30 border border-dashed border-[#D4AF37]/30 rounded-lg text-center flex flex-col items-center justify-center space-y-2">
+                                                            <span className="text-xs text-white/50">Belum ada bukti pembayaran yang diunggah</span>
+                                                            <Label 
+                                                                htmlFor="upload_proof" 
+                                                                className="cursor-pointer bg-[#D4AF37]/20 border border-[#D4AF37]/40 hover:bg-[#D4AF37]/30 text-[#D4AF37] px-3.5 py-1.5 text-xs rounded-full font-semibold transition-all inline-block hover:shadow-[0_0_8px_rgba(212,175,55,0.25)]"
+                                                            >
+                                                                {uploadingProof ? 'Mengunggah...' : 'Unggah Bukti (Gambar / PDF)'}
+                                                            </Label>
+                                                            <Input
+                                                                id="upload_proof"
+                                                                type="file"
+                                                                accept="image/*,application/pdf"
+                                                                className="hidden"
+                                                                disabled={uploadingProof}
+                                                                onChange={handleUploadProof}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {!isConfirmed ? (
+                                                <div className="flex flex-col gap-4 mt-4">
+                                                    <Button
+                                                        type="button"
+                                                        onClick={confirmPayment}
+                                                        disabled={loading}
+                                                        className="emerald-button w-full"
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                Memproses Verifikasi...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <CheckCircle className="mr-2 h-4 w-4 text-[#022c22]" />
+                                                                Konfirmasi Pembayaran Lunas
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                    {proposalPdfUrl && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={() => window.open(proposalPdfUrl, '_blank')}
+                                                            className="w-full rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
+                                                        >
+                                                            <DollarSign className="mr-2 h-4 w-4" />
+                                                            Lihat PDF Proposal (Ter-update)
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="pt-4 border-t border-[#D4AF37]/20 space-y-4">
+                                                    <div className="p-3 bg-[#047857]/30 rounded-lg text-sm text-[#FDFBF7]/90 border border-[#D4AF37]/20">
+                                                        Status: Pembayaran Lunas & Terkonfirmasi
+                                                    </div>
+                                                    {proposalPdfUrl && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={() => window.open(proposalPdfUrl, '_blank')}
+                                                            className="w-full rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors mb-2"
+                                                        >
+                                                            <DollarSign className="mr-2 h-4 w-4" />
+                                                            Lihat PDF Proposal (Ter-update)
+                                                        </Button>
+                                                    )}
+                                                    <div className="flex gap-4">
+                                                        {tokenUrl && (
+                                                            <>
+                                                                <Button
+                                                                    type="button"
+                                                                    onClick={sendTokenViaWA}
+                                                                    disabled={isSending}
+                                                                    className="bg-[#25D366] hover:bg-[#128C7E] text-white flex-1 rounded-full font-semibold transition-all shadow-[0_4px_14px_0_rgba(37,211,102,0.39)]"
+                                                                >
+                                                                    <Send className="mr-2 h-4 w-4" /> Kirim Token via WA
+                                                                </Button>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    onClick={() => window.open(tokenUrl, '_blank')}
+                                                                    className="flex-1 rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
+                                                                >
+                                                                    Lihat Token
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
-                                    </div>
-                                )}
-                            </motion.div>
-                        )}
+                                    )}
+                                </motion.div>
+                            )
+                        })()}
                     </CardContent>
                 </Card>
             </motion.div>
@@ -501,6 +966,14 @@ export default function ProposalDonaturPage() {
                                         placeholder="Cari dan pilih nama panitia..."
                                         searchPlaceholder="Cari nama atau jabatan..."
                                     />
+                                    {formData.committee_id && (() => {
+                                        const selected = committees.find(c => c.id === formData.committee_id)
+                                        return selected ? (
+                                            <p className="text-xs text-[#D4AF37] mt-3">
+                                                WhatsApp Panitia: <span className="text-[#FDFBF7] font-mono">{selected.phone || '-'}</span>
+                                            </p>
+                                        ) : null
+                                    })()}
                                 </div>
                             </motion.div>
 
@@ -527,19 +1000,30 @@ export default function ProposalDonaturPage() {
                                             name="display_name"
                                             value={formData.display_name}
                                             onChange={handleInputChange}
-                                            placeholder="Kosongkan jika sama dengan atas"
+                                            placeholder="Kosongkan jika sama dengan nama lengkap"
+                                            className="form-input"
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="company_name" className="text-[#FDFBF7]/80">Perusahaan / Komunitas / Keluarga (Opsional)</Label>
+                                        <Input
+                                            id="company_name"
+                                            name="company_name"
+                                            value={formData.company_name}
+                                            onChange={handleInputChange}
+                                            placeholder="Contoh: Keluarga Rondonuwu, PT Aman Berkat"
                                             className="form-input"
                                         />
                                     </div>
                                 </div>
                             </motion.div>
 
-                            {/* Kontak */}
+                            {/* Kontak & Asal */}
                             <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
-                                <Label className="form-section-title">Kontak</Label>
+                                <Label className="form-section-title">Kontak & Asal Jemaat</Label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="phone" className="text-[#FDFBF7]/80">Nomor WhatsApp</Label>
+                                        <Label htmlFor="phone" className="text-[#FDFBF7]/80">Nomor WhatsApp Donatur</Label>
                                         <Input
                                             id="phone"
                                             name="phone"
@@ -551,123 +1035,28 @@ export default function ProposalDonaturPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="congregation" className="text-[#FDFBF7]/80">Jemaat</Label>
+                                        <Label htmlFor="email" className="text-[#FDFBF7]/80">Email Donatur (Opsional)</Label>
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            placeholder="Contoh: donatur@email.com"
+                                            className="form-input"
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="congregation" className="text-[#FDFBF7]/80">Asal Jemaat / Wilayah</Label>
                                         <Input
                                             id="congregation"
                                             name="congregation"
                                             value={formData.congregation}
                                             onChange={handleInputChange}
-                                            placeholder="Jemaat GPIB (Opsional)"
+                                            placeholder="Jemaat GPIB / Wilayah (Opsional)"
                                             className="form-input"
                                         />
                                     </div>
                                 </div>
-                            </motion.div>
-
-                            {/* Dukungan */}
-                            <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
-                                <Label className="form-section-title">Dukungan</Label>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="contribution_value" className="text-[#FDFBF7]/80">Nilai Dukungan (Rp)</Label>
-                                        <Input
-                                            id="contribution_value"
-                                            name="contribution_value"
-                                            type="text"
-                                            value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
-                                            onChange={handleCurrencyChange}
-                                            placeholder="500.000"
-                                            className="form-input"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="specific_support" className="text-[#FDFBF7]/80">Pilihan Dukungan Spesifik (Opsional)</Label>
-                                        <Select
-                                            value={formData.specific_support}
-                                            onValueChange={(value) => setFormData({ ...formData, specific_support: value })}
-                                        >
-                                            <SelectTrigger id="specific_support" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
-                                                <SelectValue placeholder="Pilih dukungan spesifik" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                <SelectItem value="konsumsi_lansia" className="focus:bg-[#D4AF37]/20 focus:text-[#FDFBF7]">Konsumsi Lansia</SelectItem>
-                                                <SelectItem value="hadiah_lomba" className="focus:bg-[#D4AF37]/20 focus:text-[#FDFBF7]">Hadiah Lomba</SelectItem>
-                                                <SelectItem value="souvenir_peserta" className="focus:bg-[#D4AF37]/20 focus:text-[#FDFBF7]">Souvenir Peserta</SelectItem>
-                                                <SelectItem value="dokumentasi" className="focus:bg-[#D4AF37]/20 focus:text-[#FDFBF7]">Dokumentasi</SelectItem>
-                                                <SelectItem value="webinar" className="focus:bg-[#D4AF37]/20 focus:text-[#FDFBF7]">Webinar</SelectItem>
-                                                <SelectItem value="peserta_lansia" className="focus:bg-[#D4AF37]/20 focus:text-[#FDFBF7]">Dukung Peserta Lansia</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            </motion.div>
-
-                            {/* Kategori Donatur */}
-                            <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
-                                <Label className="form-section-title">Kategori Donatur</Label>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mt-4">
-                                    <Button
-                                        type="button"
-                                        variant={formData.donatur_category === 'sahabat_bakti' ? 'default' : 'outline'}
-                                        className={`h-auto py-3 px-2 flex flex-col items-center text-center justify-center border-[#D4AF37]/50 ${formData.donatur_category === 'sahabat_bakti' ? 'bg-[#D4AF37] text-[#022c22] hover:bg-[#D4AF37]/90' : 'bg-transparent text-[#FDFBF7] hover:bg-[#D4AF37]/20 hover:text-[#D4AF37]'}`}
-                                        onClick={() => handleCategoryChange('sahabat_bakti')}
-                                    >
-                                        <span className="font-semibold text-xs mb-1">Sahabat Bakti</span>
-                                        <span className="text-[10px] opacity-80 leading-tight">Rp500Rb+</span>
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={formData.donatur_category === 'sahabat_teladan' ? 'default' : 'outline'}
-                                        className={`h-auto py-3 px-2 flex flex-col items-center text-center justify-center border-[#D4AF37]/50 ${formData.donatur_category === 'sahabat_teladan' ? 'bg-[#D4AF37] text-[#022c22] hover:bg-[#D4AF37]/90' : 'bg-transparent text-[#FDFBF7] hover:bg-[#D4AF37]/20 hover:text-[#D4AF37]'}`}
-                                        onClick={() => handleCategoryChange('sahabat_teladan')}
-                                    >
-                                        <span className="font-semibold text-xs mb-1">Sahabat Teladan</span>
-                                        <span className="text-[10px] opacity-80 leading-tight">Rp1Jt+</span>
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={formData.donatur_category === 'sahabat_pelayanan' ? 'default' : 'outline'}
-                                        className={`h-auto py-3 px-2 flex flex-col items-center text-center justify-center border-[#D4AF37]/50 ${formData.donatur_category === 'sahabat_pelayanan' ? 'bg-[#D4AF37] text-[#022c22] hover:bg-[#D4AF37]/90' : 'bg-transparent text-[#FDFBF7] hover:bg-[#D4AF37]/20 hover:text-[#D4AF37]'}`}
-                                        onClick={() => handleCategoryChange('sahabat_pelayanan')}
-                                    >
-                                        <span className="font-semibold text-xs mb-1">Sahabat Pelayan</span>
-                                        <span className="text-[10px] opacity-80 leading-tight">Rp2.5Jt+</span>
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={formData.donatur_category === 'sahabat_berkat' ? 'default' : 'outline'}
-                                        className={`h-auto py-3 px-2 flex flex-col items-center text-center justify-center border-[#D4AF37]/50 ${formData.donatur_category === 'sahabat_berkat' ? 'bg-[#D4AF37] text-[#022c22] hover:bg-[#D4AF37]/90' : 'bg-transparent text-[#FDFBF7] hover:bg-[#D4AF37]/20 hover:text-[#D4AF37]'}`}
-                                        onClick={() => handleCategoryChange('sahabat_berkat')}
-                                    >
-                                        <span className="font-semibold text-xs mb-1">Sahabat Berkat</span>
-                                        <span className="text-[10px] opacity-80 leading-tight">Rp5Jt+</span>
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={formData.donatur_category === 'sahabat_kasih' ? 'default' : 'outline'}
-                                        className={`h-auto py-3 px-2 flex flex-col items-center text-center justify-center col-span-2 sm:col-span-1 md:col-span-1 border-[#D4AF37]/50 ${formData.donatur_category === 'sahabat_kasih' ? 'bg-[#D4AF37] text-[#022c22] hover:bg-[#D4AF37]/90' : 'bg-transparent text-[#FDFBF7] hover:bg-[#D4AF37]/20 hover:text-[#D4AF37]'}`}
-                                        onClick={() => handleCategoryChange('sahabat_kasih')}
-                                    >
-                                        <span className="font-semibold text-xs mb-1">Sahabat Kasih</span>
-                                        <span className="text-[10px] opacity-80 leading-tight">Rp10Jt+</span>
-                                    </Button>
-                                </div>
-                            </motion.div>
-
-                            {/* Ucapan */}
-                            <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
-                                <Label htmlFor="message" className="form-section-title">Ucapan Singkat (25-40 kata)</Label>
-                                <Textarea
-                                    id="message"
-                                    name="message"
-                                    value={formData.message}
-                                    onChange={handleInputChange}
-                                    placeholder="Tulis ucapan singkat untuk buku acara..."
-                                    rows={4}
-                                    maxLength={300}
-                                    className="form-input mt-4"
-                                />
                             </motion.div>
 
                             {/* Bahasa */}
@@ -700,12 +1089,12 @@ export default function ProposalDonaturPage() {
                                     {isGenerating ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Membuat Proposal
+                                            Membuat Proposal...
                                         </>
                                     ) : (
                                         <>
                                             <DollarSign className="mr-2 h-4 w-4 text-[#022c22]" />
-                                            Buat Proposal
+                                            Buat Proposal (Undangan Kasih)
                                         </>
                                     )}
                                 </Button>
@@ -732,7 +1121,7 @@ export default function ProposalDonaturPage() {
                                         {isSending ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Mengirim
+                                                Mengirim...
                                             </>
                                         ) : (
                                             <>
@@ -761,7 +1150,7 @@ export default function ProposalDonaturPage() {
                                         {isSending ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Mengirim Token
+                                                Mengirim Token...
                                             </>
                                         ) : (
                                             <>

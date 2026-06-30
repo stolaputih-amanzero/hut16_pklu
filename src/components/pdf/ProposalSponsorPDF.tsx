@@ -404,10 +404,31 @@ interface Props {
     lang: 'id' | 'en'
     logoUrl?: string
     gpibLogoUrl?: string
+    origin?: string
 }
 
-export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png" }: Props) {
+export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png", origin = "https://pklu.amanloka.com" }: Props) {
     const isId = lang === 'id'
+
+    const CENTRAL_CONTACT_NAME = 'Vevi Mayo'
+    const CENTRAL_CONTACT_PHONE = '628111550543'
+
+    const formatDateLong = (dateStr: string, isId: boolean) => {
+        try {
+            const d = new Date(dateStr)
+            if (isNaN(d.getTime())) {
+                return isId ? '12 Oktober 2026' : 'October 12, 2026'
+            }
+            const options: Intl.DateTimeFormatOptions = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }
+            return d.toLocaleDateString(isId ? 'id-ID' : 'en-US', options)
+        } catch {
+            return isId ? '12 Oktober 2026' : 'October 12, 2026'
+        }
+    }
 
     const committeeName = data.committees?.name || 'Vrilly Rondonuwu'
     const committeeRole = data.committees?.role || (isId ? 'Ketua Panitia' : 'Committee Chairperson')
@@ -474,14 +495,55 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     <Text style={styles.coverThemeSub}>
                         {isId ? 'Lansia Teladan dalam Iman, Karya, dan Pelayanan\nBertumbuh Dalam Keselamatan (1 Petrus 2:2)' : 'Elderly Role Models in Faith, Work, and Service\nGrowing in Salvation (1 Peter 2:2)'}
                     </Text>
-                    <View style={styles.coverDetails}>
-                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, marginBottom: 12 }]}>
-                            {isId ? `NO. PROPOSAL: ${data.number}` : `PROPOSAL NO: ${data.number}`}
-                        </Text>
+                    {/* Event Details Section (DI ATAS PREPARED FOR) */}
+                    <View style={[styles.coverDetails, { marginBottom: 15 }]}>
                         <Text style={styles.coverDetailText}>{isId ? 'Senin, 12 Oktober 2026' : 'Monday, October 12, 2026'}</Text>
                         <Text style={styles.coverDetailText}>Bekasi Convention Center</Text>
                         <Text style={styles.coverDetailText}>Hotel Santika Mega Mall Bekasi</Text>
                         <Text style={styles.coverDetailText}>Jawa Barat</Text>
+                    </View>
+
+                    {/* Target Recipient Section with exclusive frame (DI TENGAH) */}
+                    <View style={{ 
+                        border: '1pt solid #D4AF37', 
+                        padding: '12 24', 
+                        marginTop: 10, 
+                        marginBottom: 15, 
+                        alignItems: 'center', 
+                        borderRadius: 4, 
+                        backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                        minWidth: 260
+                    }}>
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 7, color: '#D4AF37', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>
+                            {isId ? 'Ditujukan Kepada / Prepared For:' : 'Prepared For:'}
+                        </Text>
+                        <Text style={{ fontFamily: 'Times-Roman', fontSize: 13, color: '#FDFBF7', fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center' }}>
+                            {data.name}
+                        </Text>
+                        {data.company_name && data.company_name !== data.name && (
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 10, color: '#FDFBF7', marginTop: 2, textTransform: 'uppercase', textAlign: 'center' }}>
+                                {data.company_name}
+                            </Text>
+                        )}
+                        {data.pic_name && (
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 8, color: '#A0AEC0', marginTop: 4, textTransform: 'uppercase', textAlign: 'center' }}>
+                                {isId ? `U.p. Bpk/Ibu ${data.pic_name}` : `Attn: Mr/Ms ${data.pic_name}`} {data.pic_position ? `(${data.pic_position})` : ''}
+                            </Text>
+                        )}
+                    </View>
+
+                    {/* Proposal ID / Pembawa Section (DI BAWAH) */}
+                    <View style={styles.coverDetails}>
+                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, marginBottom: 6, textAlign: 'center' }]}>
+                            {isId 
+                                ? `NO. PROPOSAL: ${data.number}${data.committees?.name ? ` | PEMBAWA: ${data.committees.name}` : ''}`
+                                : `PROPOSAL NO: ${data.number}${data.committees?.name ? ` | PRESENTED BY: ${data.committees.name}` : ''}`}
+                        </Text>
+                        <Text style={[styles.coverDetailText, { color: '#A0AEC0', fontSize: 8 }]}>
+                            {isId 
+                                ? `Tanggal Terbit: ${formatDateLong(data.created_at, true)}`
+                                : `Issued Date: ${formatDateLong(data.created_at, false)}`}
+                        </Text>
                     </View>
                 </View>
             </Page>
@@ -906,8 +968,8 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 </View>
                 
                 <Text style={[styles.bodyText, { textAlign: 'center', marginTop: -10, marginBottom: 40 }]}>
-                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor pengurus: ' : 'Please kindly send the transfer receipt via WhatsApp to the board number: '}
-                    <Text style={styles.bodyTextBold}>{data.phone}</Text>
+                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: ' : 'Please kindly send the transfer receipt via WhatsApp to the Committee Secretary: '}
+                    <Text style={styles.bodyTextBold}>{CENTRAL_CONTACT_PHONE} ({CENTRAL_CONTACT_NAME})</Text>
                 </Text>
 
                 <Text style={styles.sectionTitle}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>
@@ -925,12 +987,27 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                 <View style={styles.signRow}>
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>Ketua Panitia</Text>
+                        <Text style={styles.signTitle}>{isId ? 'Ketua Panitia' : 'Committee Chairperson'}</Text>
                         <View style={styles.signLine} />
-                        <Text style={styles.signName}>{committeeName}</Text>
+                        <Text style={styles.signName}>Vrilly Rondonuwu</Text>
                     </View>
+
+                    {/* Verification QR Code in the middle */}
+                    <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -5 }}>
+                        <Image 
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${origin}/verify/${data.id}`)}`} 
+                            style={{ width: 55, height: 55, marginBottom: 4 }} 
+                        />
+                        <Text style={{ fontSize: 6, color: '#D4AF37', textAlign: 'center', fontWeight: 'bold' }}>
+                            {isId ? 'DOKUMEN VALID' : 'VALID DOCUMENT'}
+                        </Text>
+                        <Text style={{ fontSize: 5, color: '#718096', textAlign: 'center', marginTop: 1 }}>
+                            {isId ? 'PINDAI VERIFIKASI' : 'SCAN TO VERIFY'}
+                        </Text>
+                    </View>
+
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>Sekretaris I</Text>
+                        <Text style={styles.signTitle}>{isId ? 'Sekretaris I' : 'Secretary I'}</Text>
                         <View style={styles.signLine} />
                         <Text style={styles.signName}>Vevi Mayo</Text>
                     </View>
@@ -938,11 +1015,11 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                 <View style={{ alignItems: 'center' }}>
                     <View style={styles.signCenterBox}>
-                        <Text style={[styles.signTitle, { marginBottom: 10 }]}>Mengetahui,</Text>
-                        <Text style={[styles.signTitle, { marginBottom: 35 }]}>Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 10 }]}>{isId ? 'Mengetahui,' : 'Acknowledged by,'}</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 35 }]}>{isId ? 'Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi' : 'Executive Board of GPIB MUPEL - Bekasi Jemaat'}</Text>
                         <View style={[styles.signLine, { width: 180 }]} />
                         <Text style={styles.signName}>Pdt. Daniel J C Lumentut, S.Th., M.M</Text>
-                        <Text style={styles.signRole}>Ketua B.P Mupel Bekasi</Text>
+                        <Text style={styles.signRole}>{isId ? 'Ketua B.P Mupel Bekasi' : 'Chairperson of BP Mupel Bekasi'}</Text>
                     </View>
                 </View>
 

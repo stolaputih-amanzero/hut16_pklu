@@ -404,16 +404,43 @@ interface Props {
     lang: 'id' | 'en'
     logoUrl?: string
     gpibLogoUrl?: string
+    origin?: string
 }
 
-export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png" }: Props) {
+export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png", origin = "https://pklu.amanloka.com" }: Props) {
     const isId = lang === 'id'
+
+    const CENTRAL_CONTACT_NAME = 'Vevi Mayo'
+    const CENTRAL_CONTACT_PHONE = '628111550543'
+
+    const formatDateLong = (dateStr: string, isId: boolean) => {
+        try {
+            const d = new Date(dateStr)
+            if (isNaN(d.getTime())) {
+                return isId ? '12 Oktober 2026' : 'October 12, 2026'
+            }
+            const options: Intl.DateTimeFormatOptions = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }
+            return d.toLocaleDateString(isId ? 'id-ID' : 'en-US', options)
+        } catch {
+            return isId ? '12 Oktober 2026' : 'October 12, 2026'
+        }
+    }
 
     const committeeName = data.committees?.name || 'Vrilly Rondonuwu'
     const committeeRole = data.committees?.role || (isId ? 'Ketua Panitia' : 'Committee Chairperson')
     
     const verifyUrl = `${VERIFY_BASE_URL}${data.number || '0000-0000'}`
     const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=140&margin=1&dark=022c22`
+
+    const commitmentMsg = isId
+        ? `Halo Panitia HUT 16 PKLU GPIB, saya ingin memberikan komitmen dukungan untuk Proposal Donatur No: ${data.number}. Nama saya: ${data.name}.`
+        : `Hello 16th PKLU GPIB Anniversary Committee, I would like to make a support commitment for Donor Proposal No: ${data.number}. My name is: ${data.name}.`
+    const commitmentWaUrl = `https://wa.me/${CENTRAL_CONTACT_PHONE}?text=${encodeURIComponent(commitmentMsg)}`
+    const commitmentWaQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(commitmentWaUrl)}&size=140&margin=1&dark=022c22`
 
     const categoryMap: Record<string, string> = {
         sahabat_bakti: isId ? 'Sahabat Bakti' : 'Service Friend',
@@ -474,14 +501,55 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     <Text style={styles.coverThemeSub}>
                         {isId ? 'Lansia Teladan dalam Iman, Karya, dan Pelayanan\nBertumbuh Dalam Keselamatan (1 Petrus 2:2)' : 'Elderly Role Models in Faith, Work, and Service\nGrowing in Salvation (1 Peter 2:2)'}
                     </Text>
-                    <View style={styles.coverDetails}>
-                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, marginBottom: 12 }]}>
-                            {isId ? `NO. PROPOSAL: ${data.number}` : `PROPOSAL NO: ${data.number}`}
-                        </Text>
+                    {/* Event Details Section (DI ATAS PREPARED FOR) */}
+                    <View style={[styles.coverDetails, { marginBottom: 15 }]}>
                         <Text style={styles.coverDetailText}>{isId ? 'Senin, 12 Oktober 2026' : 'Monday, October 12, 2026'}</Text>
                         <Text style={styles.coverDetailText}>Bekasi Convention Center</Text>
                         <Text style={styles.coverDetailText}>Hotel Santika Mega Mall Bekasi</Text>
                         <Text style={styles.coverDetailText}>Jawa Barat</Text>
+                    </View>
+
+                    {/* Target Recipient Section with exclusive frame (DI TENGAH) */}
+                    <View style={{ 
+                        border: '1pt solid #D4AF37', 
+                        padding: '12 24', 
+                        marginTop: 10, 
+                        marginBottom: 15, 
+                        alignItems: 'center', 
+                        borderRadius: 4, 
+                        backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                        minWidth: 260
+                    }}>
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 7, color: '#D4AF37', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>
+                            {isId ? 'Ditujukan Kepada / Prepared For:' : 'Prepared For:'}
+                        </Text>
+                        <Text style={{ fontFamily: 'Times-Roman', fontSize: 13, color: '#FDFBF7', fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center' }}>
+                            {data.name}
+                        </Text>
+                        {data.company_name && (
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 9, color: '#D4AF37', marginTop: 4, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center' }}>
+                                {data.company_name}
+                            </Text>
+                        )}
+                        {data.display_name && data.display_name !== data.name && data.display_name !== data.company_name && (
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 8, color: '#A0AEC0', marginTop: 3, textTransform: 'uppercase', textAlign: 'center' }}>
+                                {data.display_name}
+                            </Text>
+                        )}
+                    </View>
+
+                    {/* Proposal ID / Pembawa Section (DI BAWAH) */}
+                    <View style={styles.coverDetails}>
+                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, marginBottom: 6, textAlign: 'center' }]}>
+                            {isId 
+                                ? `NO. PROPOSAL: ${data.number}${data.committees?.name ? ` | PEMBAWA: ${data.committees.name}` : ''}`
+                                : `PROPOSAL NO: ${data.number}${data.committees?.name ? ` | PRESENTED BY: ${data.committees.name}` : ''}`}
+                        </Text>
+                        <Text style={[styles.coverDetailText, { color: '#A0AEC0', fontSize: 8 }]}>
+                            {isId 
+                                ? `Tanggal Terbit: ${formatDateLong(data.created_at, true)}`
+                                : `Issued Date: ${formatDateLong(data.created_at, false)}`}
+                        </Text>
                     </View>
                 </View>
             </Page>
@@ -833,55 +901,91 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <Footer />
             </Page>
 
-            {/* PAGE 8: FORMAT KOMITMEN DONATUR (DINAMIS - VIP FORMAT) */}
+            {/* PAGE 8: BUKTI KOMITMEN ATAU FORMULIR DIGITAL */}
             <Page size="A4" style={styles.page}>
                 <Header />
-                <Text style={styles.sectionTitle}>{isId ? 'XI. Lembar Komitmen & Pengesahan' : 'XI. Commitment & Endorsement Sheet'}</Text>
-                <Text style={styles.bodyText}>
-                    {isId ? 'Dengan kerendahan hati kami mengucapkan terima kasih atas komitmen dan dukungan yang Bapak/Ibu/Saudara berikan. Berikut adalah rincian data partisipasi resmi Anda yang telah tercatat dengan aman dalam sistem perbendaharaan kami.' : 'With humility, we thank you for your commitment and support. Below are the official details of your participation, securely recorded in our treasury system.'}
-                </Text>
-
-                {/* VIP Card Layout */}
-                <View style={styles.vipCard}>
-                    <Text style={styles.vipTitle}>{isId ? 'REKAMAN DUKUNGAN DONATUR' : 'DONOR SUPPORT RECORD'}</Text>
-                    
-                    <View style={styles.vipRow}>
-                        <Text style={styles.vipLabel}>{isId ? 'Nomor Registrasi' : 'Registration Number'}</Text>
-                        <Text style={[styles.vipValue, { fontFamily: 'Helvetica', fontSize: 10 }]}>{data.number}</Text>
-                    </View>
-                    <View style={styles.vipRow}>
-                        <Text style={styles.vipLabel}>{isId ? 'Nama Lengkap' : 'Full Name'}</Text>
-                        <Text style={styles.vipValue}>{data.name}</Text>
-                    </View>
-                    <View style={styles.vipRow}>
-                        <Text style={styles.vipLabel}>{isId ? 'Nama Tercantum' : 'Published Name'}</Text>
-                        <Text style={styles.vipValue}>{data.display_name || data.name}</Text>
-                    </View>
-                    <View style={styles.vipRow}>
-                        <Text style={styles.vipLabel}>{isId ? 'Kategori Kehormatan' : 'Honorary Category'}</Text>
-                        <Text style={[styles.vipValue, { color: '#D4AF37' }]}>{categoryLabel}</Text>
-                    </View>
-                    <View style={styles.vipRow}>
-                        <Text style={styles.vipLabel}>{isId ? 'Nilai Dukungan' : 'Support Value'}</Text>
-                        <Text style={styles.vipValueGold}>Rp {formatRupiah(Number(data.contribution_value))}</Text>
-                    </View>
-                    <View style={[styles.vipRow, { borderBottom: 'none', marginBottom: 0 }]}>
-                        <Text style={styles.vipLabel}>{isId ? 'Pesan / Harapan' : 'Message / Hope'}</Text>
-                        <Text style={[styles.vipValue, { fontSize: 10, lineHeight: 1.5 }]}>
-                            "{data.message || (isId ? 'Teruskan Baktimu!' : 'Continue Your Service!')}"
+                {data.contribution_value ? (
+                    <>
+                        <Text style={styles.sectionTitle}>{isId ? 'XI. Lembar Komitmen & Pengesahan' : 'XI. Commitment & Endorsement Sheet'}</Text>
+                        <Text style={styles.bodyText}>
+                            {isId ? 'Dengan kerendahan hati kami mengucapkan terima kasih atas komitmen dan dukungan yang Bapak/Ibu/Saudara berikan. Berikut adalah rincian data partisipasi resmi Anda yang telah tercatat dengan aman dalam sistem perbendaharaan kami.' : 'With humility, we thank you for your commitment and support. Below are the official details of your participation, securely recorded in our treasury system.'}
                         </Text>
-                    </View>
-                </View>
 
-                {/* Royal Seal */}
-                <View style={styles.sealSection}>
-                    <View style={styles.sealBox}>
-                        <Image src={qrImageUrl} style={styles.qrCodeSeal} />
-                        <Text style={styles.sealText}>
-                            {isId ? 'PINDAI UNTUK\nVERIFIKASI KEASLIAN' : 'SCAN TO\nVERIFY AUTHENTICITY'}
+                        {/* VIP Card Layout */}
+                        <View style={styles.vipCard}>
+                            <Text style={styles.vipTitle}>{isId ? 'REKAMAN DUKUNGAN DONATUR' : 'DONOR SUPPORT RECORD'}</Text>
+                            
+                            <View style={styles.vipRow}>
+                                <Text style={styles.vipLabel}>{isId ? 'Nomor Registrasi' : 'Registration Number'}</Text>
+                                <Text style={[styles.vipValue, { fontFamily: 'Helvetica', fontSize: 10 }]}>{data.number}</Text>
+                            </View>
+                            <View style={styles.vipRow}>
+                                <Text style={styles.vipLabel}>{isId ? 'Nama Lengkap' : 'Full Name'}</Text>
+                                <Text style={styles.vipValue}>{data.name}</Text>
+                            </View>
+                            <View style={styles.vipRow}>
+                                <Text style={styles.vipLabel}>{isId ? 'Nama Tercantum' : 'Published Name'}</Text>
+                                <Text style={styles.vipValue}>{data.display_name || data.name}</Text>
+                            </View>
+                            <View style={styles.vipRow}>
+                                <Text style={styles.vipLabel}>{isId ? 'Kategori Kehormatan' : 'Honorary Category'}</Text>
+                                <Text style={[styles.vipValue, { color: '#D4AF37' }]}>{categoryLabel}</Text>
+                            </View>
+                            <View style={styles.vipRow}>
+                                <Text style={styles.vipLabel}>{isId ? 'Nilai Dukungan' : 'Support Value'}</Text>
+                                <Text style={styles.vipValueGold}>Rp {formatRupiah(Number(data.contribution_value))}</Text>
+                            </View>
+                            <View style={[styles.vipRow, { borderBottom: 'none', marginBottom: 0 }]}>
+                                <Text style={styles.vipLabel}>{isId ? 'Pesan / Harapan' : 'Message / Hope'}</Text>
+                                <Text style={[styles.vipValue, { fontSize: 10, lineHeight: 1.5 }]}>
+                                    "{data.message || (isId ? 'Teruskan Baktimu!' : 'Continue Your Service!')}"
+                                </Text>
+                            </View>
+                        </View>
+
+                        {/* Royal Seal */}
+                        <View style={styles.sealSection}>
+                            <View style={styles.sealBox}>
+                                <Image src={qrImageUrl} style={styles.qrCodeSeal} />
+                                <Text style={styles.sealText}>
+                                    {isId ? 'PINDAI UNTUK\nVERIFIKASI KEASLIAN' : 'SCAN TO\nVERIFY AUTHENTICITY'}
+                                </Text>
+                            </View>
+                        </View>
+                    </>
+                ) : (
+                    <>
+                        <Text style={styles.sectionTitle}>{isId ? 'XI. Formulir Komitmen Digital' : 'XI. Digital Commitment Form'}</Text>
+                        <Text style={styles.bodyText}>
+                            {isId 
+                                ? 'Bapak/Ibu/Saudara yang terkasih, jika Anda tergerak untuk mengambil bagian dalam persekutuan dan pelayanan Kaum Lanjut Usia GPIB ini, Anda dapat menyatakan komitmen dukungan Anda secara mudah secara digital.'
+                                : 'Dear brothers and sisters, if you are moved to participate in this GPIB Elderly Fellowship and service, you can easily convey your support commitment digitally.'
+                            }
                         </Text>
-                    </View>
-                </View>
+                        <Text style={styles.bodyText}>
+                            {isId
+                                ? 'Silakan membalas pesan WhatsApp panitia yang menghubungi Anda, atau pindai QR Code di bawah ini untuk mengirimkan komitmen dukungan Anda secara otomatis ke nomor resmi Sekretariat Panitia.'
+                                : 'Please reply to the WhatsApp message from the committee member contacting you, or scan the QR Code below to automatically send your support commitment to the official Committee Secretariat.'
+                            }
+                        </Text>
+
+                        {/* QR Code WhatsApp Box */}
+                        <View style={{ alignItems: 'center', marginTop: 30, marginBottom: 20 }}>
+                            <View style={[styles.vipCard, { width: '80%', alignItems: 'center', padding: 25 }]}>
+                                <Text style={[styles.vipTitle, { fontSize: 13, marginBottom: 15 }]}>
+                                    {isId ? 'PINDAI UNTUK KIRIM KOMITMEN VIA WA' : 'SCAN TO SEND COMMITMENT VIA WHATSAPP'}
+                                </Text>
+                                <Image src={commitmentWaQrUrl} style={{ width: 140, height: 140, marginBottom: 15 }} />
+                                <Text style={[styles.bodyText, { textAlign: 'center', fontSize: 9, color: '#718096' }]}>
+                                    {isId
+                                        ? 'Atau hubungi WhatsApp: 0811-1550-543 (Vevi Mayo)'
+                                        : 'Or contact WhatsApp: +62 811-1550-543 (Vevi Mayo)'
+                                    }
+                                </Text>
+                            </View>
+                        </View>
+                    </>
+                )}
 
                 <Footer />
             </Page>
@@ -906,8 +1010,8 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 </View>
                 
                 <Text style={[styles.bodyText, { textAlign: 'center', marginTop: -10, marginBottom: 40 }]}>
-                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor pengurus: ' : 'Please kindly send the transfer receipt via WhatsApp to the board number: '}
-                    <Text style={styles.bodyTextBold}>{data.phone}</Text>
+                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: ' : 'Please kindly send the transfer receipt via WhatsApp to the Committee Secretary: '}
+                    <Text style={styles.bodyTextBold}>{CENTRAL_CONTACT_PHONE} ({CENTRAL_CONTACT_NAME})</Text>
                 </Text>
 
                 <Text style={styles.sectionTitle}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>
@@ -925,12 +1029,27 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                 <View style={styles.signRow}>
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>Ketua Panitia</Text>
+                        <Text style={styles.signTitle}>{isId ? 'Ketua Panitia' : 'Committee Chairperson'}</Text>
                         <View style={styles.signLine} />
-                        <Text style={styles.signName}>{committeeName}</Text>
+                        <Text style={styles.signName}>Vrilly Rondonuwu</Text>
                     </View>
+
+                    {/* Verification QR Code in the middle */}
+                    <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -5 }}>
+                        <Image 
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${origin}/verify/${data.id}`)}`} 
+                            style={{ width: 55, height: 55, marginBottom: 4 }} 
+                        />
+                        <Text style={{ fontSize: 6, color: '#D4AF37', textAlign: 'center', fontWeight: 'bold' }}>
+                            {isId ? 'DOKUMEN VALID' : 'VALID DOCUMENT'}
+                        </Text>
+                        <Text style={{ fontSize: 5, color: '#718096', textAlign: 'center', marginTop: 1 }}>
+                            {isId ? 'PINDAI VERIFIKASI' : 'SCAN TO VERIFY'}
+                        </Text>
+                    </View>
+
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>Sekretaris I</Text>
+                        <Text style={styles.signTitle}>{isId ? 'Sekretaris I' : 'Secretary I'}</Text>
                         <View style={styles.signLine} />
                         <Text style={styles.signName}>Vevi Mayo</Text>
                     </View>
@@ -938,11 +1057,11 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                 <View style={{ alignItems: 'center' }}>
                     <View style={styles.signCenterBox}>
-                        <Text style={[styles.signTitle, { marginBottom: 10 }]}>Mengetahui,</Text>
-                        <Text style={[styles.signTitle, { marginBottom: 35 }]}>Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 10 }]}>{isId ? 'Mengetahui,' : 'Acknowledged by,'}</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 35 }]}>{isId ? 'Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi' : 'Executive Board of GPIB MUPEL - Bekasi Jemaat'}</Text>
                         <View style={[styles.signLine, { width: 180 }]} />
                         <Text style={styles.signName}>Pdt. Daniel J C Lumentut, S.Th., M.M</Text>
-                        <Text style={styles.signRole}>Ketua B.P Mupel Bekasi</Text>
+                        <Text style={styles.signRole}>{isId ? 'Ketua B.P Mupel Bekasi' : 'Chairperson of BP Mupel Bekasi'}</Text>
                     </View>
                 </View>
 

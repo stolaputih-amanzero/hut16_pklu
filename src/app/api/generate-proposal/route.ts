@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         const logoUrl = `${req.nextUrl.origin}/logo_hut16_pklu.png`
         const gpibLogoUrl = `${req.nextUrl.origin}/logo_gpib.png`
 
-        const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang, logoUrl, gpibLogoUrl }) as any)
+        const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang, logoUrl, gpibLogoUrl, origin: req.nextUrl.origin }) as any)
 
         // 3. Upload ke Supabase Storage
         const fileName = `${proposal.year}/${proposal.type}/${proposal.number}.pdf`

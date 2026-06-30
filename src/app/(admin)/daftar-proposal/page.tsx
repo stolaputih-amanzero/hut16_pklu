@@ -25,6 +25,7 @@ export default function DaftarProposalPage() {
     const [isEditMode, setIsEditMode] = useState(false)
     const [modalSubmitting, setModalSubmitting] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [uploadingProof, setUploadingProof] = useState(false)
 
     // Form states
     const [formData, setFormData] = useState({
@@ -33,7 +34,9 @@ export default function DaftarProposalPage() {
         number: '',
         name: '',
         display_name: '',
+        company_name: '',
         phone: '',
+        email: '',
         congregation: '',
         contribution_value: '',
         specific_support: '',
@@ -41,7 +44,8 @@ export default function DaftarProposalPage() {
         donatur_category: 'sahabat_bakti',
         lang: 'id',
         payment_status: 'pending',
-        committee_id: ''
+        committee_id: '',
+        payment_proof_url: ''
     })
 
     useEffect(() => {
@@ -82,7 +86,9 @@ export default function DaftarProposalPage() {
             number: proposal.number,
             name: proposal.name,
             display_name: proposal.display_name || proposal.name,
+            company_name: proposal.company_name || '',
             phone: proposal.phone,
+            email: proposal.email || '',
             congregation: proposal.congregation || '',
             contribution_value: proposal.contribution_value?.toString() || '',
             specific_support: proposal.specific_support || '',
@@ -90,7 +96,8 @@ export default function DaftarProposalPage() {
             donatur_category: proposal.donatur_category || 'sahabat_bakti',
             lang: proposal.lang || 'id',
             payment_status: proposal.payment_status || 'pending',
-            committee_id: proposal.committee_id || ''
+            committee_id: proposal.committee_id || '',
+            payment_proof_url: proposal.payment_proof_url || ''
         })
         setIsOpen(true)
     }
@@ -104,7 +111,9 @@ export default function DaftarProposalPage() {
             number: '',
             name: '',
             display_name: '',
+            company_name: '',
             phone: '',
+            email: '',
             congregation: '',
             contribution_value: '',
             specific_support: '',
@@ -112,7 +121,8 @@ export default function DaftarProposalPage() {
             donatur_category: 'sahabat_bakti',
             lang: 'id',
             payment_status: 'pending',
-            committee_id: committees[0]?.id || ''
+            committee_id: committees[0]?.id || '',
+            payment_proof_url: ''
         })
         setIsOpen(true)
     }
@@ -124,6 +134,78 @@ export default function DaftarProposalPage() {
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/\D/g, '')
         setFormData({ ...formData, [e.target.name]: rawValue })
+    }
+
+    const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file || !formData.id) return
+
+        try {
+            setUploadingProof(true)
+
+            const fileExt = file.name.split('.').pop()
+            const filePath = `proofs/${formData.id}_proof.${fileExt}`
+            
+            const { data, error: uploadError } = await supabase.storage
+                .from('proposals')
+                .upload(filePath, file, {
+                    upsert: true
+                })
+
+            if (uploadError) throw uploadError
+
+            const { data: urlData } = supabase.storage
+                .from('proposals')
+                .getPublicUrl(filePath)
+
+            const publicUrl = urlData.publicUrl
+
+            const { error: updateError } = await supabase
+                .from('proposals')
+                .update({
+                    payment_proof_url: publicUrl
+                })
+                .eq('id', formData.id)
+
+            if (updateError) throw updateError
+
+            setFormData(prev => ({ ...prev, payment_proof_url: publicUrl }))
+            fetchProposals()
+
+            toast.success('Bukti pembayaran berhasil diunggah!')
+        } catch (err: any) {
+            console.error(err)
+            toast.error('Gagal mengunggah bukti pembayaran: ' + err.message)
+        } finally {
+            setUploadingProof(false)
+        }
+    }
+
+    const handleRemoveProof = async () => {
+        if (!formData.id) return
+
+        try {
+            setUploadingProof(true)
+
+            const { error: updateError } = await supabase
+                .from('proposals')
+                .update({
+                    payment_proof_url: null
+                })
+                .eq('id', formData.id)
+
+            if (updateError) throw updateError
+
+            setFormData(prev => ({ ...prev, payment_proof_url: '' }))
+            fetchProposals()
+
+            toast.success('Bukti pembayaran berhasil dihapus!')
+        } catch (err: any) {
+            console.error(err)
+            toast.error('Gagal menghapus bukti pembayaran: ' + err.message)
+        } finally {
+            setUploadingProof(false)
+        }
     }
 
     const generateProposalPDF = async (id: string, lang: string) => {
@@ -147,8 +229,8 @@ export default function DaftarProposalPage() {
     }
 
     const handleSave = async () => {
-        if (!formData.name || !formData.phone || !formData.contribution_value || !formData.committee_id) {
-            toast.error('Silakan lengkapi data wajib (Nama, WhatsApp, Nilai, Penanggung Jawab)')
+        if (!formData.name || !formData.phone || !formData.committee_id) {
+            toast.error('Silakan lengkapi data wajib (Nama, WhatsApp, Penanggung Jawab)')
             return
         }
 
@@ -162,12 +244,14 @@ export default function DaftarProposalPage() {
                     .update({
                         name: formData.name,
                         display_name: formData.display_name || formData.name,
+                        company_name: formData.company_name || null,
                         phone: formData.phone,
+                        email: formData.email || null,
                         congregation: formData.congregation,
-                        contribution_value: Number(formData.contribution_value),
-                        specific_support: formData.specific_support,
-                        message: formData.message,
-                        donatur_category: formData.type === 'donatur' ? formData.donatur_category : null,
+                        contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
+                        specific_support: formData.specific_support || null,
+                        message: formData.message || null,
+                        donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
                         lang: formData.lang,
                         committee_id: formData.committee_id
                     })
@@ -193,12 +277,14 @@ export default function DaftarProposalPage() {
                         number: number,
                         name: formData.name,
                         display_name: formData.display_name || formData.name,
+                        company_name: formData.company_name || null,
                         phone: formData.phone,
+                        email: formData.email || null,
                         congregation: formData.congregation,
-                        contribution_value: Number(formData.contribution_value),
-                        specific_support: formData.specific_support,
-                        message: formData.message,
-                        donatur_category: formData.type === 'donatur' ? formData.donatur_category : null,
+                        contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
+                        specific_support: formData.specific_support || null,
+                        message: formData.message || null,
+                        donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
                         lang: formData.lang,
                         payment_status: 'pending',
                         committee_id: formData.committee_id
@@ -402,7 +488,7 @@ export default function DaftarProposalPage() {
 
             {/* Custom Modal */}
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="relative w-full max-w-2xl bg-[#022c22] border border-[#D4AF37]/30 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-[#D4AF37]/20 bg-[#033B2B]/40">
@@ -472,16 +558,29 @@ export default function DaftarProposalPage() {
                                     />
                                 </div>
                                 {formData.type === 'donatur' && (
-                                    <div>
-                                        <Label className="text-xs text-[#D4AF37]">Nama untuk Buku Acara</Label>
-                                        <Input
-                                            name="display_name"
-                                            value={formData.display_name}
-                                            onChange={handleInputChange}
-                                            disabled={!isEditMode}
-                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                        />
-                                    </div>
+                                    <>
+                                        <div>
+                                            <Label className="text-xs text-[#D4AF37]">Nama untuk Buku Acara</Label>
+                                            <Input
+                                                name="display_name"
+                                                value={formData.display_name}
+                                                onChange={handleInputChange}
+                                                disabled={!isEditMode}
+                                                className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <Label className="text-xs text-[#D4AF37]">Perusahaan / Komunitas / Keluarga (Opsional)</Label>
+                                            <Input
+                                                name="company_name"
+                                                value={formData.company_name}
+                                                onChange={handleInputChange}
+                                                disabled={!isEditMode}
+                                                placeholder="Contoh: Keluarga Rondonuwu, PT Aman Berkat"
+                                                className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                            />
+                                        </div>
+                                    </>
                                 )}
                                 <div>
                                     <Label className="text-xs text-[#D4AF37]">WhatsApp (Format: 628xxx)</Label>
@@ -494,12 +593,24 @@ export default function DaftarProposalPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-[#D4AF37]">Jemaat GPIB</Label>
+                                    <Label className="text-xs text-[#D4AF37]">Asal Jemaat / Wilayah</Label>
                                     <Input
                                         name="congregation"
                                         value={formData.congregation}
                                         onChange={handleInputChange}
                                         disabled={!isEditMode}
+                                        placeholder="GPIB Jemaat / Wilayah (Opsional)"
+                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                    />
+                                </div>
+                                <div>
+                                    <Label className="text-xs text-[#D4AF37]">Email (Opsional)</Label>
+                                    <Input
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        disabled={!isEditMode}
+                                        placeholder="donatur@email.com"
                                         className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
                                     />
                                 </div>
@@ -593,6 +704,78 @@ export default function DaftarProposalPage() {
                                         className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] focus:ring-[#D4AF37]"
                                     />
                                 </div>
+                                {formData.id && formData.contribution_value && Number(formData.contribution_value) > 0 && (
+                                    <div className="md:col-span-2 border-t border-[#D4AF37]/25 pt-4 space-y-2">
+                                        <Label className="text-xs text-[#D4AF37] font-semibold flex items-center gap-1.5">
+                                            <FileText className="h-4 w-4" /> Bukti Pembayaran
+                                        </Label>
+                                        {formData.payment_proof_url ? (
+                                            <div className="p-3 bg-black/40 rounded-xl border border-[#D4AF37]/20 space-y-3">
+                                                {formData.payment_proof_url.match(/\.(jpeg|jpg|gif|png|webp)/i) ? (
+                                                    <div className="relative group rounded-lg overflow-hidden border border-emerald-500/10 max-h-48 bg-black/60 flex justify-center items-center p-2">
+                                                        <img 
+                                                            src={formData.payment_proof_url} 
+                                                            alt="Bukti Pembayaran" 
+                                                            className="max-h-44 object-contain"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2.5 p-3 bg-[#022c22]/40 rounded-lg border border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                        <FileText className="h-5 w-5 text-[#D4AF37] shrink-0" />
+                                                        <div className="text-xs truncate flex-1 font-medium">Dokumen Bukti Pembayaran</div>
+                                                    </div>
+                                                )}
+                                                <div className="flex gap-2.5">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => window.open(formData.payment_proof_url, '_blank')}
+                                                        className="flex-1 text-xs border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/15 h-8 rounded-full font-medium"
+                                                    >
+                                                        Buka / Unduh
+                                                    </Button>
+                                                    {isEditMode && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={handleRemoveProof}
+                                                            disabled={uploadingProof}
+                                                            className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 rounded-full"
+                                                        >
+                                                            {uploadingProof ? 'Menghapus...' : 'Hapus Bukti'}
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="p-4 bg-black/30 border border-dashed border-[#D4AF37]/30 rounded-lg text-center flex flex-col items-center justify-center space-y-2">
+                                                <span className="text-xs text-white/50">Belum ada bukti pembayaran yang diunggah</span>
+                                                {isEditMode ? (
+                                                    <>
+                                                        <Label 
+                                                            htmlFor="upload_proof" 
+                                                            className="cursor-pointer bg-[#D4AF37]/20 border border-[#D4AF37]/40 hover:bg-[#D4AF37]/30 text-[#D4AF37] px-3.5 py-1.5 text-xs rounded-full font-semibold transition-all inline-block"
+                                                        >
+                                                            {uploadingProof ? 'Mengunggah...' : 'Unggah Bukti (Gambar / PDF)'}
+                                                        </Label>
+                                                        <Input
+                                                            id="upload_proof"
+                                                            type="file"
+                                                            accept="image/*,application/pdf"
+                                                            className="hidden"
+                                                            disabled={uploadingProof}
+                                                            onChange={handleUploadProof}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <span className="text-xs text-[#D4AF37]/80">Masuk ke mode edit untuk mengunggah bukti</span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -665,7 +848,7 @@ export default function DaftarProposalPage() {
             )}
 
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-100">
+                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-100">
                     <div className="relative w-full max-w-md bg-[#022c22] border border-red-500/30 rounded-2xl shadow-2xl p-6 space-y-4">
                         <div className="flex items-center gap-3 text-red-400">
                             <Trash2 className="h-6 w-6" />

@@ -19,6 +19,7 @@ import { formatRupiah } from '@/lib/utils'
 
 export default function LaporanLpjPublicPage() {
     const [proposals, setProposals] = useState<any[]>([])
+    const [allProposals, setAllProposals] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -29,11 +30,11 @@ export default function LaporanLpjPublicPage() {
                 const { data, error: fetchError } = await supabase
                     .from('proposals')
                     .select('*')
-                    .eq('payment_status', 'confirmed')
                     .order('created_at', { ascending: false })
 
                 if (fetchError) throw fetchError
-                setProposals(data || [])
+                setAllProposals(data || [])
+                setProposals(data?.filter(p => p.payment_status === 'confirmed') || [])
             } catch (err: any) {
                 console.error(err)
                 setError(err.message || 'Gagal memuat data laporan.')
@@ -52,6 +53,12 @@ export default function LaporanLpjPublicPage() {
         .filter(p => p.type === 'sponsorship')
         .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
     const totalDana = totalDanaDonatur + totalDanaSponsor
+
+    // Compute proposal stats (issued/keluar vs confirmed/isi)
+    const donaturKeluar = allProposals.filter(p => p.type === 'donatur').length
+    const donaturIsi = allProposals.filter(p => p.type === 'donatur' && p.payment_status === 'confirmed').length
+    const sponsorKeluar = allProposals.filter(p => p.type === 'sponsorship').length
+    const sponsorIsi = allProposals.filter(p => p.type === 'sponsorship' && p.payment_status === 'confirmed').length
 
     const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
@@ -100,23 +107,47 @@ export default function LaporanLpjPublicPage() {
                         </p>
                     </div>
 
-                    {/* Summary Card */}
-                    <div className="bg-black/25 backdrop-blur-md rounded-2xl border border-white/5 p-6 shadow-xl space-y-6">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#D4AF37] border-b border-white/10 pb-2">
-                            Ringkasan Perolehan Dana
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="p-4 bg-[#022c22]/50 rounded-xl border border-white/5 space-y-1">
-                                <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Total Dana Donatur</span>
-                                <p className="text-lg font-bold text-[#FDFBF7]">{formatRupiah(totalDanaDonatur)}</p>
+                    {/* Summary Section Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Funds Summary Box */}
+                        <div className="bg-black/25 backdrop-blur-md rounded-2xl border border-white/5 p-6 shadow-xl space-y-4">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#D4AF37] border-b border-white/10 pb-2">
+                                (A) Realisasi Penerimaan Dana
+                            </h3>
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-white/60">Total Dana Donatur:</span>
+                                    <span className="font-semibold text-[#FDFBF7]">{formatRupiah(totalDanaDonatur)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-white/60">Total Dana Sponsorship:</span>
+                                    <span className="font-semibold text-[#FDFBF7]">{formatRupiah(totalDanaSponsor)}</span>
+                                </div>
+                                <div className="flex justify-between border-t border-white/10 pt-2 font-bold text-amber-400">
+                                    <span>Total Keseluruhan Dana:</span>
+                                    <span>{formatRupiah(totalDana)}</span>
+                                </div>
                             </div>
-                            <div className="p-4 bg-[#022c22]/50 rounded-xl border border-white/5 space-y-1">
-                                <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Total Dana Sponsorship</span>
-                                <p className="text-lg font-bold text-[#FDFBF7]">{formatRupiah(totalDanaSponsor)}</p>
-                            </div>
-                            <div className="p-4 bg-[#022c22]/50 rounded-xl border border-[#D4AF37]/20 space-y-1 bg-[#D4AF37]/5">
-                                <span className="text-[10px] text-[#D4AF37] uppercase tracking-wider font-semibold">Total Keseluruhan Dana</span>
-                                <p className="text-xl font-black text-amber-400">{formatRupiah(totalDana)}</p>
+                        </div>
+
+                        {/* Proposal Stats Summary Box */}
+                        <div className="bg-black/25 backdrop-blur-md rounded-2xl border border-white/5 p-6 shadow-xl space-y-4">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#D4AF37] border-b border-white/10 pb-2">
+                                (B) Status Distribusi Proposal
+                            </h3>
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-white/60">Proposal Donatur (Keluar / Lunas):</span>
+                                    <span className="font-semibold text-[#FDFBF7]">{donaturKeluar} / {donaturIsi}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-white/60">Proposal Sponsor (Keluar / Lunas):</span>
+                                    <span className="font-semibold text-[#FDFBF7]">{sponsorKeluar} / {sponsorIsi}</span>
+                                </div>
+                                <div className="flex justify-between border-t border-white/10 pt-2 font-bold text-amber-400">
+                                    <span>Total Proposal (Keluar / Lunas):</span>
+                                    <span>{donaturKeluar + sponsorKeluar} / {donaturIsi + sponsorIsi}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

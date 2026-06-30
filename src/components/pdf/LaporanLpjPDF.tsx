@@ -59,13 +59,17 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         marginTop: 15,
     },
+    summaryContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
     summaryBox: {
         border: '1pt solid #e5e7eb',
         borderRadius: 4,
         padding: 10,
         backgroundColor: '#f9fafb',
-        marginBottom: 10,
-        width: '50%',
+        width: '49%',
     },
     summaryRow: {
         flexDirection: 'row',
@@ -202,9 +206,28 @@ interface Props {
     totalDana: number
     logoUrl?: string
     origin?: string
+    stats?: {
+        donaturKeluar: number
+        donaturIsi: number
+        sponsorKeluar: number
+        sponsorIsi: number
+    }
 }
 
-export function LaporanLpjPDF({ proposals, totalDanaDonatur, totalDanaSponsor, totalDana, logoUrl = "/logo_hut16_pklu.png", origin = "https://pklu.amanloka.com" }: Props) {
+export function LaporanLpjPDF({ 
+    proposals, 
+    totalDanaDonatur, 
+    totalDanaSponsor, 
+    totalDana, 
+    logoUrl = "/logo_hut16_pklu.png", 
+    origin = "https://pklu.amanloka.com",
+    stats = {
+        donaturKeluar: 0,
+        donaturIsi: 0,
+        sponsorKeluar: 0,
+        sponsorIsi: 0
+    }
+}: Props) {
     const qrImageUrl = `https://quickchart.io/qr?size=100&text=${encodeURIComponent(origin + '/laporan-lpj')}`
     const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
@@ -222,20 +245,41 @@ export function LaporanLpjPDF({ proposals, totalDanaDonatur, totalDanaSponsor, t
                     <Text style={styles.organization}>HUT ke-16 Pelayanan Kategorial Lanjut Usia (PKLU)</Text>
                 </View>
 
-                {/* Summary */}
-                <Text style={styles.sectionTitle}>Ringkasan Perolehan Dana</Text>
-                <View style={styles.summaryBox}>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>Total Dana Donatur</Text>
-                        <Text style={styles.summaryValue}>: {formatRupiah(totalDanaDonatur)}</Text>
+                {/* Summary Section */}
+                <Text style={styles.sectionTitle}>Ringkasan Laporan</Text>
+                <View style={styles.summaryContainer}>
+                    {/* Funds Summary Box */}
+                    <View style={styles.summaryBox}>
+                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 9 }]}>(A) Realisasi Penerimaan Dana</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Total Dana Donatur</Text>
+                            <Text style={styles.summaryValue}>: {formatRupiah(totalDanaDonatur)}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Total Dana Sponsorship</Text>
+                            <Text style={styles.summaryValue}>: {formatRupiah(totalDanaSponsor)}</Text>
+                        </View>
+                        <View style={styles.summaryTotalRow}>
+                            <Text style={styles.summaryTotalLabel}>Total Keseluruhan Dana</Text>
+                            <Text style={styles.summaryTotalValue}>: {formatRupiah(totalDana)}</Text>
+                        </View>
                     </View>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>Total Dana Sponsorship</Text>
-                        <Text style={styles.summaryValue}>: {formatRupiah(totalDanaSponsor)}</Text>
-                    </View>
-                    <View style={styles.summaryTotalRow}>
-                        <Text style={styles.summaryTotalLabel}>Total Keseluruhan Dana</Text>
-                        <Text style={styles.summaryTotalValue}>: {formatRupiah(totalDana)}</Text>
+
+                    {/* Proposal Stats Summary Box */}
+                    <View style={styles.summaryBox}>
+                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 9 }]}>(B) Status Distribusi Proposal</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Proposal Donatur (Keluar / Lunas)</Text>
+                            <Text style={styles.summaryValue}>: {stats.donaturKeluar} / {stats.donaturIsi}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Proposal Sponsor (Keluar / Lunas)</Text>
+                            <Text style={styles.summaryValue}>: {stats.sponsorKeluar} / {stats.sponsorIsi}</Text>
+                        </View>
+                        <View style={styles.summaryTotalRow}>
+                            <Text style={styles.summaryTotalLabel}>Total Proposal (Keluar / Lunas)</Text>
+                            <Text style={styles.summaryTotalValue}>: {stats.donaturKeluar + stats.sponsorKeluar} / {stats.donaturIsi + stats.sponsorIsi}</Text>
+                        </View>
                     </View>
                 </View>
 

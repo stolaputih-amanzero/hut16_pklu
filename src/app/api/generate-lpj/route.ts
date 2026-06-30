@@ -10,13 +10,14 @@ export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
     try {
-        const { data: proposals, error } = await supabaseAdmin
+        const { data: allProposals, error } = await supabaseAdmin
             .from('proposals')
             .select('*')
-            .eq('payment_status', 'confirmed')
             .order('created_at', { ascending: false })
             
         if (error) throw error
+
+        const proposals = allProposals?.filter(p => p.payment_status === 'confirmed') || []
 
         const totalDanaDonatur = proposals
             .filter(p => p.type === 'donatur')
@@ -25,6 +26,12 @@ export async function GET(req: NextRequest) {
             .filter(p => p.type === 'sponsorship')
             .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
         const totalDana = totalDanaDonatur + totalDanaSponsor
+
+        // Compute proposal stats (issued/keluar vs confirmed/isi)
+        const donaturKeluar = allProposals?.filter(p => p.type === 'donatur').length || 0
+        const donaturIsi = allProposals?.filter(p => p.type === 'donatur' && p.payment_status === 'confirmed').length || 0
+        const sponsorKeluar = allProposals?.filter(p => p.type === 'sponsorship').length || 0
+        const sponsorIsi = allProposals?.filter(p => p.type === 'sponsorship' && p.payment_status === 'confirmed').length || 0
 
         const getBase64Logo = () => {
             try {
@@ -40,12 +47,18 @@ export async function GET(req: NextRequest) {
 
         const buffer = await renderToBuffer(
             React.createElement(LaporanLpjPDF, {
-                proposals: proposals || [],
+                proposals,
                 totalDanaDonatur,
                 totalDanaSponsor,
                 totalDana,
                 logoUrl,
-                origin: req.nextUrl.origin
+                origin: req.nextUrl.origin,
+                stats: {
+                    donaturKeluar,
+                    donaturIsi,
+                    sponsorKeluar,
+                    sponsorIsi
+                }
             }) as any
         )
         

@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
             }) as any
         )
         
-        return new NextResponse(buffer, {
+        return new NextResponse(buffer as any, {
             status: 200,
             headers: {
                 'Content-Type': 'application/pdf',

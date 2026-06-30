@@ -326,7 +326,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                 <Text style={styles.detailLabel}>{isId ? 'Nilai Komitmen' : 'Commitment Value'}</Text>
                                 <Text style={styles.detailValueHighlight}>
                                     {data.contribution_value && Number(data.contribution_value) > 0 
-                                        ? `Rp ${formatRupiah(Number(data.contribution_value))}`
+                                        ? formatRupiah(Number(data.contribution_value))
                                         : (isId ? 'In-Kind / Non-Moneter' : 'In-Kind / Non-Monetary')}
                                 </Text>
                             </View>

@@ -327,7 +327,7 @@ export default function VerificationPage() {
                                 </div>
                                 <div className="p-2 border border-white/5 rounded-lg bg-black/10">
                                     <p className="text-xs font-bold text-[#FDFBF7]">Vevi Mayo</p>
-                                    <p className="text-[9px] text-white/50">Sekretaris I</p>
+                                    <p className="text-[9px] text-white/50">Sekretaris</p>
                                 </div>
                                 <div className="col-span-2 p-2 border border-[#D4AF37]/10 rounded-lg bg-[#D4AF37]/5">
                                     <p className="text-xs font-bold text-[#D4AF37]">Pdt. Daniel J C Lumentut, S.Th., M.M</p>

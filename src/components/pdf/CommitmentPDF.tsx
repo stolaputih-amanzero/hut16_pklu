@@ -409,7 +409,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
 
                                 <View style={styles.signatureBox}>
                                     <Text style={styles.signatureTitle}>
-                                        {isId ? 'Sekretaris I' : 'Secretary I'}
+                                        {isId ? 'Sekretaris' : 'Secretary'}
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>

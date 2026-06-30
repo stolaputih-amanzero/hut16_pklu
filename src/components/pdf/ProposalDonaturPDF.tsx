@@ -1052,7 +1052,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
 
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>{isId ? 'Sekretaris I' : 'Secretary I'}</Text>
+                        <Text style={styles.signTitle}>{isId ? 'Sekretaris' : 'Secretary'}</Text>
                         <View style={styles.signLine} />
                         <Text style={styles.signName}>Vevi Mayo</Text>
                     </View>

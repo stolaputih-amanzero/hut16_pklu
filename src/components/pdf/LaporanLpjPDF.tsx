@@ -318,7 +318,7 @@ export function LaporanLpjPDF({ proposals, totalDanaDonatur, totalDanaSponsor, t
                     <View style={styles.signatureBox}>
                         <Text style={styles.signatureTitle}>Menyetujui,</Text>
                         <View style={styles.signatureLine} />
-                        <Text style={styles.signatureName}>Syanne Liwe</Text>
+                        <Text style={styles.signatureName}>Paul Simanjuntak</Text>
                         <Text style={styles.organization}>Bendahara</Text>
                     </View>
                 </View>

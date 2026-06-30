@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     },
     contentWrapper: {
         paddingHorizontal: 15,
+        paddingTop: 20,
         flex: 1,
     },
     salutation: {
@@ -426,7 +427,6 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
-                                    <Text style={styles.signatureRole}>{committeeRole}</Text>
                                 </View>
 
                                 {/* Verification QR Code */}
@@ -446,7 +446,6 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>
-                                    <Text style={styles.signatureRole}>{isId ? 'Sekretaris Panitia' : 'Committee Secretary'}</Text>
                                 </View>
                             </View>
 

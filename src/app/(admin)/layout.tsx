@@ -71,8 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { name: 'Beranda', path: '/', icon: Home },
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { name: 'Donatur', path: '/proposal-donatur', icon: FileText },
-        { name: 'Sponsor', path: '/proposal-sponsorship', icon: Users },
+        { name: 'Buat Proposal', path: '/buat-proposal', icon: FileText },
         { name: 'Daftar', path: '/daftar-proposal', icon: Archive },
     ]
 

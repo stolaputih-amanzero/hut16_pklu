@@ -165,52 +165,26 @@ export default function DashboardPage() {
                 animate="show"
                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
-                <motion.div variants={itemVariants}>
+                <motion.div variants={itemVariants} className="md:col-span-2">
                     <Card className="border-emerald shadow-emerald relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                         <CardHeader>
                             <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
                                 <FileText className="mr-2 h-5 w-5 text-[#D4AF37]" />
-                                Proposal Donatur
+                                Buat Proposal Baru
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-[#FDFBF7]/60 mb-6 text-sm">
-                                Kelola pendaftaran proposal donatur baru dan verifikasi pembayaran.
+                            <p className="text-[#FDFBF7]/60 mb-6 text-sm max-w-2xl">
+                                Kelola pendaftaran proposal donatur pribadi maupun sponsorship institusi dalam satu alur yang mudah dan terintegrasi.
                             </p>
                             <Button
                                 asChild
-                                className="emerald-button w-full justify-center"
+                                className="emerald-button md:w-auto w-full justify-center px-8"
                             >
-                                <a href="/proposal-donatur">
+                                <a href="/buat-proposal">
                                     <Plus className="mr-2 h-4 w-4" />
-                                    Buat Proposal Donatur Baru
-                                </a>
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                    <Card className="border-emerald shadow-emerald relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
-                                <FileText className="mr-2 h-5 w-5 text-[#D4AF37]" />
-                                Proposal Sponsorship
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-[#FDFBF7]/60 mb-6 text-sm">
-                                Kelola dukungan sponsorship dari perusahaan dan mitra gereja.
-                            </p>
-                            <Button
-                                asChild
-                                className="emerald-button w-full justify-center"
-                            >
-                                <a href="/proposal-sponsorship">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Buat Proposal Sponsorship
+                                    Buka Halaman Pembuatan Proposal
                                 </a>
                             </Button>
                         </CardContent>

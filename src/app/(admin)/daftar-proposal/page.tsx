@@ -532,6 +532,8 @@ export default function DaftarProposalPage() {
                                     totalDanaDonatur={totalDanaDonatur} 
                                     totalDanaSponsor={totalDanaSponsor} 
                                     totalDana={totalDana}
+                                    logoUrl={`${window.location.origin}/logo_hut16_pklu.png`}
+                                    origin={window.location.origin}
                                 />
                             }
                             fileName="Laporan_LPJ_HUT16_PKLU.pdf"

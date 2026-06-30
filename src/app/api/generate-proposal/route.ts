@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
             ? ProposalDonaturPDF
             : ProposalSponsorPDF
 
-        const logoUrl = `${req.nextUrl.origin}/logo_hut16_pklu.png`
-        const gpibLogoUrl = `${req.nextUrl.origin}/logo_gpib.png`
+        const logoUrl = `https://pklu.amanloka.com/logo_hut16_pklu.png`
+        const gpibLogoUrl = `https://pklu.amanloka.com/logo_gpib.png`
 
         const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang, logoUrl, gpibLogoUrl, origin: req.nextUrl.origin }) as any)
 

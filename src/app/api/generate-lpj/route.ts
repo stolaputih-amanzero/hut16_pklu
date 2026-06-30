@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
             .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
         const totalDana = totalDanaDonatur + totalDanaSponsor
 
-        const logoUrl = `${req.nextUrl.origin}/logo_hut16_pklu.png`
+        const logoUrl = `https://pklu.amanloka.com/logo_hut16_pklu.png`
 
         const buffer = await renderToBuffer(
             React.createElement(LaporanLpjPDF, {

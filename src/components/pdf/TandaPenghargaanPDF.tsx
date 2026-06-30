@@ -5,14 +5,14 @@ import {
 // Premium Redesign
 const styles = StyleSheet.create({
     page: {
-        padding: 40,
+        padding: 30,
         backgroundColor: '#FAFAF7', // Extremely subtle ivory
     },
     backgroundLogo: {
         position: 'absolute',
-        top: '20%',
-        left: '30%',
-        width: '40%',
+        top: '25%',
+        left: '35%',
+        width: '30%',
         opacity: 0.03, // Very subtle watermark
     },
     outerBorder: {
@@ -22,61 +22,61 @@ const styles = StyleSheet.create({
     },
     innerBorder: {
         border: '1pt solid #D4AF37',
-        padding: 35,
+        padding: 20,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
     },
-    header: { alignItems: 'center', marginBottom: 30 },
-    logo: { width: 80, height: 80, marginBottom: 20 },
+    header: { alignItems: 'center', marginBottom: 10 },
+    logo: { width: 70, height: 70, marginBottom: 10, objectFit: 'contain' },
     title: { 
         fontFamily: 'Times-Bold',
         fontSize: 32, 
         color: '#022c22', // Deep Emerald
         textAlign: 'center',
         letterSpacing: 4,
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        marginBottom: 4
     },
     subtitle: { 
         fontFamily: 'Helvetica',
-        fontSize: 10, 
+        fontSize: 9, 
         color: '#D4AF37', 
         textAlign: 'center', 
-        marginTop: 10,
         letterSpacing: 2,
         textTransform: 'uppercase'
     },
-    body: { marginVertical: 30, flexGrow: 1, justifyContent: 'center' },
+    body: { marginVertical: 10, flexGrow: 1, justifyContent: 'center' },
     text: { 
         fontFamily: 'Times-Roman',
-        fontSize: 14, 
-        lineHeight: 2, 
+        fontSize: 13, 
+        lineHeight: 1.5, 
         textAlign: 'center', 
         color: '#334155',
-        marginBottom: 12,
-        paddingHorizontal: 50
+        marginBottom: 6,
+        paddingHorizontal: 40
     },
     name: { 
         fontFamily: 'Times-BoldItalic',
-        fontSize: 38, 
+        fontSize: 34, 
         color: '#D4AF37', 
         textAlign: 'center', 
-        marginVertical: 18,
+        marginVertical: 10,
         letterSpacing: 1
     },
     category: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 16, 
+        fontSize: 14, 
         color: '#022c22', 
         textAlign: 'center', 
-        marginVertical: 18,
+        marginVertical: 10,
         letterSpacing: 3,
         textTransform: 'uppercase'
     },
     footerContainer: {
         marginTop: 'auto',
-        paddingTop: 10
+        paddingTop: 5
     },
     footer: {
         flexDirection: 'row',
@@ -97,49 +97,49 @@ const styles = StyleSheet.create({
     },
     signatureTitle: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 11, 
+        fontSize: 10, 
         color: '#022c22',
-        marginBottom: 40
+        marginBottom: 35
     },
     signatureLine: {
         borderBottom: '1pt solid #022c22',
         width: '100%',
-        marginBottom: 6
+        marginBottom: 4
     },
     signatureName: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 12, 
+        fontSize: 11, 
         color: '#022c22'
     },
     signatureRole: { 
         fontFamily: 'Helvetica',
-        fontSize: 9,
+        fontSize: 8,
         color: '#475569'
     },
     qrContainer: {
         alignItems: 'center',
-        width: 110,
-        padding: 8,
+        width: 100,
+        padding: 6,
         border: '1pt solid #e2e8f0',
         backgroundColor: '#ffffff',
         borderRadius: 8,
-        marginBottom: 10
+        marginBottom: 0
     },
     qrCode: {
-        width: 75,
-        height: 75,
-        marginBottom: 6
+        width: 70,
+        height: 70,
+        marginBottom: 4
     },
     qrText: {
         fontFamily: 'Helvetica-Bold',
-        fontSize: 7,
+        fontSize: 6,
         color: '#022c22',
         textAlign: 'center',
         letterSpacing: 1
     },
     qrSubText: {
         fontFamily: 'Helvetica',
-        fontSize: 6,
+        fontSize: 5,
         color: '#64748b',
         textAlign: 'center',
         marginTop: 2

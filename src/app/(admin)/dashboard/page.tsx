@@ -234,7 +234,15 @@ export default function DashboardPage() {
                                         />
                                         <Tooltip 
                                             cursor={{ fill: 'rgba(212, 175, 55, 0.1)' }}
-                                            contentStyle={{ backgroundColor: '#022c22', borderColor: 'rgba(212, 175, 55, 0.3)', borderRadius: '12px', color: '#FDFBF7', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
+                                            contentStyle={{ 
+                                                backgroundColor: '#022c22', 
+                                                borderColor: 'rgba(212, 175, 55, 0.4)', 
+                                                borderRadius: '8px', 
+                                                color: '#FDFBF7', 
+                                                boxShadow: '0 8px 30px rgba(0,0,0,0.6)' 
+                                            }}
+                                            itemStyle={{ color: '#FDFBF7', fontSize: '13px', fontWeight: 500 }}
+                                            labelStyle={{ color: '#D4AF37', fontSize: '14px', fontWeight: 'bold', paddingBottom: '4px', borderBottom: '1px solid rgba(212, 175, 55, 0.2)', marginBottom: '8px' }}
                                             formatter={(value: any) => [formatRupiah(Number(value) || 0), 'Total']}
                                         />
                                         <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={60}>

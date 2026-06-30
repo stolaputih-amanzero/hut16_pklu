@@ -7,7 +7,7 @@ const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/'
 
 const styles = StyleSheet.create({
     page: {
-        padding: 25,
+        padding: 20,
         backgroundColor: '#FFFFFF',
         fontFamily: 'Times-Roman',
         color: '#1a1a1a',
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         border: '1pt solid #D4AF37',
-        padding: 25,
+        padding: 20,
         position: 'relative',
     },
     header: {
@@ -54,11 +54,11 @@ const styles = StyleSheet.create({
     divider: {
         borderBottom: '1pt solid #D4AF37',
         marginHorizontal: 30,
-        marginBottom: 15,
+        marginBottom: 10,
     },
     titleSection: {
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     docTitle: {
         fontFamily: 'Times-Bold',
@@ -83,20 +83,20 @@ const styles = StyleSheet.create({
     },
     salutation: {
         fontSize: 11,
-        marginBottom: 8,
-        lineHeight: 1.5,
+        marginBottom: 6,
+        lineHeight: 1.4,
     },
     bodyParagraph: {
         fontSize: 10.5,
-        lineHeight: 1.5,
+        lineHeight: 1.4,
         color: '#374151',
-        marginBottom: 10,
+        marginBottom: 8,
         textAlign: 'justify',
     },
     detailContainer: {
-        marginVertical: 8,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+        marginVertical: 4,
+        paddingHorizontal: 15,
+        paddingVertical: 8,
         backgroundColor: '#FAFAFA',
         borderRadius: 4,
         border: '0.5pt solid #E5E7EB',
@@ -128,9 +128,9 @@ const styles = StyleSheet.create({
     bankCard: {
         backgroundColor: '#F8FBF9',
         borderLeft: '3pt solid #022c22',
-        padding: 12,
-        marginTop: 6,
-        marginBottom: 10,
+        padding: 10,
+        marginTop: 4,
+        marginBottom: 8,
     },
     bankTitle: {
         fontFamily: 'Helvetica-Bold',
@@ -143,11 +143,11 @@ const styles = StyleSheet.create({
     bankText: {
         fontSize: 9.5,
         color: '#374151',
-        lineHeight: 1.5,
+        lineHeight: 1.4,
     },
     footerContainer: {
         marginTop: 'auto',
-        paddingTop: 15,
+        paddingTop: 10,
     },
     signatureRow: {
         flexDirection: 'row',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Helvetica-Bold',
         fontSize: 8.5,
         color: '#374151',
-        marginBottom: 30,
+        marginBottom: 25,
         textAlign: 'center',
     },
     signatureLine: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         fontSize: 7.5,
         color: '#D4AF37',
         textAlign: 'center',
-        marginTop: 15,
+        marginTop: 10,
         letterSpacing: 2,
         textTransform: 'uppercase',
     }

@@ -13,12 +13,15 @@ import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getNextNumber } from '@/lib/numbering'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import { LaporanLpjPDF } from '@/components/pdf/LaporanLpjPDF'
 
 export default function DaftarProposalPage() {
     const [proposals, setProposals] = useState<any[]>([])
     const [committees, setCommittees] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
+    const [isMounted, setIsMounted] = useState(false)
     
     // Modal states
     const [isOpen, setIsOpen] = useState(false)
@@ -55,6 +58,7 @@ export default function DaftarProposalPage() {
     })
 
     useEffect(() => {
+        setIsMounted(true)
         fetchProposals()
         fetchCommittees()
     }, [])
@@ -499,6 +503,15 @@ export default function DaftarProposalPage() {
         return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
     }
 
+    const confirmedProposals = proposals.filter(p => p.payment_status === 'confirmed')
+    const totalDanaDonatur = confirmedProposals
+        .filter(p => p.type === 'donatur')
+        .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
+    const totalDanaSponsor = confirmedProposals
+        .filter(p => p.type === 'sponsorship')
+        .reduce((sum, p) => sum + (Number(p.contribution_value) || 0), 0)
+    const totalDana = totalDanaDonatur + totalDanaSponsor
+
     return (
         <div className="max-w-6xl mx-auto space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -511,15 +524,30 @@ export default function DaftarProposalPage() {
                     </p>
                 </div>
                 <div className="flex gap-3 mt-4 md:mt-0">
-                    <Link href="/laporan-lpj" passHref>
-                        <Button 
-                            variant="outline"
-                            className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2"
+                    {isMounted && (
+                        <PDFDownloadLink
+                            document={
+                                <LaporanLpjPDF 
+                                    proposals={confirmedProposals} 
+                                    totalDanaDonatur={totalDanaDonatur} 
+                                    totalDanaSponsor={totalDanaSponsor} 
+                                    totalDana={totalDana}
+                                />
+                            }
+                            fileName="Laporan_LPJ_HUT16_PKLU.pdf"
                         >
-                            <Printer className="h-4 w-4" />
-                            Cetak Laporan LPJ
-                        </Button>
-                    </Link>
+                            {({ loading: pdfLoading }) => (
+                                <Button 
+                                    variant="outline"
+                                    disabled={pdfLoading}
+                                    className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2"
+                                >
+                                    <Printer className="h-4 w-4" />
+                                    {pdfLoading ? 'Menyiapkan...' : 'Unduh Laporan LPJ'}
+                                </Button>
+                            )}
+                        </PDFDownloadLink>
+                    )}
                     <Link href="/buat-proposal" passHref>
                         <Button 
                             className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"

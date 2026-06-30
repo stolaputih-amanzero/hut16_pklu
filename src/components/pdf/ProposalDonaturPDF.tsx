@@ -540,15 +540,18 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                     {/* Proposal ID / Pembawa Section (DI BAWAH) */}
                     <View style={styles.coverDetails}>
-                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, marginBottom: 6, textAlign: 'center' }]}>
-                            {isId 
-                                ? `NO. PROPOSAL: ${data.number}${data.committees?.name ? ` | PEMBAWA: ${data.committees.name}` : ''}`
-                                : `PROPOSAL NO: ${data.number}${data.committees?.name ? ` | PRESENTED BY: ${data.committees.name}` : ''}`}
+                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, fontSize: 8, marginBottom: 4, textAlign: 'center', letterSpacing: 1 }]}>
+                            {data.number}
                         </Text>
-                        <Text style={[styles.coverDetailText, { color: '#A0AEC0', fontSize: 8 }]}>
+                        {data.committees?.name && (
+                            <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 500, fontSize: 8, marginBottom: 4, textAlign: 'center', letterSpacing: 0.5 }]}>
+                                {data.committees.name.toUpperCase()}
+                            </Text>
+                        )}
+                        <Text style={[styles.coverDetailText, { color: '#A0AEC0', fontSize: 7, textAlign: 'center', letterSpacing: 0.5 }]}>
                             {isId 
-                                ? `Tanggal Terbit: ${formatDateLong(data.created_at, true)}`
-                                : `Issued Date: ${formatDateLong(data.created_at, false)}`}
+                                ? formatDateLong(data.created_at, true)
+                                : formatDateLong(data.created_at, false)}
                         </Text>
                     </View>
                 </View>

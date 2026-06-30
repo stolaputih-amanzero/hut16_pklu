@@ -253,9 +253,20 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
         sahabat_kasih: isId ? 'Sahabat Kasih' : 'Love Friend',
     }
 
+    const sponsorPackageMap: Record<string, string> = {
+        platinum: isId ? 'Platinum' : 'Platinum',
+        gold: isId ? 'Emas (Gold)' : 'Gold',
+        silver: isId ? 'Perak (Silver)' : 'Silver',
+        bronze: isId ? 'Perunggu (Bronze)' : 'Bronze',
+        in_kind: isId ? 'In-Kind' : 'In-Kind',
+        donatur: isId ? 'Partisipasi' : 'Participation'
+    }
+
+    const isSponsorship = data.type === 'sponsorship'
     const commitmentFormLabel = commitmentFormMap[data.contribution_form] || data.contribution_form || (isId ? 'Uang Tunai / Transfer' : 'Cash / Transfer')
     const specificSupportLabel = specificSupportMap[data.specific_support as keyof typeof specificSupportMap] || data.specific_support || '-'
     const categoryLabel = categoryMap[data.donatur_category as keyof typeof categoryMap] || data.donatur_category || '-'
+    const sponsorPackageLabel = sponsorPackageMap[data.sponsor_package as keyof typeof sponsorPackageMap] || data.sponsor_package || '-'
 
     const committeeName = data.committees?.name || 'Vrilly Rondonuwu'
     const committeeRole = data.committees?.role || (isId ? 'Ketua Panitia' : 'Committee Chairperson')
@@ -315,12 +326,16 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                         {/* Detail Card */}
                         <View style={styles.detailCard}>
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>{isId ? 'Nama Donatur' : 'Donor Name'}</Text>
+                                <Text style={styles.detailLabel}>
+                                    {isId ? (isSponsorship ? 'Nama Sponsor' : 'Nama Donatur') : (isSponsorship ? 'Sponsor Name' : 'Donor Name')}
+                                </Text>
                                 <Text style={styles.detailValue}>{data.name}</Text>
                             </View>
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>{isId ? 'Nama Tercantum' : 'Published Name'}</Text>
-                                <Text style={styles.detailValue}>{data.display_name || data.name}</Text>
+                                <Text style={styles.detailLabel}>
+                                    {isId ? (isSponsorship ? 'Perusahaan' : 'Nama Tercantum') : (isSponsorship ? 'Company' : 'Published Name')}
+                                </Text>
+                                <Text style={styles.detailValue}>{isSponsorship ? (data.company_name || data.name) : (data.display_name || data.name)}</Text>
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>{isId ? 'Jenis Komitmen' : 'Commitment Type'}</Text>
@@ -335,8 +350,10 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                 </Text>
                             </View>
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>{isId ? 'Kategori Apresiasi' : 'Honorary Category'}</Text>
-                                <Text style={styles.detailValue}>{categoryLabel}</Text>
+                                <Text style={styles.detailLabel}>
+                                    {isId ? (isSponsorship ? 'Paket Sponsor' : 'Kategori Apresiasi') : (isSponsorship ? 'Sponsor Package' : 'Honorary Category')}
+                                </Text>
+                                <Text style={styles.detailValue}>{isSponsorship ? sponsorPackageLabel : categoryLabel}</Text>
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>{isId ? 'Alokasi Dukungan' : 'Support Allocation'}</Text>

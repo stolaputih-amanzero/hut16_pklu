@@ -45,6 +45,7 @@ export default function DaftarProposalPage() {
         specific_support: '',
         message: '',
         donatur_category: 'sahabat_bakti',
+        sponsor_package: 'donatur',
         lang: 'id',
         payment_status: 'pending',
         committee_id: '',
@@ -99,6 +100,7 @@ export default function DaftarProposalPage() {
             specific_support: proposal.specific_support || '',
             message: proposal.message || '',
             donatur_category: proposal.donatur_category || 'sahabat_bakti',
+            sponsor_package: proposal.sponsor_package || 'donatur',
             lang: proposal.lang || 'id',
             payment_status: proposal.payment_status || 'pending',
             committee_id: proposal.committee_id || '',
@@ -126,6 +128,7 @@ export default function DaftarProposalPage() {
             specific_support: '',
             message: '',
             donatur_category: 'sahabat_bakti',
+            sponsor_package: 'donatur',
             lang: 'id',
             payment_status: 'pending',
             committee_id: committees[0]?.id || '',
@@ -157,17 +160,25 @@ export default function DaftarProposalPage() {
         const rawValue = e.target.value.replace(/\D/g, '')
         const val = Number(rawValue) || 0
         let category = formData.donatur_category
+        let pkg = formData.sponsor_package
         if (val > 0) {
             if (val >= 10000000) category = 'sahabat_kasih'
             else if (val >= 5000000) category = 'sahabat_berkat'
             else if (val >= 2500000) category = 'sahabat_pelayanan'
             else if (val >= 1000000) category = 'sahabat_teladan'
             else category = 'sahabat_bakti'
+
+            if (val >= 50000000) pkg = 'platinum'
+            else if (val >= 25000000) pkg = 'gold'
+            else if (val >= 15000000) pkg = 'silver'
+            else if (val >= 5000000) pkg = 'bronze'
+            else pkg = 'donatur' // Partisipasi
         }
         setFormData({ 
             ...formData, 
             [e.target.name]: rawValue,
-            donatur_category: category
+            donatur_category: category,
+            sponsor_package: pkg
         })
     }
 
@@ -288,6 +299,7 @@ export default function DaftarProposalPage() {
                         specific_support: formData.specific_support || null,
                         message: formData.message || null,
                         donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
+                        sponsor_package: formData.type === 'sponsorship' ? (formData.sponsor_package || null) : null,
                         lang: formData.lang,
                         payment_status: formData.payment_status,
                         confirmed_at: formData.payment_status === 'confirmed' ? (selectedProposal?.confirmed_at || new Date().toISOString()) : null,
@@ -299,7 +311,7 @@ export default function DaftarProposalPage() {
 
                 // Regenerate PDF
                 await generateProposalPDF(formData.id, formData.lang)
-                if (formData.type === 'donatur' && formData.contribution_form) {
+                if (formData.contribution_form) {
                     await generateCommitmentPDF(formData.id, formData.lang)
                 }
                 if (formData.payment_status === 'confirmed') {
@@ -327,6 +339,7 @@ export default function DaftarProposalPage() {
                         specific_support: formData.specific_support || null,
                         message: formData.message || null,
                         donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
+                        sponsor_package: formData.type === 'sponsorship' ? (formData.sponsor_package || null) : null,
                         lang: formData.lang,
                         payment_status: formData.payment_status || 'pending',
                         confirmed_at: formData.payment_status === 'confirmed' ? new Date().toISOString() : null,
@@ -339,7 +352,7 @@ export default function DaftarProposalPage() {
 
                 // Generate PDF
                 await generateProposalPDF(newProp.id, formData.lang)
-                if (formData.type === 'donatur' && formData.contribution_form) {
+                if (formData.contribution_form) {
                     await generateCommitmentPDF(newProp.id, formData.lang)
                 }
                 toast.success(`Proposal ${number} berhasil dibuat!`)
@@ -808,7 +821,7 @@ export default function DaftarProposalPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                {formData.type === 'donatur' && (
+                                {(formData.type === 'donatur' || formData.type === 'sponsorship') && (
                                     <>
                                         <div>
                                             <Label className="text-xs text-[#D4AF37]">Jenis Komitmen</Label>
@@ -829,25 +842,52 @@ export default function DaftarProposalPage() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div>
-                                            <Label className="text-xs text-[#D4AF37]">Kategori Donatur</Label>
-                                            <Select 
-                                                disabled={!isEditMode}
-                                                value={formData.donatur_category} 
-                                                onValueChange={(val) => setFormData({ ...formData, donatur_category: val })}
-                                            >
-                                                <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                    <SelectItem value="sahabat_bakti">Sahabat Bakti (Rp500Rb+)</SelectItem>
-                                                    <SelectItem value="sahabat_teladan">Sahabat Teladan (Rp1Jt+)</SelectItem>
-                                                    <SelectItem value="sahabat_pelayanan">Sahabat Pelayan (Rp2.5Jt+)</SelectItem>
-                                                    <SelectItem value="sahabat_berkat">Sahabat Berkat (Rp5Jt+)</SelectItem>
-                                                    <SelectItem value="sahabat_kasih">Sahabat Kasih (Rp10Jt+)</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+
+                                        {formData.type === 'donatur' && (
+                                            <div>
+                                                <Label className="text-xs text-[#D4AF37]">Kategori Donatur</Label>
+                                                <Select 
+                                                    disabled={!isEditMode}
+                                                    value={formData.donatur_category} 
+                                                    onValueChange={(val) => setFormData({ ...formData, donatur_category: val })}
+                                                >
+                                                    <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                        <SelectItem value="sahabat_bakti">Sahabat Bakti (Rp500Rb+)</SelectItem>
+                                                        <SelectItem value="sahabat_teladan">Sahabat Teladan (Rp1Jt+)</SelectItem>
+                                                        <SelectItem value="sahabat_pelayanan">Sahabat Pelayan (Rp2.5Jt+)</SelectItem>
+                                                        <SelectItem value="sahabat_berkat">Sahabat Berkat (Rp5Jt+)</SelectItem>
+                                                        <SelectItem value="sahabat_kasih">Sahabat Kasih (Rp10Jt+)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )}
+
+                                        {formData.type === 'sponsorship' && (
+                                            <div>
+                                                <Label className="text-xs text-[#D4AF37]">Paket Sponsor</Label>
+                                                <Select 
+                                                    disabled={!isEditMode}
+                                                    value={formData.sponsor_package} 
+                                                    onValueChange={(val) => setFormData({ ...formData, sponsor_package: val })}
+                                                >
+                                                    <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                        <SelectValue placeholder="Pilih paket..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                        <SelectItem value="platinum">Platinum (Rp50Jt+)</SelectItem>
+                                                        <SelectItem value="gold">Emas / Gold (Rp25Jt+)</SelectItem>
+                                                        <SelectItem value="silver">Perak / Silver (Rp15Jt+)</SelectItem>
+                                                        <SelectItem value="bronze">Perunggu / Bronze (Rp5Jt+)</SelectItem>
+                                                        <SelectItem value="in_kind">In-Kind (Barang/Jasa)</SelectItem>
+                                                        <SelectItem value="donatur">Partisipasi (Bebas)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )}
+
                                         <div className="md:col-span-2">
                                             <Label className="text-xs text-[#D4AF37]">Dukungan Spesifik</Label>
                                             <Select

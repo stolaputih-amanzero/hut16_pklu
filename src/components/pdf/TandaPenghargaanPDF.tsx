@@ -244,7 +244,6 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
-                                    <Text style={styles.signatureRole}>{isId ? 'Panitia HUT ke-16 PKLU' : '16th PKLU Committee'}</Text>
                                 </View>
 
                                 {/* QR Code Signature for Verification */}
@@ -266,7 +265,6 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>
-                                    <Text style={styles.signatureRole}>{isId ? 'Panitia HUT ke-16 PKLU' : '16th PKLU Committee'}</Text>
                                 </View>
                             </View>
                         </View>

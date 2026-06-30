@@ -92,7 +92,7 @@ export default function ProposalSponsorshipPage() {
     }
 
     const handleGenerateProposal = async () => {
-        if (!formData.name || !formData.phone || !formData.contribution_value || !formData.committee_id) {
+        if (!formData.name || !formData.phone || !formData.committee_id) {
             toast.error('Silakan lengkapi data yang diperlukan, termasuk Panitia Penanggung Jawab')
             return
         }
@@ -111,11 +111,11 @@ export default function ProposalSponsorshipPage() {
                     type: 'sponsorship',
                     number: number,
                     name: formData.name,
-                    display_name: formData.name,
+                    display_name: formData.display_name || formData.name,
+                    company_name: formData.company_name || null,
                     phone: formData.phone,
-                    congregation: formData.congregation,
-                    contribution_value: Number(formData.contribution_value),
-                    message: formData.message,
+                    email: formData.email || null,
+                    congregation: formData.congregation || null,
                     lang: formData.language,
                     payment_status: 'pending',
                     committee_id: formData.committee_id
@@ -1056,7 +1056,7 @@ export default function ProposalSponsorshipPage() {
                                 {/* Nama Sponsor */}
                                 <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
                                     <Label className="form-section-title">Nama Instansi / Perusahaan</Label>
-                                    <div className="grid grid-cols-1 gap-6 mt-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                         <div className="space-y-2">
                                             <Label htmlFor="name" className="text-[#FDFBF7]/80">Nama Lengkap Sponsor</Label>
                                             <Input
@@ -1067,6 +1067,28 @@ export default function ProposalSponsorshipPage() {
                                                 placeholder="Nama Instansi, Perusahaan, atau Sponsor Pribadi"
                                                 className="form-input"
                                                 required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="display_name" className="text-[#FDFBF7]/80">Nama untuk Buku Acara</Label>
+                                            <Input
+                                                id="display_name"
+                                                name="display_name"
+                                                value={formData.display_name}
+                                                onChange={handleInputChange}
+                                                placeholder="Kosongkan jika sama dengan nama lengkap"
+                                                className="form-input"
+                                            />
+                                        </div>
+                                        <div className="space-y-2 md:col-span-2">
+                                            <Label htmlFor="company_name" className="text-[#FDFBF7]/80">Perusahaan / Kemitraan Utama (Opsional)</Label>
+                                            <Input
+                                                id="company_name"
+                                                name="company_name"
+                                                value={formData.company_name}
+                                                onChange={handleInputChange}
+                                                placeholder="Contoh: PT Swadaya Mandiri, CV Indah Karya"
+                                                className="form-input"
                                             />
                                         </div>
                                     </div>
@@ -1089,6 +1111,17 @@ export default function ProposalSponsorshipPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
+                                            <Label htmlFor="email" className="text-[#FDFBF7]/80">Email PIC (Opsional)</Label>
+                                            <Input
+                                                id="email"
+                                                name="email"
+                                                value={formData.email}
+                                                onChange={handleInputChange}
+                                                placeholder="Contoh: sponsor@email.com"
+                                                className="form-input"
+                                            />
+                                        </div>
+                                        <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="congregation" className="text-[#FDFBF7]/80">Jemaat / Kemitraan</Label>
                                             <Input
                                                 id="congregation"
@@ -1100,40 +1133,6 @@ export default function ProposalSponsorshipPage() {
                                             />
                                         </div>
                                     </div>
-                                </motion.div>
-
-                                {/* Nilai Dukungan */}
-                                <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
-                                    <Label className="form-section-title">Nilai Dukungan Sponsorship</Label>
-                                    <div className="grid grid-cols-1 gap-6 mt-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="contribution_value" className="text-[#FDFBF7]/80">Nilai Kontrak (Rp)</Label>
-                                            <Input
-                                                id="contribution_value"
-                                                name="contribution_value"
-                                                type="text"
-                                                value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
-                                                onChange={handleCurrencyChange}
-                                                placeholder="10.000.000"
-                                                className="form-input"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                {/* Keterangan Tambahan */}
-                                <motion.div variants={itemVariants} className="form-section bg-black/10 p-6 rounded-xl border border-[#D4AF37]/10">
-                                    <Label htmlFor="message" className="form-section-title">Keterangan / Paket Sponsorship</Label>
-                                    <Textarea
-                                        id="message"
-                                        name="message"
-                                        value={formData.message}
-                                        onChange={handleInputChange}
-                                        placeholder="Tulis paket sponsorship atau keterangan kerja sama..."
-                                        rows={4}
-                                        className="form-input mt-4"
-                                    />
                                 </motion.div>
 
                                 {/* Bahasa */}

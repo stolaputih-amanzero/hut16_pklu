@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] pb-24 md:pb-6">
             {/* Ambient Background */}
-            <div className="fixed inset-0 pointer-events-none z-0">
+            <div className="fixed inset-0 pointer-events-none -z-10">
                 <div className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-[#D4AF37]/10 rounded-full blur-[150px]" />
                 <div className="absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-[#047857]/20 rounded-full blur-[150px]" />
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
@@ -134,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </nav>
 
             {/* Content */}
-            <main className="p-4 md:p-6 relative z-10">{children}</main>
+            <main className="p-4 md:p-6 relative">{children}</main>
 
             {/* Mobile Floating Bottom Nav */}
             <div className="fixed bottom-6 left-4 right-4 z-50 md:hidden flex justify-around items-center bg-black/60 backdrop-blur-lg border border-[#D4AF37]/30 rounded-2xl py-3 px-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)]">

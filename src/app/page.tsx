@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,6 +10,7 @@ import { Playfair_Display } from 'next/font/google'
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700'], style: ['normal', 'italic'] })
 
 export default function Home() {
+  const [mapLoaded, setMapLoaded] = useState(false)
   const fadeIn = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -340,15 +342,16 @@ export default function Home() {
 
               {/* Peta Interaktif */}
               <div className="relative h-[300px] lg:h-[400px] w-full rounded-2xl overflow-hidden border border-[#D4AF37]/20 group shadow-2xl">
-                <div className="absolute inset-0 bg-[#022c22] animate-pulse flex items-center justify-center">
+                <div className={`absolute inset-0 bg-[#022c22] flex items-center justify-center transition-opacity duration-500 z-10 ${mapLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                   <div className="w-8 h-8 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
                 </div>
                 <iframe 
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.0520261394336!2d106.99238317585523!3d-6.250284793739777!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698dd26cd7d463%3A0x133da8fcb359f4f4!2sBekasi%20Convention%20Center!5e0!3m2!1sen!2sid!4v1715694295325!5m2!1sen!2sid" 
-                  className="absolute inset-0 w-full h-full border-0 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                  className="absolute inset-0 w-full h-full border-0 transition-all duration-700"
                   allowFullScreen={true} 
                   loading="lazy" 
                   referrerPolicy="no-referrer-when-downgrade"
+                  onLoad={() => setMapLoaded(true)}
                 ></iframe>
               </div>
 

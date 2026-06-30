@@ -44,10 +44,7 @@ Kami menghaturkan limpah terima kasih atas dukungan kasih yang telah Bapak/Ibu b
 
 Sebagai bentuk apresiasi dan penghargaan kami, bersama pesan ini kami lampirkan *Tanda Penghargaan* resmi dari panitia.
 
-📄 *Silakan unduh dokumen Anda melalui tautan berikut:*
-${d.token_url}
-
-*(Dokumen ini dilengkapi dengan Tanda Tangan Digital berupa QR Code untuk menjamin keasliannya)*
+📄 *Tanda Penghargaan Terlampir*
 
 Kiranya Tuhan Yesus Kristus senantiasa memberkati setiap kebaikan dan pelayanan Bapak/Ibu.
 
@@ -116,10 +113,7 @@ We would like to express our deepest gratitude for your generous support towards
 
 In recognition of your invaluable contribution, we are honored to present you with this official *Token of Appreciation*.
 
-📄 *Please download your document through the link below:*
-${d.token_url}
-
-*(This document is secured with a QR Code Digital Signature to verify its authenticity)*
+📄 *Token of Appreciation Attached*
 
 May the Lord Jesus Christ bless every kindness you have shown.
 

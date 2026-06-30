@@ -994,74 +994,74 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
             </Page>
 
             {/* PAGE 9: INFORMASI TRANSFER & PENUTUP */}
-            <Page size="A4" style={styles.page}>
+            <Page size="A4" style={[styles.page, { paddingBottom: 40 }]}>
                 <Header />
-                <Text style={styles.sectionTitle}>{isId ? 'XII. Informasi Transfer Dukungan' : 'XII. Support Transfer Information'}</Text>
-                <Text style={styles.bodyText}>
+                <Text style={[styles.sectionTitle, { fontSize: 13, marginBottom: 6 }]}>{isId ? 'XII. Informasi Transfer Dukungan' : 'XII. Support Transfer Information'}</Text>
+                <Text style={[styles.bodyText, { fontSize: 8.5, marginBottom: 5 }]}>
                     {isId ? 'Guna memastikan transparansi dan akuntabilitas, seluruh dukungan dana hanya disalurkan melalui satu pintu rekening resmi Kepanitiaan berikut ini:' : 'To ensure transparency and accountability, all financial support is exclusively channeled through the following official Committee account:'}
                 </Text>
 
-                <View style={styles.quoteContainer}>
-                    <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 5 }]}>Bank Pembayaran / Payment Bank</Text>
-                    <Text style={[styles.vipValueGold, { marginBottom: 15 }]}>PT. BANK ...............................................</Text>
+                <View style={[styles.quoteContainer, { padding: '8 15', marginVertical: 6, borderLeftWidth: 3 }]}>
+                    <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 2, fontSize: 7.5 }]}>Bank Pembayaran / Payment Bank</Text>
+                    <Text style={[styles.vipValueGold, { marginBottom: 6, fontSize: 10 }]}>PT. BANK ...............................................</Text>
                     
-                    <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 5 }]}>Nomor Rekening / Account Number</Text>
-                    <Text style={[styles.vipValueGold, { marginBottom: 15 }]}>...............................................................</Text>
+                    <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 2, fontSize: 7.5 }]}>Nomor Rekening / Account Number</Text>
+                    <Text style={[styles.vipValueGold, { marginBottom: 6, fontSize: 10 }]}>...............................................................</Text>
                     
-                    <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 5 }]}>Nama Penerima / Beneficiary Name</Text>
-                    <Text style={[styles.vipValueGold, { color: '#FDFBF7' }]}>...............................................................</Text>
+                    <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 2, fontSize: 7.5 }]}>Nama Penerima / Beneficiary Name</Text>
+                    <Text style={[styles.vipValueGold, { color: '#FDFBF7', fontSize: 10 }]}>...............................................................</Text>
                 </View>
                 
-                <Text style={[styles.bodyText, { textAlign: 'center', marginTop: -10, marginBottom: 40 }]}>
+                <Text style={[styles.bodyText, { textAlign: 'center', marginTop: 2, marginBottom: 8, fontSize: 8 }]}>
                     {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: ' : 'Please kindly send the transfer receipt via WhatsApp to the Committee Secretary: '}
                     <Text style={styles.bodyTextBold}>{CENTRAL_CONTACT_PHONE} ({CENTRAL_CONTACT_NAME})</Text>
                 </Text>
 
-                <Text style={styles.sectionTitle}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>
-                <Text style={styles.bodyText}>
+                <Text style={[styles.sectionTitle, { fontSize: 13, marginBottom: 6 }]}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>
+                <Text style={[styles.bodyText, { fontSize: 8.5, marginBottom: 4, lineHeight: 1.3 }]}>
                     {isId ? 'Demikian proposal dukungan donatur ini disampaikan sebagai undangan pelayanan bagi pribadi, keluarga, dan sahabat Pelkat PKLU GPIB yang rindu mengambil bagian dalam Perayaan dan Ibadah Memperingati HUT ke-16 Pelkat PKLU GPIB.' : 'Thus this donor support proposal is presented as an invitation to serve for individuals, families, and friends of PKLU GPIB who wish to take part in the 16th Anniversary Celebration and Worship.'}
                 </Text>
-                <Text style={styles.bodyText}>
+                <Text style={[styles.bodyText, { fontSize: 8.5, marginBottom: 6, lineHeight: 1.3 }]}>
                     {isId ? 'Setiap dukungan, baik besar maupun kecil, merupakan wujud kasih dan kepedulian yang sangat berarti bagi pelayanan kaum lanjut usia. Kiranya melalui kegiatan ini, Pelkat PKLU GPIB semakin dikuatkan untuk terus menjadi lansia teladan dalam iman, karya, dan pelayanan.' : 'Every support, big or small, is a manifestation of love and care that means a lot to the elderly service. May through this event, PKLU GPIB be further strengthened to continue being elderly role models in faith, work, and service.'}
                 </Text>
                 
-                <Text style={[styles.sectionTitle, { fontSize: 12, marginTop: 20, textAlign: 'center' }]}>Terima Kasih</Text>
-                <Text style={[styles.bodyText, { textAlign: 'center' }]}>
+                <Text style={[styles.sectionTitle, { fontSize: 10, marginTop: 4, marginBottom: 2, textAlign: 'center' }]}>Terima Kasih</Text>
+                <Text style={[styles.bodyText, { fontSize: 8.5, textAlign: 'center', marginBottom: 8 }]}>
                     {isId ? 'Atas doa, dukungan, dan kasih yang diberikan, Panitia menyampaikan terima kasih.' : 'For the prayers, support, and love given, the Committee expresses gratitude.'}
                 </Text>
 
-                <View style={styles.signRow}>
+                <View style={[styles.signRow, { marginTop: 6 }]}>
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>{isId ? 'Ketua Panitia' : 'Committee Chairperson'}</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 20 }]}>{isId ? 'Ketua Panitia' : 'Committee Chairperson'}</Text>
                         <View style={styles.signLine} />
                         <Text style={styles.signName}>Vrilly Rondonuwu</Text>
                     </View>
 
                     {/* Verification QR Code in the middle */}
-                    <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -5 }}>
+                    <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -8 }}>
                         <Image 
                             src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${origin}/verify/${data.id}`)}`} 
-                            style={{ width: 55, height: 55, marginBottom: 4 }} 
+                            style={{ width: 45, height: 45, marginBottom: 2 }} 
                         />
-                        <Text style={{ fontSize: 6, color: '#D4AF37', textAlign: 'center', fontWeight: 'bold' }}>
+                        <Text style={{ fontSize: 5.5, color: '#D4AF37', textAlign: 'center', fontWeight: 'bold' }}>
                             {isId ? 'DOKUMEN VALID' : 'VALID DOCUMENT'}
                         </Text>
-                        <Text style={{ fontSize: 5, color: '#718096', textAlign: 'center', marginTop: 1 }}>
+                        <Text style={{ fontSize: 4.5, color: '#718096', textAlign: 'center', marginTop: 0.5 }}>
                             {isId ? 'PINDAI VERIFIKASI' : 'SCAN TO VERIFY'}
                         </Text>
                     </View>
 
                     <View style={styles.signBox}>
-                        <Text style={styles.signTitle}>{isId ? 'Sekretaris' : 'Secretary'}</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 20 }]}>{isId ? 'Sekretaris' : 'Secretary'}</Text>
                         <View style={styles.signLine} />
                         <Text style={styles.signName}>Vevi Mayo</Text>
                     </View>
                 </View>
 
-                <View style={{ alignItems: 'center' }}>
-                    <View style={styles.signCenterBox}>
-                        <Text style={[styles.signTitle, { marginBottom: 10 }]}>{isId ? 'Mengetahui,' : 'Acknowledged by,'}</Text>
-                        <Text style={[styles.signTitle, { marginBottom: 35 }]}>{isId ? 'Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi' : 'Executive Board of GPIB MUPEL - Bekasi Jemaat'}</Text>
+                <View style={{ alignItems: 'center', marginTop: 6 }}>
+                    <View style={[styles.signCenterBox, { marginTop: 0 }]}>
+                        <Text style={[styles.signTitle, { marginBottom: 4 }]}>{isId ? 'Mengetahui,' : 'Acknowledged by,'}</Text>
+                        <Text style={[styles.signTitle, { marginBottom: 20 }]}>{isId ? 'Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi' : 'Executive Board of GPIB MUPEL - Bekasi Jemaat'}</Text>
                         <View style={[styles.signLine, { width: 180 }]} />
                         <Text style={styles.signName}>Pdt. Daniel J C Lumentut, S.Th., M.M</Text>
                         <Text style={styles.signRole}>{isId ? 'Ketua B.P Mupel Bekasi' : 'Chairperson of BP Mupel Bekasi'}</Text>

@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import {
-    DollarSign,
+    Heart,
     CheckCircle,
     Send,
-    Loader2
+    Loader2,
+    FileText
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { getNextNumber } from '@/lib/numbering'
@@ -337,7 +338,7 @@ export default function ProposalSponsorshipPage() {
                                                 onClick={() => window.open(proposalPdfUrl, '_blank')}
                                                 className="w-full rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
                                             >
-                                                <DollarSign className="mr-2 h-4 w-4" />
+                                                <FileText className="mr-2 h-4 w-4" />
                                                 Lihat PDF Proposal
                                             </Button>
                                         )}
@@ -354,7 +355,7 @@ export default function ProposalSponsorshipPage() {
                                                 onClick={() => window.open(proposalPdfUrl, '_blank')}
                                                 className="w-full rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
                                             >
-                                                <DollarSign className="mr-2 h-4 w-4" />
+                                                <FileText className="mr-2 h-4 w-4" />
                                                 Lihat PDF Proposal
                                             </Button>
                                         )}
@@ -375,7 +376,7 @@ export default function ProposalSponsorshipPage() {
                 <Card className="border-emerald shadow-emerald overflow-hidden bg-[#022c22]/40 backdrop-blur-xl">
                     <CardHeader className="border-b border-[#D4AF37]/20 pb-6 bg-[#022c22]/60">
                         <CardTitle className="text-2xl font-bold text-[#FDFBF7] flex items-center">
-                            <DollarSign className="mr-2 h-6 w-6 text-[#D4AF37]" />
+                            <Heart className="mr-2 h-6 w-6 text-[#D4AF37]" />
                             Pendaftaran Proposal Sponsorship Baru
                         </CardTitle>
                         <p className="text-[#FDFBF7]/60 mt-2 text-sm italic">
@@ -521,7 +522,7 @@ export default function ProposalSponsorshipPage() {
                                             </>
                                         ) : (
                                             <>
-                                                <DollarSign className="mr-2 h-4 w-4 text-[#022c22]" />
+                                                <Heart className="mr-2 h-4 w-4 text-[#022c22]" />
                                                 Buat Proposal Sponsorship
                                             </>
                                         )}
@@ -534,7 +535,7 @@ export default function ProposalSponsorshipPage() {
                                             onClick={() => window.open(proposalPdfUrl, '_blank')}
                                             className="flex-1 rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
                                         >
-                                            <DollarSign className="mr-2 h-4 w-4" />
+                                            <FileText className="mr-2 h-4 w-4" />
                                             Lihat PDF Proposal
                                         </Button>
                                     )}

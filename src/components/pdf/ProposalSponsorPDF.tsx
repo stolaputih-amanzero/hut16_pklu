@@ -983,12 +983,12 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     {isId ? 'Setiap dukungan, baik besar maupun kecil, merupakan wujud kasih dan kepedulian yang sangat berarti bagi pelayanan kaum lanjut usia. Kiranya melalui kegiatan ini, Pelkat PKLU GPIB semakin dikuatkan untuk terus menjadi lansia teladan dalam iman, karya, dan pelayanan.' : 'Every support, big or small, is a manifestation of love and care that means a lot to the elderly service. May through this event, PKLU GPIB be further strengthened to continue being elderly role models in faith, work, and service.'}
                 </Text>
                 
-                <Text style={[styles.sectionTitle, { fontSize: 10, marginTop: 4, marginBottom: 2, textAlign: 'center' }]}>Terima Kasih</Text>
-                <Text style={[styles.bodyText, { fontSize: 8.5, textAlign: 'center', marginBottom: 8 }]}>
+                <Text style={[styles.sectionTitle, { fontSize: 10, marginTop: 15, marginBottom: 4, textAlign: 'center' }]}>Terima Kasih</Text>
+                <Text style={[styles.bodyText, { fontSize: 8.5, textAlign: 'center', marginBottom: 15 }]}>
                     {isId ? 'Atas doa, dukungan, dan kasih yang diberikan, Panitia menyampaikan terima kasih.' : 'For the prayers, support, and love given, the Committee expresses gratitude.'}
                 </Text>
 
-                <View style={[styles.signRow, { marginTop: 6 }]}>
+                <View style={[styles.signRow, { marginTop: 15 }]}>
                     <View style={styles.signBox}>
                         <Text style={[styles.signTitle, { marginBottom: 20 }]}>{isId ? 'Ketua Panitia' : 'Committee Chairperson'}</Text>
                         <View style={styles.signLine} />
@@ -1016,7 +1016,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
                 </View>
 
-                <View style={{ alignItems: 'center', marginTop: 6 }}>
+                <View style={{ alignItems: 'center', marginTop: 15 }}>
                     <View style={[styles.signCenterBox, { marginTop: 0 }]}>
                         <Text style={[styles.signTitle, { marginBottom: 4 }]}>{isId ? 'Mengetahui,' : 'Acknowledged by,'}</Text>
                         <Text style={[styles.signTitle, { marginBottom: 20 }]}>{isId ? 'Badan Pelaksana MUPEL Jemaat – Jemaat Bekasi' : 'Executive Board of GPIB MUPEL - Bekasi Jemaat'}</Text>

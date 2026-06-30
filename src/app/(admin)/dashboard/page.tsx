@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-    DollarSign,
+    Heart,
     Users,
     FileText,
     Trophy,
@@ -102,7 +102,7 @@ export default function DashboardPage() {
                     <Card className="border-emerald shadow-emerald h-full transition-transform hover:scale-105 duration-300 cursor-default">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium text-[#FDFBF7]/80 uppercase tracking-wider">Proposal Donatur</CardTitle>
-                            <DollarSign className="h-4 w-4 text-[#D4AF37]" />
+                            <Heart className="h-4 w-4 text-[#D4AF37]" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-[#D4AF37]">{stats.donatur}</div>

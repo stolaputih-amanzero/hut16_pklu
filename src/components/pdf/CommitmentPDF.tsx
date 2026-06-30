@@ -429,7 +429,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                         {/* Footer Signatures */}
                         <View style={styles.footerContainer}>
                             <Text style={styles.letterDate}>
-                                {isId ? 'Bekasi' : 'Bekasi'}, {formatDateLong(data.confirmed_at || data.created_at, isId)}
+                                {isId ? 'Bekasi' : 'Bekasi'}, {formatDateLong(data.confirmed_date || data.confirmed_at || data.created_at, isId)}
                             </Text>
                             <View style={styles.signatureRow}>
                                 <View style={styles.signatureBox}>

@@ -52,7 +52,10 @@ export default function DaftarProposalPage() {
         payment_status: 'pending',
         committee_id: '',
         payment_proof_url: '',
-        commitment_pdf_url: ''
+        commitment_pdf_url: '',
+        proposal_date: '',
+        confirmed_date: '',
+        paid_date: ''
     })
 
     useEffect(() => {
@@ -108,7 +111,10 @@ export default function DaftarProposalPage() {
             payment_status: proposal.payment_status || 'pending',
             committee_id: proposal.committee_id || '',
             payment_proof_url: proposal.payment_proof_url || '',
-            commitment_pdf_url: proposal.commitment_pdf_url || ''
+            commitment_pdf_url: proposal.commitment_pdf_url || '',
+            proposal_date: proposal.proposal_date || '',
+            confirmed_date: proposal.confirmed_date || '',
+            paid_date: proposal.paid_date || ''
         })
         setIsOpen(true)
     }
@@ -136,7 +142,10 @@ export default function DaftarProposalPage() {
             payment_status: 'pending',
             committee_id: committees[0]?.id || '',
             payment_proof_url: '',
-            commitment_pdf_url: ''
+            commitment_pdf_url: '',
+            proposal_date: new Date().toISOString().split('T')[0],
+            confirmed_date: '',
+            paid_date: ''
         })
         setIsOpen(true)
     }
@@ -356,7 +365,10 @@ export default function DaftarProposalPage() {
                         lang: formData.lang,
                         payment_status: formData.payment_status,
                         confirmed_at: formData.payment_status === 'confirmed' ? (selectedProposal?.confirmed_at || new Date().toISOString()) : null,
-                        committee_id: formData.committee_id
+                        committee_id: formData.committee_id,
+                        proposal_date: formData.proposal_date || null,
+                        confirmed_date: formData.confirmed_date || null,
+                        paid_date: formData.paid_date || null
                     })
                     .eq('id', formData.id)
 
@@ -396,7 +408,10 @@ export default function DaftarProposalPage() {
                         lang: formData.lang,
                         payment_status: formData.payment_status || 'pending',
                         confirmed_at: formData.payment_status === 'confirmed' ? new Date().toISOString() : null,
-                        committee_id: formData.committee_id
+                        committee_id: formData.committee_id,
+                        proposal_date: formData.proposal_date || null,
+                        confirmed_date: formData.confirmed_date || null,
+                        paid_date: formData.paid_date || null
                     })
                     .select()
                     .single()
@@ -609,7 +624,7 @@ export default function DaftarProposalPage() {
                                                 <td className="px-4 py-4 text-[#A0AEC0] whitespace-nowrap">
                                                     <div className="flex items-center gap-1.5">
                                                         <Calendar className="h-3 w-3" />
-                                                        {formatDate(p.created_at)}
+                                                        {formatDate(p.proposal_date || p.created_at)}
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4">
@@ -674,7 +689,7 @@ export default function DaftarProposalPage() {
                                         <div className="flex justify-between items-center pt-2 border-t border-[#D4AF37]/10 text-xs">
                                             <div className="text-[#A0AEC0] flex items-center gap-1">
                                                 <Calendar className="h-3.5 w-3.5" />
-                                                {formatDate(p.created_at)}
+                                                {formatDate(p.proposal_date || p.created_at)}
                                             </div>
                                             <div>
                                                 {p.payment_status === 'confirmed' ? (
@@ -904,14 +919,39 @@ export default function DaftarProposalPage() {
                                         </Select>
                                     </div>
                                     {formData.id && (
-                                        <div className="md:col-span-2 grid grid-cols-2 gap-4 pt-2 border-t border-[#D4AF37]/10 text-xs text-[#FDFBF7]/70">
+                                        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-[#D4AF37]/10 text-xs text-[#FDFBF7]">
                                             <div>
-                                                <span className="block text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Dibuat</span>
-                                                <span className="font-semibold">{selectedProposal?.created_at ? formatDate(selectedProposal.created_at) : '-'}</span>
+                                                <Label className="text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Dibuat</Label>
+                                                <Input
+                                                    type="date"
+                                                    name="proposal_date"
+                                                    value={formData.proposal_date}
+                                                    onChange={(e) => setFormData({ ...formData, proposal_date: e.target.value })}
+                                                    disabled={!isEditMode}
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] mt-1 [color-scheme:dark]"
+                                                />
                                             </div>
                                             <div>
-                                                <span className="block text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Dikonfirmasi / Lunas</span>
-                                                <span className="font-semibold">{selectedProposal?.confirmed_at ? formatDate(selectedProposal.confirmed_at) : '-'}</span>
+                                                <Label className="text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Dikonfirmasi</Label>
+                                                <Input
+                                                    type="date"
+                                                    name="confirmed_date"
+                                                    value={formData.confirmed_date}
+                                                    onChange={(e) => setFormData({ ...formData, confirmed_date: e.target.value })}
+                                                    disabled={!isEditMode}
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] mt-1 [color-scheme:dark]"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Lunas</Label>
+                                                <Input
+                                                    type="date"
+                                                    name="paid_date"
+                                                    value={formData.paid_date}
+                                                    onChange={(e) => setFormData({ ...formData, paid_date: e.target.value })}
+                                                    disabled={!isEditMode}
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] mt-1 [color-scheme:dark]"
+                                                />
                                             </div>
                                         </div>
                                     )}

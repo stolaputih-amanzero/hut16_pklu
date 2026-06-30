@@ -550,8 +550,8 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                         )}
                         <Text style={[styles.coverDetailText, { color: '#A0AEC0', fontSize: 7, textAlign: 'center', letterSpacing: 0.5 }]}>
                             {isId 
-                                ? formatDateLong(data.created_at, true)
-                                : formatDateLong(data.created_at, false)}
+                                ? formatDateLong(data.proposal_date || data.created_at, true)
+                                : formatDateLong(data.proposal_date || data.created_at, false)}
                         </Text>
                     </View>
                 </View>

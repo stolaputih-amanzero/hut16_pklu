@@ -36,7 +36,8 @@ export default function BuatProposalPage() {
         email: '',
         congregation: '',
         language: 'id',
-        committee_id: ''
+        committee_id: '',
+        proposal_date: new Date().toISOString().split('T')[0]
     })
 
     const [committees, setCommittees] = useState<any[]>([])
@@ -73,7 +74,8 @@ export default function BuatProposalPage() {
             company_name: '',
             phone: '',
             email: '',
-            congregation: ''
+            congregation: '',
+            proposal_date: new Date().toISOString().split('T')[0]
         }))
         setIsSuccess(false)
         setProposalId('')
@@ -108,7 +110,8 @@ export default function BuatProposalPage() {
                     congregation: formData.congregation || null,
                     lang: formData.language,
                     payment_status: 'pending',
-                    committee_id: formData.committee_id
+                    committee_id: formData.committee_id,
+                    proposal_date: formData.proposal_date
                 })
                 .select()
                 .single()
@@ -340,6 +343,18 @@ export default function BuatProposalPage() {
                                             onChange={(val) => setFormData(prev => ({ ...prev, committee_id: val }))}
                                             placeholder="Pilih nama panitia..."
                                             disabled={committees.length === 0}
+                                        />
+                                    </div>
+
+                                    {/* Proposal Date */}
+                                    <div className="space-y-2">
+                                        <Label className="text-[#FDFBF7]">Tanggal Proposal</Label>
+                                        <Input
+                                            type="date"
+                                            name="proposal_date"
+                                            value={formData.proposal_date}
+                                            onChange={handleInputChange}
+                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] [color-scheme:dark]"
                                         />
                                     </div>
                                 </div>

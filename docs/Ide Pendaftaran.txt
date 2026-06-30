@@ -1,0 +1,69 @@
+Ide Anda **sangat brilian dan sangat relevan** untuk membangun antusiasme (hype) dan rasa memiliki (sense of belonging) di kalangan peserta, terutama karena ini adalah acara untuk kaum lanjut usia (Lansia). 
+
+Menyediakan halaman publik yang interaktif akan membuat acara HUT ke-16 PKLU GPIB terasa lebih hidup, modern, namun tetap hangat.
+
+Namun, karena target penggunanya adalah **Lansia**, ada beberapa catatan penting terkait **User Experience (UX)** dan **mekanisme PIN** yang Anda tanyakan. Berikut adalah analisis dan saran terbaik dari saya:
+
+---
+
+### 1. Evaluasi Ide "PIN" untuk Edit Data & Twibbon
+Anda bertanya: *"Apakah bisa ketika mendaftar mereka create PIN yang nantinya digunakan untuk edit?"*
+
+**Jawabannya: Bisa, tapi TIDAK DISARANKAN untuk Lansia.**
+*   **Risiko Keamanan:** Jika halaman bersifat publik dan hanya mengandalkan PIN (misal: 4-6 digit angka), siapa pun yang tahu PIN tersebut bisa mengedit data atau mengganti foto.
+*   **Risiko Lupa:** Lansia sangat rentan lupa PIN atau kehilangan kertas/email yang berisi PIN tersebut. Jika mereka lupa, mereka akan frustrasi dan batal mendaftar.
+*   **Solusi yang Jauh Lebih Baik & Ramah Lansia:** Gunakan **WhatsApp OTP (One Time Password)** atau **Magic Link via WhatsApp/Email**.
+    *   **Caranya:** Saat mendaftar, mereka wajib memasukkan Nomor WhatsApp. Saat mereka ingin mengedit pendaftaran atau mengganti foto Twibbon, mereka cukup memasukkan Nomor WA mereka di halaman "Lupa PIN/Edit Data". Sistem akan otomatis mengirimkan **Link Akses (Magic Link)** atau **Kode 4 digit** langsung ke WhatsApp mereka.
+    *   **Keuntungan:** Mereka tidak perlu menghafal apa pun. Cukup buka WhatsApp, klik link, dan mereka langsung masuk ke halaman edit data mereka. Ini jauh lebih aman dan mudah.
+
+---
+
+### 2. Bedah Fitur untuk Halaman Publik (Khusus Lansia)
+
+Karena ini untuk Lansia, kuncinya adalah: **Tulisan Besar (Large Font), Kontras Warna Tinggi, Tombol Jelas, dan Langkah Minim.**
+
+#### A. Pendaftaran Peserta (Registration)
+*   **Saran Data yang Diisi:** Jangan terlalu banyak. Cukup: Nama Lengkap, Nama Jemaat, No. WhatsApp (Wajib), dan Usia.
+*   **Fitur Tambahan yang Sangat Disarankan (Value Add):** Tambahkan kolom **"Kondisi Kesehatan / Mobilitas"** (Pilihan ganda: *Mandiri, Menggunakan Tongkat, Kursi Roda, atau Perlu Pendampingan*). Ini akan sangat membantu **Seksi Kesehatan** dan **Seksi Acara/Penerima Tamu** dalam mempersiapkan fasilitas di Bekasi Convention Center nanti.
+*   **Tiket Digital:** Setelah mendaftar, sistem men-generate **QR Code Tiket Digital** yang dikirim ke WhatsApp mereka. Nanti di pintu masuk acara, panitia tinggal scan QR Code ini (bisa juga di-print oleh panitia jika lansia tersebut tidak bisa print sendiri).
+
+#### B. Fitur Twibbon (Sangat Disarankan!)
+Ini adalah fitur yang paling disukai untuk disebar di grup-grup WA Jemaat.
+*   **Cara Kerja:** 
+    1. Pilih bingkai (Twibbon) yang disediakan panitia (misal: ada 3 pilihan desain).
+    2. Upload foto selfie / foto keluarga.
+    3. Sistem otomatis memotong (crop) dan menyesuaikan foto ke dalam bingkai.
+    4. Tombol **"Download ke Galeri HP"** (Pastikan tombol ini besar dan jelas).
+*   **Tips Teknis:** Pastikan sistem bisa diakses dengan baik lewat HP (Mobile Friendly), karena 99% lansia akan mengakses ini dari Smartphone mereka, bukan dari Laptop.
+
+#### C. Testimoni / Ucapan Syukur (Wall of Grace)
+*   **Konsep:** Buat "Papan Ucapan Digital" atau "Pohon Syukur Digital" (sesuai ide di proposal donatur sebelumnya).
+*   **Cara Kerja:** Lansia (atau keluarga/wilayah yang membantu) bisa mengetik ucapan maksimal 100-150 karakter.
+*   **Fitur Moderasi (PENTING):** Karena ini halaman publik, ucapan yang masuk **TIDAK LANGSUNG TAMPIL**. Harus masuk ke dashboard admin panitia (Seksi Humas) untuk di-approve terlebih dahulu agar tidak ada kata-kata yang tidak pantas atau spam.
+*   **Ide Menarik:** Izinkan mereka mengirim testimoni berupa **Voice Note (Suara)** atau **Video Singkat** (maksimal 30 detik) yang nanti akan diputar saat *Slideshow* di acara puncak atau di halaman web.
+
+---
+
+### 3. Arus Sistem (User Flow) yang Disarankan
+
+1.  **Akses Halaman Publik:** `hut16pklugpib.org` (atau subdomain serupa).
+2.  **Menu Utama:** 
+    *   [Daftar Sekarang] -> Mengisi form -> Dapat QR Code & Kode Akses di WA.
+    *   [Pasang Twibbon] -> Upload foto -> Download.
+    *   [Kirim Testimoni] -> Isi ucapan -> Menunggu persetujuan admin.
+    *   [Info Acara] -> Rundown, Lokasi, Peta.
+3.  **Jika Ingin Edit Data / Ganti Foto Twibbon:**
+    *   Klik menu [Edit Pendaftaran Saya].
+    *   Masukkan No. WhatsApp -> Klik "Kirim Kode".
+    *   Buka WA, masukkan kode/link -> Berhasil masuk ke dashboard pribadi -> Bisa edit data atau ganti foto twibbon.
+
+---
+
+### Kesimpulan
+Ide Anda **sangat memungkinkan dan sangat bagus** untuk meningkatkan partisipasi. 
+
+**Kunci keberhasilannya ada di dua hal:**
+1.  **Ganti konsep "PIN Hafalan" menjadi "Verifikasi via WhatsApp"**. Ini akan menyelamatkan panitia dari ratusan komplain "Lupa PIN" dari para lansia.
+2.  **Desain UI/UX yang "Lansia-Friendly"**. Gunakan font minimal ukuran 16px-18px, hindari warna teks abu-abu di atas latar putih (kurang kontras), dan gunakan tombol dengan label yang jelas (misal: tulisan "UNDUH FOTO" lebih baik daripada sekadar ikon panah ke bawah).
+
+Apakah Anda ingin saya bantu buatkan **struktur database** atau **mockup teks untuk form pendaftaran** yang ramah lansia ini?

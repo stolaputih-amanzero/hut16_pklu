@@ -1209,42 +1209,6 @@ export default function ProposalSponsorshipPage() {
                                     )}
                                 </motion.div>
                             </div>
-
-                            {!isConfirmed && proposalNumber && (
-                                <motion.div variants={itemVariants} className="mt-8 p-6 bg-[#D4AF37]/10 rounded-xl border border-[#D4AF37]/40 backdrop-blur-md">
-                                    <h3 className="font-bold text-[#D4AF37] mb-2 text-lg">Konfirmasi Sponsorship</h3>
-                                    <p className="text-[#FDFBF7]/80 mb-6">
-                                        Setelah berkas MoU ditandatangani dan dana disetujui, klik konfirmasi di bawah ini.
-                                    </p>
-                                    <Button
-                                        type="button"
-                                        onClick={confirmPayment}
-                                        disabled={loading}
-                                        className="emerald-button w-full"
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Mengecek Konfirmasi
-                                            </>
-                                        ) : (
-                                            <>
-                                                <CheckCircle className="mr-2 h-4 w-4 text-[#022c22]" />
-                                                Konfirmasi Kerja Sama
-                                            </>
-                                        )}
-                                    </Button>
-                                </motion.div>
-                            )}
-
-                            {isConfirmed && (
-                                <motion.div variants={itemVariants} className="mt-8 p-6 bg-[#047857]/30 rounded-xl border border-[#D4AF37]/40 backdrop-blur-md">
-                                    <h3 className="font-bold text-[#D4AF37] mb-2 text-lg">Kerja Sama Sponsorship Dikonfirmasi</h3>
-                                    <p className="text-[#FDFBF7]/80">
-                                        Sponsorship ini telah lunas/disetujui dan tercatat dalam sistem keuangan panitia.
-                                    </p>
-                                </motion.div>
-                            )}
                         </motion.div>
                     </CardContent>
                 </Card>

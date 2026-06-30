@@ -1245,72 +1245,7 @@ export default function ProposalDonaturPage() {
                                     </Button>
                                 )}
                             </motion.div>
-                        </div>
-
-                        {isConfirmed && tokenUrl && (
-                            <motion.div variants={itemVariants} className="mt-8 p-6 bg-[#047857]/30 rounded-xl border border-[#D4AF37]/40 backdrop-blur-md">
-                                <h3 className="font-bold text-[#D4AF37] mb-2 text-lg">Token Penghargaan Tersedia</h3>
-                                <p className="text-[#FDFBF7]/80 mb-6">
-                                    Tanda penghargaan telah dibuat dan siap dikirim ke donatur.
-                                </p>
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <Button
-                                        type="button"
-                                        onClick={sendTokenViaWA}
-                                        disabled={isSending}
-                                        className="bg-[#25D366] hover:bg-[#128C7E] text-white flex-1 rounded-full font-semibold transition-all shadow-[0_4px_14px_0_rgba(37,211,102,0.39)]"
-                                    >
-                                        {isSending ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Mengirim Token...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Send className="mr-2 h-4 w-4" />
-                                                Kirim Token via WhatsApp
-                                            </>
-                                        )}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => window.open(tokenUrl, '_blank')}
-                                        className="flex-1 rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
-                                    >
-                                        <Award className="mr-2 h-4 w-4" />
-                                        Lihat Token
-                                    </Button>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {!isConfirmed && proposalNumber && (
-                            <motion.div variants={itemVariants} className="mt-8 p-6 bg-[#D4AF37]/10 rounded-xl border border-[#D4AF37]/40 backdrop-blur-md">
-                                <h3 className="font-bold text-[#D4AF37] mb-2 text-lg">Konfirmasi Pembayaran</h3>
-                                <p className="text-[#FDFBF7]/80 mb-6">
-                                    Setelah dana diterima, silakan konfirmasi pembayaran untuk menghasilkan token penghargaan.
-                                </p>
-                                <Button
-                                    type="button"
-                                    onClick={confirmPayment}
-                                    disabled={loading}
-                                    className="emerald-button w-full"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Mengecek Konfirmasi
-                                        </>
-                                    ) : (
-                                        <>
-                                            <CheckCircle className="mr-2 h-4 w-4 text-[#022c22]" />
-                                            Konfirmasi Pembayaran
-                                        </>
-                                    )}
-                                </Button>
-                            </motion.div>
-                        )}
+                            </div>
                         </motion.div>
                     </CardContent>
                 </Card>

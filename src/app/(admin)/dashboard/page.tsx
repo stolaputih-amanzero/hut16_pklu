@@ -10,11 +10,22 @@ import {
     Trophy,
     CheckCircle,
     Send,
-    Plus
+    Plus,
+    PieChart
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
-
 import { motion } from 'framer-motion'
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    Cell
+} from 'recharts'
+import { formatRupiah } from '@/lib/utils'
 
 export default function DashboardPage() {
     const [stats, setStats] = useState({
@@ -23,6 +34,11 @@ export default function DashboardPage() {
         confirmed: 0,
         tokens: 0
     })
+
+    const [fundData, setFundData] = useState([
+        { name: 'Donatur', amount: 0, fill: '#10b981' },
+        { name: 'Sponsorship', amount: 0, fill: '#f59e0b' }
+    ])
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -50,6 +66,27 @@ export default function DashboardPage() {
                     .from('proposals')
                     .select('*', { count: 'exact', head: true })
                     .neq('token_pdf_url', null)
+
+                // Get funds
+                const { data: donaturFunds } = await supabase
+                    .from('proposals')
+                    .select('contribution_value')
+                    .eq('type', 'donatur')
+                    .not('contribution_value', 'is', null)
+
+                const { data: sponsorFunds } = await supabase
+                    .from('proposals')
+                    .select('contribution_value')
+                    .eq('type', 'sponsorship')
+                    .not('contribution_value', 'is', null)
+
+                const sumDonatur = donaturFunds?.reduce((acc, curr) => acc + (curr.contribution_value || 0), 0) || 0
+                const sumSponsor = sponsorFunds?.reduce((acc, curr) => acc + (curr.contribution_value || 0), 0) || 0
+
+                setFundData([
+                    { name: 'Donatur', amount: sumDonatur, fill: '#10b981' },
+                    { name: 'Sponsorship', amount: sumSponsor, fill: '#f59e0b' }
+                ])
 
                 setStats({
                     donatur: donaturCount || 0,
@@ -163,9 +200,58 @@ export default function DashboardPage() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
                 <motion.div variants={itemVariants} className="md:col-span-2">
+                    <Card className="border-emerald shadow-emerald h-full cursor-default bg-[#033B2B]/40 backdrop-blur-xl">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
+                                <PieChart className="mr-2 h-5 w-5 text-[#D4AF37]" />
+                                Perolehan Dana (Donatur & Sponsor)
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[250px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={fundData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} vertical={false} />
+                                        <XAxis 
+                                            dataKey="name" 
+                                            stroke="#FDFBF7" 
+                                            opacity={0.6}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            tick={{ fill: '#FDFBF7', fontSize: 12 }}
+                                        />
+                                        <YAxis 
+                                            stroke="#FDFBF7" 
+                                            opacity={0.6}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            tickFormatter={(value) => value >= 1000000 ? `Rp${(value / 1000000).toFixed(0)}M` : `Rp${value.toLocaleString('id-ID')}`}
+                                            tick={{ fill: '#FDFBF7', fontSize: 12 }}
+                                            width={80}
+                                        />
+                                        <Tooltip 
+                                            cursor={{ fill: 'rgba(212, 175, 55, 0.1)' }}
+                                            contentStyle={{ backgroundColor: '#022c22', borderColor: 'rgba(212, 175, 55, 0.3)', borderRadius: '12px', color: '#FDFBF7', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
+                                            formatter={(value: number) => [formatRupiah(value), 'Total']}
+                                        />
+                                        <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={60}>
+                                            {
+                                                fundData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                                ))
+                                            }
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                <motion.div variants={itemVariants} className="md:col-span-1 flex flex-col">
                     <Card className="border-emerald shadow-emerald relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                         <CardHeader>
@@ -174,17 +260,17 @@ export default function DashboardPage() {
                                 Buat Proposal Baru
                             </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-[#FDFBF7]/60 mb-6 text-sm max-w-2xl">
+                        <CardContent className="flex-1 flex flex-col justify-between">
+                            <p className="text-[#FDFBF7]/60 mb-6 text-sm">
                                 Kelola pendaftaran proposal donatur pribadi maupun sponsorship institusi dalam satu alur yang mudah dan terintegrasi.
                             </p>
                             <Button
                                 asChild
-                                className="emerald-button md:w-auto w-full justify-center px-8"
+                                className="emerald-button w-full justify-center px-4 py-6 whitespace-normal h-auto text-center"
                             >
                                 <a href="/buat-proposal">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Buka Halaman Pembuatan Proposal
+                                    <Plus className="mr-2 h-4 w-4 shrink-0" />
+                                    <span>Buka Halaman Pembuatan Proposal</span>
                                 </a>
                             </Button>
                         </CardContent>

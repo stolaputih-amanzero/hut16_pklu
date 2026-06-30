@@ -76,16 +76,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     ]
 
     return (
-        <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] pb-24 md:pb-6">
+        <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] print:bg-white print:text-black relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] pb-24 md:pb-6">
             {/* Ambient Background */}
-            <div className="fixed inset-0 pointer-events-none -z-10">
+            <div className="fixed inset-0 pointer-events-none -z-10 print:hidden">
                 <div className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-[#D4AF37]/10 rounded-full blur-[150px]" />
                 <div className="absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-[#047857]/20 rounded-full blur-[150px]" />
                 <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
             </div>
 
             {/* Navbar (Desktop only navigation links) */}
-            <nav className="bg-[#022c22]/70 backdrop-blur-xl border-b border-[#D4AF37]/20 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.5)] transition-all">
+            <nav className="bg-[#022c22]/70 backdrop-blur-xl border-b border-[#D4AF37]/20 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.5)] transition-all print:hidden">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavigation('/')}>
                         <img src="/logo_hut16_pklu.png" alt="Logo" className="h-10 w-10 object-contain drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]" />
@@ -110,7 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                     {/* Navigation (Desktop) */}
                     <div className="hidden md:flex items-center gap-2">
-                        {navItems.slice(1).map((item) => {
+                        {navItems.map((item) => {
                             const Icon = item.icon
                             const isActive = activePath === item.path
                             return (
@@ -136,7 +136,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <main className="p-4 md:p-6 relative">{children}</main>
 
             {/* Mobile Floating Bottom Nav */}
-            <div className="fixed bottom-6 left-4 right-4 z-50 md:hidden flex justify-around items-center bg-black/60 backdrop-blur-lg border border-[#D4AF37]/30 rounded-2xl py-3 px-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)]">
+            <div className="fixed bottom-6 left-4 right-4 z-50 md:hidden flex justify-around items-center bg-black/60 backdrop-blur-lg border border-[#D4AF37]/30 rounded-2xl py-3 px-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] print:hidden">
                 {navItems.map((item) => {
                     const Icon = item.icon
                     const isActive = activePath === item.path

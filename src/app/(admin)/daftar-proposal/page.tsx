@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users, MessageCircle } from 'lucide-react'
+import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users, MessageCircle, Printer } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getNextNumber } from '@/lib/numbering'
@@ -510,14 +510,25 @@ export default function DaftarProposalPage() {
                         Seluruh riwayat proposal dukungan yang telah diterbitkan
                     </p>
                 </div>
-                <Link href="/buat-proposal" passHref>
-                    <Button 
-                        className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Buat Proposal Baru
-                    </Button>
-                </Link>
+                <div className="flex gap-3 mt-4 md:mt-0">
+                    <Link href="/laporan-lpj" passHref>
+                        <Button 
+                            variant="outline"
+                            className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2"
+                        >
+                            <Printer className="h-4 w-4" />
+                            Cetak Laporan LPJ
+                        </Button>
+                    </Link>
+                    <Link href="/buat-proposal" passHref>
+                        <Button 
+                            className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Buat Proposal Baru
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">

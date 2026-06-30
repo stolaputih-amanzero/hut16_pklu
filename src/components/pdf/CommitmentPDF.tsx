@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderBottom: '1pt solid #D4AF37',
-        paddingBottom: 15,
-        marginBottom: 20,
+        paddingBottom: 8,
+        marginBottom: 10,
     },
     headerLeft: {
         flexDirection: 'row',
@@ -38,17 +38,17 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     logo: {
-        width: 45,
-        height: 45,
+        width: 40,
+        height: 40,
     },
     headerTitle: {
         fontFamily: 'Times-Bold',
-        fontSize: 12,
+        fontSize: 11,
         color: '#022c22',
         letterSpacing: 0.5,
     },
     headerSubtitle: {
-        fontSize: 7,
+        fontSize: 6.5,
         color: '#718096',
         marginTop: 2,
         textTransform: 'uppercase',
@@ -61,41 +61,42 @@ const styles = StyleSheet.create({
     },
     titleSection: {
         alignItems: 'center',
-        marginVertical: 15,
+        marginVertical: 8,
     },
     docTitle: {
         fontFamily: 'Times-Bold',
-        fontSize: 16,
+        fontSize: 13,
         color: '#022c22',
         textAlign: 'center',
-        letterSpacing: 1,
+        letterSpacing: 0.5,
+        lineHeight: 1.2,
     },
     docSubtitle: {
-        fontSize: 8,
+        fontSize: 7.5,
         color: '#D4AF37',
-        marginTop: 4,
+        marginTop: 3,
         textAlign: 'center',
         textTransform: 'uppercase',
         letterSpacing: 1,
     },
     salutation: {
-        fontSize: 10,
-        marginBottom: 10,
-        lineHeight: 1.4,
+        fontSize: 9.5,
+        marginBottom: 6,
+        lineHeight: 1.3,
     },
     bodyParagraph: {
-        fontSize: 9.5,
-        lineHeight: 1.5,
+        fontSize: 9,
+        lineHeight: 1.4,
         color: '#4b5563',
-        marginBottom: 15,
+        marginBottom: 8,
         textAlign: 'justify',
     },
     detailCard: {
         backgroundColor: '#ffffff',
         border: '1pt solid #E2E8F0',
         borderRadius: 6,
-        padding: 15,
-        marginVertical: 15,
+        padding: 10,
+        marginVertical: 8,
     },
     detailRow: {
         flexDirection: 'row',
@@ -125,8 +126,8 @@ const styles = StyleSheet.create({
     bankCard: {
         backgroundColor: '#022c22',
         borderLeft: '3pt solid #D4AF37',
-        padding: 12,
-        marginVertical: 10,
+        padding: 10,
+        marginVertical: 6,
     },
     bankTitle: {
         fontSize: 8.5,
@@ -141,9 +142,9 @@ const styles = StyleSheet.create({
         lineHeight: 1.4,
     },
     footerContainer: {
-        marginTop: 'auto',
-        borderTop: '0.5pt solid rgba(2, 44, 34, 0.1)',
-        paddingTop: 15,
+        marginTop: 15,
+        borderTop: '0.5pt solid #D4AF37',
+        paddingTop: 10,
     },
     signatureRow: {
         flexDirection: 'row',
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
         fontSize: 8,
         color: '#022c22',
         fontWeight: 'bold',
-        marginBottom: 35,
+        marginBottom: 25,
         textAlign: 'center',
     },
     signatureLine: {
@@ -287,7 +288,10 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                         {/* Title Section */}
                         <View style={styles.titleSection}>
                             <Text style={styles.docTitle}>
-                                {isId ? 'SURAT KONFIRMASI KOMITMEN & UCAPAN TERIMA KASIH' : 'COMMITMENT CONFIRMATION & THANK YOU LETTER'}
+                                {isId ? 'SURAT KONFIRMASI KOMITMEN' : 'COMMITMENT CONFIRMATION'}
+                            </Text>
+                            <Text style={styles.docTitle}>
+                                {isId ? '& UCAPAN TERIMA KASIH' : '& THANK YOU LETTER'}
                             </Text>
                             <Text style={styles.docSubtitle}>
                                 {isId ? `No. Registrasi: ${data.number}` : `Registration No: ${data.number}`}

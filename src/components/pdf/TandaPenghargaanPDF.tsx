@@ -2,100 +2,107 @@ import {
     Document, Page, Text, View, StyleSheet, Image, Font
 } from '@react-pdf/renderer'
 
-// Define the dummy verification URL base
-const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/TKN-'
-
+// Premium Redesign
 const styles = StyleSheet.create({
     page: {
         padding: 40,
-        backgroundColor: '#fefdf5', // Soft ivory paper color
+        backgroundColor: '#FAFAF7', // Extremely subtle ivory
+    },
+    backgroundLogo: {
+        position: 'absolute',
+        top: '20%',
+        left: '30%',
+        width: '40%',
+        opacity: 0.03, // Very subtle watermark
     },
     outerBorder: {
-        border: '3pt solid #D4AF37', // Gold outer border
+        border: '3pt solid #D4AF37',
         padding: 4,
         height: '100%',
     },
     innerBorder: {
-        border: '1pt solid #022c22', // Emerald inner border
-        padding: 30,
+        border: '1pt solid #D4AF37',
+        padding: 35,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
     },
-    header: { alignItems: 'center', marginBottom: 25 },
-    logo: { width: 70, height: 70, marginBottom: 15 },
+    header: { alignItems: 'center', marginBottom: 30 },
+    logo: { width: 80, height: 80, marginBottom: 20 },
     title: { 
-        fontFamily: 'Times-Roman',
-        fontSize: 28, 
-        fontWeight: 'extrabold', 
-        color: '#022c22', // Emerald Green
+        fontFamily: 'Times-Bold',
+        fontSize: 32, 
+        color: '#022c22', // Deep Emerald
         textAlign: 'center',
-        letterSpacing: 2
+        letterSpacing: 4,
+        textTransform: 'uppercase'
     },
     subtitle: { 
         fontFamily: 'Helvetica',
         fontSize: 10, 
         color: '#D4AF37', 
         textAlign: 'center', 
-        marginTop: 6,
-        letterSpacing: 1,
+        marginTop: 10,
+        letterSpacing: 2,
         textTransform: 'uppercase'
     },
-    body: { marginVertical: 15, flexGrow: 1, justifyContent: 'center' },
+    body: { marginVertical: 20, flexGrow: 1, justifyContent: 'center' },
     text: { 
         fontFamily: 'Times-Roman',
         fontSize: 14, 
-        lineHeight: 1.6, 
+        lineHeight: 1.8, 
         textAlign: 'center', 
+        color: '#334155',
         marginBottom: 10,
-        color: '#1f2937'
+        paddingHorizontal: 40
     },
     name: { 
-        fontFamily: 'Times-Roman',
-        fontSize: 32, 
-        color: '#D4AF37', // Gold
+        fontFamily: 'Times-BoldItalic',
+        fontSize: 36, 
+        color: '#D4AF37', 
         textAlign: 'center', 
         marginVertical: 15,
-        fontStyle: 'italic'
+        letterSpacing: 1
     },
     category: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 16, 
+        fontSize: 14, 
         color: '#022c22', 
-        textAlign: 'center',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-        marginVertical: 10
+        textAlign: 'center', 
+        marginVertical: 15,
+        letterSpacing: 2,
+        textTransform: 'uppercase'
     },
     footerContainer: {
         marginTop: 'auto',
     },
-    footer: { 
-        flexDirection: 'row', 
+    footer: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
         paddingHorizontal: 20
     },
-    signatureBlock: { 
-        alignItems: 'center', 
-        width: 180 
+    signatureBlock: {
+        alignItems: 'center',
+        width: 180
     },
-    dateText: {
-        fontFamily: 'Helvetica',
-        fontSize: 10,
+    dateText: { 
+        fontFamily: 'Times-Roman',
+        fontSize: 11, 
         color: '#475569',
         marginBottom: 4
     },
-    signatureTitle: {
+    signatureTitle: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 10,
+        fontSize: 10, 
         color: '#022c22',
-        marginBottom: 10
+        marginBottom: 40
     },
-    signatureLine: { 
-        width: 160, 
-        borderBottom: '1pt solid #D4AF37', 
-        marginBottom: 6 
+    signatureLine: {
+        borderBottom: '1pt solid #022c22',
+        width: '100%',
+        marginBottom: 6
     },
     signatureName: { 
         fontFamily: 'Helvetica-Bold',
@@ -109,18 +116,30 @@ const styles = StyleSheet.create({
     },
     qrContainer: {
         alignItems: 'center',
-        width: 120
+        width: 120,
+        padding: 10,
+        border: '1pt solid #e2e8f0',
+        backgroundColor: '#ffffff',
+        borderRadius: 8
     },
     qrCode: {
-        width: 70,
-        height: 70,
-        marginBottom: 6
+        width: 80,
+        height: 80,
+        marginBottom: 8
     },
     qrText: {
-        fontFamily: 'Helvetica',
+        fontFamily: 'Helvetica-Bold',
         fontSize: 7,
+        color: '#022c22',
+        textAlign: 'center',
+        letterSpacing: 1
+    },
+    qrSubText: {
+        fontFamily: 'Helvetica',
+        fontSize: 6,
         color: '#64748b',
-        textAlign: 'center'
+        textAlign: 'center',
+        marginTop: 2
     }
 })
 
@@ -128,9 +147,10 @@ interface Props {
     data: any
     lang: 'id' | 'en'
     logoUrl?: string
+    origin?: string
 }
 
-export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
+export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
     const isId = lang === 'id'
     const categoryMap: Record<string, string> = {
         sahabat_bakti: 'Sahabat Bakti',
@@ -139,20 +159,23 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
         sahabat_berkat: 'Sahabat Berkat',
         sahabat_kasih: 'Sahabat Kasih',
         anonim: isId ? 'Sahabat Sukacita' : 'Joyful Friend',
-    }
-    
-    let categoryLabel = categoryMap[data.donatur_category] || data.donatur_category
-    if (!isId && data.donatur_category !== 'anonim') {
-         // Fallback translations if it's English and wasn't manually translated in the map
-         categoryLabel = categoryLabel.replace('Sahabat', 'Friend of').replace('Bakti', 'Devotion').replace('Teladan', 'Excellence').replace('Pelayanan', 'Service').replace('Berkat', 'Blessing').replace('Kasih', 'Love')
+        platinum: 'Platinum Sponsor',
+        gold: isId ? 'Sponsor Emas' : 'Gold Sponsor',
+        silver: isId ? 'Sponsor Perak' : 'Silver Sponsor',
+        bronze: isId ? 'Sponsor Perunggu' : 'Bronze Sponsor',
+        in_kind: isId ? 'Dukungan In-Kind' : 'In-Kind Support',
+        donatur: isId ? 'Partisipasi' : 'Participation'
     }
 
-    const committeeName = data.committees?.name || 'Vrilly Rondonuwu'
+    const categoryKey = data.donatur_category || data.sponsor_package || 'donatur'
+    const categoryLabel = categoryMap[categoryKey] || categoryKey
+    const committeeName = data.committees?.name || 'Adriaan Vanie Maggy Tomasouw'
     const committeeRole = data.committees?.role || (isId ? 'Ketua Panitia' : 'Committee Chairperson')
     
-    // Generate dummy verification URL
-    const verifyUrl = `${VERIFY_BASE_URL}${data.id || '0000-0000'}`
-    const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=150&margin=1`
+    // Fix QR URL: No 'TKN-' prefix in the URL path, verify/[id] expects exactly the UUID
+    const baseUrl = origin || 'https://hut16pklu.org'
+    const verifyUrl = `${baseUrl}/verify/${data.id || '0000-0000'}`
+    const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=200&margin=1&dark=022c22`
 
     return (
         <Document>
@@ -160,6 +183,9 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
                 <View style={styles.outerBorder}>
                     <View style={styles.innerBorder}>
                         
+                        {/* Background Watermark */}
+                        {logoUrl && <Image src={logoUrl} style={styles.backgroundLogo} />}
+
                         {/* Header */}
                         <View style={styles.header}>
                             {logoUrl ? (
@@ -168,7 +194,7 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
                                 <Image src="/logo-hut16.png" style={styles.logo} />
                             )}
                             <Text style={styles.title}>
-                                {isId ? 'TANDA PENGHARGAAN' : 'TOKEN OF APPRECIATION'}
+                                {isId ? 'Tanda Penghargaan' : 'Token of Appreciation'}
                             </Text>
                             <Text style={styles.subtitle}>
                                 {isId ? 'HUT KE-16 PELKAT PKLU GPIB • "TERUSKAN BAKTIMU!"' : '16TH ANNIVERSARY OF PKLU GPIB • "CONTINUE YOUR SERVICE!"'}
@@ -192,7 +218,7 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
                             </Text>
 
                             <Text style={styles.category}>
-                                ★ {categoryLabel} ★
+                                ✦ {categoryLabel} ✦
                             </Text>
 
                             <Text style={styles.text}>
@@ -211,8 +237,8 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
                                     <Text style={styles.qrText}>
                                         {isId ? 'PINDAI UNTUK VERIFIKASI' : 'SCAN TO VERIFY'}
                                     </Text>
-                                    <Text style={styles.qrText}>
-                                        {isId ? 'KEASLIAN DOKUMEN' : 'AUTHENTICITY'}
+                                    <Text style={styles.qrSubText}>
+                                        {isId ? 'KEASLIAN DOKUMEN INI' : 'THIS DOCUMENT AUTHENTICITY'}
                                     </Text>
                                 </View>
 
@@ -224,7 +250,6 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
                                     <Text style={styles.signatureTitle}>
                                         {isId ? 'Panitia HUT ke-16 PKLU GPIB' : '16th Anniversary Committee'}
                                     </Text>
-                                    <View style={{ height: 40 }} /> {/* Spacing for physical signature if printed */}
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>{committeeName}</Text>
                                     <Text style={styles.signatureRole}>{committeeRole}</Text>

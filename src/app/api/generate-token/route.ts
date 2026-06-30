@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
             React.createElement(PDFComponent, { 
                 data: proposal, 
                 lang,
-                logoUrl
+                logoUrl,
+                origin: req.nextUrl.origin
             }) as any
         )
 

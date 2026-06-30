@@ -50,11 +50,12 @@ export default function BuatProposalPage() {
 
     useEffect(() => {
         const fetchCommittees = async () => {
-            const { data: comms } = await supabase
+            const { data: comms, error } = await supabase
                 .from('committees')
                 .select('*')
                 .eq('is_active', true)
                 .order('name', { ascending: true })
+            if (error) console.error('Error fetching committees:', error)
             if (comms) setCommittees(comms)
         }
         fetchCommittees()
@@ -267,7 +268,7 @@ export default function BuatProposalPage() {
                         className="space-y-6"
                     >
                         {/* GLOBAL CHOICES */}
-                        <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl">
+                        <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl overflow-visible">
                             <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
                                 <CardTitle className="text-[#D4AF37] flex items-center gap-2">
                                     <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
@@ -346,7 +347,7 @@ export default function BuatProposalPage() {
                         </Card>
 
                         {/* TARGET INFORMATION */}
-                        <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative overflow-hidden">
+                        <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative overflow-visible">
                             {/* Ambient gradient behind the form */}
                             <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 -z-10 transition-colors duration-1000 ${proposalType === 'donatur' ? 'bg-pink-500' : 'bg-blue-500'}`} />
                             

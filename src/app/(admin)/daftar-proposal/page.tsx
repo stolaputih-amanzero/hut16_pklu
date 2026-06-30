@@ -903,6 +903,18 @@ export default function DaftarProposalPage() {
                                             </SelectContent>
                                         </Select>
                                     </div>
+                                    {formData.id && (
+                                        <div className="md:col-span-2 grid grid-cols-2 gap-4 pt-2 border-t border-[#D4AF37]/10 text-xs text-[#FDFBF7]/70">
+                                            <div>
+                                                <span className="block text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Dibuat</span>
+                                                <span className="font-semibold">{selectedProposal?.created_at ? formatDate(selectedProposal.created_at) : '-'}</span>
+                                            </div>
+                                            <div>
+                                                <span className="block text-[10px] text-[#D4AF37]/80 uppercase tracking-wide">Tanggal Dikonfirmasi / Lunas</span>
+                                                <span className="font-semibold">{selectedProposal?.confirmed_at ? formatDate(selectedProposal.confirmed_at) : '-'}</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

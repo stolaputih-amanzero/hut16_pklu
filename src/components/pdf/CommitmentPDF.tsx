@@ -213,6 +213,13 @@ const styles = StyleSheet.create({
         marginTop: 10,
         letterSpacing: 2,
         textTransform: 'uppercase',
+    },
+    letterDate: {
+        fontSize: 9,
+        fontFamily: 'Times-Roman',
+        textAlign: 'right',
+        marginRight: 20,
+        marginBottom: 10,
     }
 })
 
@@ -236,7 +243,8 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
             const options: Intl.DateTimeFormatOptions = {
                 day: 'numeric',
                 month: 'long',
-                year: 'numeric'
+                year: 'numeric',
+                timeZone: 'Asia/Jakarta'
             }
             return d.toLocaleDateString(isId ? 'id-ID' : 'en-US', options)
         } catch {
@@ -420,6 +428,9 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
 
                         {/* Footer Signatures */}
                         <View style={styles.footerContainer}>
+                            <Text style={styles.letterDate}>
+                                {isId ? 'Bekasi' : 'Bekasi'}, {formatDateLong(data.confirmed_at || data.created_at, isId)}
+                            </Text>
                             <View style={styles.signatureRow}>
                                 <View style={styles.signatureBox}>
                                     <Text style={styles.signatureTitle}>

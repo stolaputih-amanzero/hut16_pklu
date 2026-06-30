@@ -721,8 +721,8 @@ export default function DaftarProposalPage() {
 
             {/* Custom Modal */}
             {isOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="relative w-full max-w-2xl bg-[#022c22] border border-[#D4AF37]/30 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+                <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 pb-20 md:pb-0">
+                    <div className="relative w-full max-w-2xl bg-[#022c22] border-t md:border border-[#D4AF37]/30 rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col max-h-[90vh] md:max-h-[90vh] mt-auto md:mt-0">
                         {/* Header */}
                         <div className="flex flex-col gap-3 px-6 py-4 border-b border-[#D4AF37]/20 bg-[#033B2B]/40">
                             <div className="flex items-start justify-between">
@@ -1237,7 +1237,7 @@ export default function DaftarProposalPage() {
                         </div>
 
                         {/* Footer / Action buttons */}
-                        <div className="px-6 py-4 bg-[#033B2B]/40 border-t border-[#D4AF37]/20 flex flex-wrap justify-between items-center gap-4 rounded-b-2xl">
+                        <div className="px-6 py-4 bg-[#033B2B]/40 border-t border-[#D4AF37]/20 flex flex-wrap justify-between items-center gap-4 md:rounded-b-2xl">
                             <div>
                                 {formData.id && (
                                     <Button

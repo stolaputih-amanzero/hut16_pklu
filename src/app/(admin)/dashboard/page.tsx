@@ -250,7 +250,7 @@ export default function DashboardPage() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="h-[250px] w-full">
+                            <div className="h-[200px] md:h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={fundData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} vertical={false} />
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                                     Belum ada data perolehan terkonfirmasi untuk menampilkan tren.
                                 </div>
                             ) : (
-                                <div className="h-[280px] w-full">
+                                <div className="h-[220px] md:h-[280px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                             <defs>

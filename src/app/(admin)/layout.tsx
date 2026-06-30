@@ -76,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     ]
 
     return (
-        <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] print:bg-white print:text-black relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] pb-24 md:pb-6">
+        <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] print:bg-white print:text-black relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] pb-28 md:pb-6">
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none -z-10 print:hidden">
                 <div className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-[#D4AF37]/10 rounded-full blur-[150px]" />

@@ -410,7 +410,6 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
-                                    <Text style={styles.signatureRole}>{isId ? 'Panitia HUT ke-16 PKLU' : '16th PKLU Committee'}</Text>
                                 </View>
 
                                 {/* Verification QR Code */}
@@ -430,7 +429,6 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>
-                                    <Text style={styles.signatureRole}>{isId ? 'Panitia HUT ke-16 PKLU' : '16th PKLU Committee'}</Text>
                                 </View>
                             </View>
 

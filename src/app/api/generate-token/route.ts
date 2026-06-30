@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         }
 
         const PDFComponent = TandaPenghargaanPDF
-        const logoUrl = `${req.nextUrl.origin}/logo-hut16.png`
+        const logoUrl = `${req.nextUrl.origin}/logo_hut16_pklu.png`
         
         const buffer = await renderToBuffer(
             React.createElement(PDFComponent, { 

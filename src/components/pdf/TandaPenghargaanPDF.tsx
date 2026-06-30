@@ -47,55 +47,57 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
         textTransform: 'uppercase'
     },
-    body: { marginVertical: 20, flexGrow: 1, justifyContent: 'center' },
+    body: { marginVertical: 30, flexGrow: 1, justifyContent: 'center' },
     text: { 
         fontFamily: 'Times-Roman',
         fontSize: 14, 
-        lineHeight: 1.8, 
+        lineHeight: 2, 
         textAlign: 'center', 
         color: '#334155',
-        marginBottom: 10,
-        paddingHorizontal: 40
+        marginBottom: 12,
+        paddingHorizontal: 50
     },
     name: { 
         fontFamily: 'Times-BoldItalic',
-        fontSize: 36, 
+        fontSize: 38, 
         color: '#D4AF37', 
         textAlign: 'center', 
-        marginVertical: 15,
+        marginVertical: 18,
         letterSpacing: 1
     },
     category: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 14, 
+        fontSize: 16, 
         color: '#022c22', 
         textAlign: 'center', 
-        marginVertical: 15,
-        letterSpacing: 2,
+        marginVertical: 18,
+        letterSpacing: 3,
         textTransform: 'uppercase'
     },
     footerContainer: {
         marginTop: 'auto',
+        paddingTop: 10
     },
     footer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        gap: 20
     },
     signatureBlock: {
         alignItems: 'center',
-        width: 180
+        width: 170
     },
     dateText: { 
         fontFamily: 'Times-Roman',
         fontSize: 11, 
         color: '#475569',
-        marginBottom: 4
+        marginBottom: 6
     },
     signatureTitle: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 10, 
+        fontSize: 11, 
         color: '#022c22',
         marginBottom: 40
     },
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
     },
     signatureName: { 
         fontFamily: 'Helvetica-Bold',
-        fontSize: 11, 
+        fontSize: 12, 
         color: '#022c22'
     },
     signatureRole: { 
@@ -116,16 +118,17 @@ const styles = StyleSheet.create({
     },
     qrContainer: {
         alignItems: 'center',
-        width: 120,
-        padding: 10,
+        width: 110,
+        padding: 8,
         border: '1pt solid #e2e8f0',
         backgroundColor: '#ffffff',
-        borderRadius: 8
+        borderRadius: 8,
+        marginBottom: 10
     },
     qrCode: {
-        width: 80,
-        height: 80,
-        marginBottom: 8
+        width: 75,
+        height: 75,
+        marginBottom: 6
     },
     qrText: {
         fontFamily: 'Helvetica-Bold',
@@ -218,7 +221,7 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                             </Text>
 
                             <Text style={styles.category}>
-                                ✦ {categoryLabel} ✦
+                                {categoryLabel}
                             </Text>
 
                             <Text style={styles.text}>
@@ -231,28 +234,39 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                         {/* Footer Signatures */}
                         <View style={styles.footerContainer}>
                             <View style={styles.footer}>
-                                {/* QR Code Signature for Verification */}
-                                <View style={styles.qrContainer}>
-                                    <Image src={qrImageUrl} style={styles.qrCode} />
-                                    <Text style={styles.qrText}>
-                                        {isId ? 'PINDAI UNTUK VERIFIKASI' : 'SCAN TO VERIFY'}
-                                    </Text>
-                                    <Text style={styles.qrSubText}>
-                                        {isId ? 'KEASLIAN DOKUMEN INI' : 'THIS DOCUMENT AUTHENTICITY'}
-                                    </Text>
-                                </View>
-
-                                {/* Committee Signature */}
+                                {/* Left Signature */}
                                 <View style={styles.signatureBlock}>
                                     <Text style={styles.dateText}>
                                         {isId ? 'Bekasi, 12 Oktober 2026' : 'Bekasi, October 12, 2026'}
                                     </Text>
                                     <Text style={styles.signatureTitle}>
-                                        {isId ? 'Panitia HUT ke-16 PKLU GPIB' : '16th Anniversary Committee'}
+                                        {isId ? 'Ketua Panitia' : 'Committee Chairperson'}
                                     </Text>
                                     <View style={styles.signatureLine} />
-                                    <Text style={styles.signatureName}>{committeeName}</Text>
-                                    <Text style={styles.signatureRole}>{committeeRole}</Text>
+                                    <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
+                                    <Text style={styles.signatureRole}>{isId ? 'Panitia HUT ke-16 PKLU' : '16th PKLU Committee'}</Text>
+                                </View>
+
+                                {/* QR Code Signature for Verification */}
+                                <View style={styles.qrContainer}>
+                                    <Image src={qrImageUrl} style={styles.qrCode} />
+                                    <Text style={styles.qrText}>
+                                        {isId ? 'PINDAI VERIFIKASI' : 'SCAN TO VERIFY'}
+                                    </Text>
+                                    <Text style={styles.qrSubText}>
+                                        {isId ? 'KEASLIAN DOKUMEN' : 'AUTHENTICITY'}
+                                    </Text>
+                                </View>
+
+                                {/* Right Signature */}
+                                <View style={styles.signatureBlock}>
+                                    <Text style={styles.dateText}> </Text>
+                                    <Text style={styles.signatureTitle}>
+                                        {isId ? 'Sekretaris' : 'Secretary'}
+                                    </Text>
+                                    <View style={styles.signatureLine} />
+                                    <Text style={styles.signatureName}>Vicora van der MUUR - Tulende</Text>
+                                    <Text style={styles.signatureRole}>{isId ? 'Koordinator Seksi Dana' : 'Fundraising Coordinator'}</Text>
                                 </View>
                             </View>
                         </View>

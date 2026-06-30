@@ -309,6 +309,22 @@ export default function DaftarProposalPage() {
         toast.success('Membuka WhatsApp...')
     }
 
+    const sendTokenViaWA = () => {
+        if (!selectedProposal || !selectedProposal.token_pdf_url) return
+        
+        const waLink = buildWhatsAppLink(
+            formData.phone,
+            'token',
+            formData.lang as 'id' | 'en',
+            {
+                display_name: formData.display_name || formData.name,
+                token_url: selectedProposal.token_pdf_url
+            }
+        )
+        window.open(waLink, '_blank', 'noopener,noreferrer')
+        toast.success('Membuka WhatsApp...')
+    }
+
     const handleSave = async () => {
         if (!formData.name || !formData.phone || !formData.committee_id) {
             toast.error('Silakan lengkapi data wajib (Nama, WhatsApp, Penanggung Jawab)')
@@ -680,60 +696,16 @@ export default function DaftarProposalPage() {
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="relative w-full max-w-2xl bg-[#022c22] border border-[#D4AF37]/30 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D4AF37]/20 bg-[#033B2B]/40">
-                            <div>
-                                <h2 className="text-xl font-bold font-playfair text-[#FDFBF7]">
-                                    {formData.id ? (isEditMode ? 'Edit Proposal' : 'Detail Proposal') : 'Tambah Proposal Baru'}
-                                </h2>
-                                <p className="text-xs text-[#D4AF37] mt-0.5">
-                                    {formData.number || 'Draft Proposal'}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {formData.id && selectedProposal?.proposal_pdf_url && (
-                                    <div className="flex gap-1 border-r border-[#D4AF37]/20 pr-2 mr-1">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => window.open(selectedProposal.proposal_pdf_url, '_blank')}
-                                            className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] h-8 gap-1.5 rounded-l-full rounded-r-none"
-                                        >
-                                            <ExternalLink className="h-3.5 w-3.5" />
-                                            Unduh PDF
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={sendProposalViaWA}
-                                            className="border-[#D4AF37] text-[#022c22] bg-[#D4AF37] hover:bg-[#D4AF37]/80 h-8 gap-1.5 rounded-r-full rounded-l-none"
-                                        >
-                                            <MessageCircle className="h-3.5 w-3.5" />
-                                            Kirim WA
-                                        </Button>
-                                    </div>
-                                )}
-                                {formData.id && selectedProposal?.commitment_pdf_url && (
-                                    <div className="flex gap-1">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => window.open(selectedProposal.commitment_pdf_url, '_blank')}
-                                            className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-[#022c22] h-8 gap-1.5 rounded-l-full rounded-r-none"
-                                        >
-                                            <ExternalLink className="h-3.5 w-3.5" />
-                                            Unduh Surat Komitmen
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={sendCommitmentViaWA}
-                                            className="border-blue-400 text-[#022c22] bg-blue-400 hover:bg-blue-400/80 h-8 gap-1.5 rounded-r-full rounded-l-none"
-                                        >
-                                            <MessageCircle className="h-3.5 w-3.5" />
-                                            Kirim WA
-                                        </Button>
-                                    </div>
-                                )}
+                        <div className="flex flex-col gap-3 px-6 py-4 border-b border-[#D4AF37]/20 bg-[#033B2B]/40">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h2 className="text-xl font-bold font-playfair text-[#FDFBF7]">
+                                        {formData.id ? (isEditMode ? 'Edit Proposal' : 'Detail Proposal') : 'Tambah Proposal Baru'}
+                                    </h2>
+                                    <p className="text-xs text-[#D4AF37] mt-0.5">
+                                        {formData.number || 'Draft Proposal'}
+                                    </p>
+                                </div>
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
@@ -743,6 +715,92 @@ export default function DaftarProposalPage() {
                                     <X className="h-5 w-5" />
                                 </Button>
                             </div>
+
+                            {/* Document Actions Row */}
+                            {formData.id && (selectedProposal?.proposal_pdf_url || selectedProposal?.commitment_pdf_url || selectedProposal?.token_pdf_url) && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#D4AF37]/10">
+                                    {selectedProposal?.proposal_pdf_url && (
+                                        <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-[#D4AF37]/20">
+                                            <div className="flex items-center gap-2 text-xs font-semibold text-[#D4AF37]">
+                                                <FileText className="h-4 w-4" />
+                                                Proposal
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => window.open(selectedProposal.proposal_pdf_url, '_blank')}
+                                                    className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
+                                                >
+                                                    Unduh
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={sendProposalViaWA}
+                                                    className="border-[#D4AF37]/50 text-[#022c22] bg-[#D4AF37] hover:bg-[#D4AF37]/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
+                                                >
+                                                    <MessageCircle className="h-3 w-3 mr-1" /> WA
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedProposal?.commitment_pdf_url && (
+                                        <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-blue-500/20">
+                                            <div className="flex items-center gap-2 text-xs font-semibold text-blue-400">
+                                                <FileText className="h-4 w-4" />
+                                                Konfirmasi & Thank You
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => window.open(selectedProposal.commitment_pdf_url, '_blank')}
+                                                    className="border-blue-400/50 text-blue-400 hover:bg-blue-400 hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
+                                                >
+                                                    Unduh
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={sendCommitmentViaWA}
+                                                    className="border-blue-400/50 text-[#022c22] bg-blue-400 hover:bg-blue-400/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
+                                                >
+                                                    <MessageCircle className="h-3 w-3 mr-1" /> WA
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {selectedProposal?.token_pdf_url && (
+                                        <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-emerald-500/20">
+                                            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
+                                                <FileText className="h-4 w-4" />
+                                                Tanda Penghargaan
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => window.open(selectedProposal.token_pdf_url, '_blank')}
+                                                    className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500 hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
+                                                >
+                                                    Unduh
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={sendTokenViaWA}
+                                                    className="border-emerald-500/50 text-[#022c22] bg-emerald-500 hover:bg-emerald-500/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
+                                                >
+                                                    <MessageCircle className="h-3 w-3 mr-1" /> WA
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Body */}

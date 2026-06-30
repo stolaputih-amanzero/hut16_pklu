@@ -21,7 +21,15 @@ export async function POST(req: NextRequest) {
         }
 
         const PDFComponent = TandaPenghargaanPDF
-        const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang }) as any)
+        const logoUrl = `${req.nextUrl.origin}/logo-hut16.png`
+        
+        const buffer = await renderToBuffer(
+            React.createElement(PDFComponent, { 
+                data: proposal, 
+                lang,
+                logoUrl
+            }) as any
+        )
 
         const fileName = `${proposal.year}/tokens/${proposal.number}_${lang}.pdf`
         const { error: uploadError } = await supabaseAdmin.storage

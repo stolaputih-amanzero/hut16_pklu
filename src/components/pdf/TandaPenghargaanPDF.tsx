@@ -127,9 +127,10 @@ const styles = StyleSheet.create({
 interface Props {
     data: any
     lang: 'id' | 'en'
+    logoUrl?: string
 }
 
-export function TandaPenghargaanPDF({ data, lang }: Props) {
+export function TandaPenghargaanPDF({ data, lang, logoUrl }: Props) {
     const isId = lang === 'id'
     const categoryMap: Record<string, string> = {
         sahabat_bakti: 'Sahabat Bakti',
@@ -161,7 +162,11 @@ export function TandaPenghargaanPDF({ data, lang }: Props) {
                         
                         {/* Header */}
                         <View style={styles.header}>
-                            <Image src="/logo-hut16.png" style={styles.logo} />
+                            {logoUrl ? (
+                                <Image src={logoUrl} style={styles.logo} />
+                            ) : (
+                                <Image src="/logo-hut16.png" style={styles.logo} />
+                            )}
                             <Text style={styles.title}>
                                 {isId ? 'TANDA PENGHARGAAN' : 'TOKEN OF APPRECIATION'}
                             </Text>

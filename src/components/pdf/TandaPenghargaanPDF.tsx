@@ -265,8 +265,8 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                                         {isId ? 'Sekretaris' : 'Secretary'}
                                     </Text>
                                     <View style={styles.signatureLine} />
-                                    <Text style={styles.signatureName}>Vicora van der MUUR - Tulende</Text>
-                                    <Text style={styles.signatureRole}>{isId ? 'Koordinator Seksi Dana' : 'Fundraising Coordinator'}</Text>
+                                    <Text style={styles.signatureName}>Vevi Mayo</Text>
+                                    <Text style={styles.signatureRole}>{isId ? 'Panitia HUT ke-16 PKLU' : '16th PKLU Committee'}</Text>
                                 </View>
                             </View>
                         </View>

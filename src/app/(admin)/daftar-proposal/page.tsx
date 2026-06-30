@@ -505,66 +505,123 @@ export default function DaftarProposalPage() {
                             <p>Tidak ada proposal yang ditemukan.</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-[#D4AF37] uppercase bg-[#022c22]/60 border-y border-[#D4AF37]/20">
-                                    <tr>
-                                        <th className="px-4 py-4 font-montserrat tracking-wider">No. Proposal</th>
-                                        <th className="px-4 py-4 font-montserrat tracking-wider">Tanggal</th>
-                                        <th className="px-4 py-4 font-montserrat tracking-wider">Nama Donatur / Sponsor</th>
-                                        <th className="px-4 py-4 font-montserrat tracking-wider">Jenis</th>
-                                        <th className="px-4 py-4 font-montserrat tracking-wider">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-[#D4AF37]/10">
-                                    {filteredProposals.map((p) => (
-                                        <tr 
-                                            key={p.id} 
-                                            onClick={() => handleOpenView(p)}
-                                            className="hover:bg-[#022c22]/40 transition-colors cursor-pointer"
-                                        >
-                                            <td className="px-4 py-4 font-mono text-[#FDFBF7]/90 font-medium whitespace-nowrap">
+                        <>
+                            {/* Desktop View Table */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="text-xs text-[#D4AF37] uppercase bg-[#022c22]/60 border-y border-[#D4AF37]/20">
+                                        <tr>
+                                            <th className="px-4 py-4 font-montserrat tracking-wider">No. Proposal</th>
+                                            <th className="px-4 py-4 font-montserrat tracking-wider">Tanggal</th>
+                                            <th className="px-4 py-4 font-montserrat tracking-wider">Nama Donatur / Sponsor</th>
+                                            <th className="px-4 py-4 font-montserrat tracking-wider">Jenis</th>
+                                            <th className="px-4 py-4 font-montserrat tracking-wider">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[#D4AF37]/10">
+                                        {filteredProposals.map((p) => (
+                                            <tr 
+                                                key={p.id} 
+                                                onClick={() => handleOpenView(p)}
+                                                className="hover:bg-[#022c22]/40 transition-colors cursor-pointer"
+                                            >
+                                                <td className="px-4 py-4 font-mono text-[#FDFBF7]/90 font-medium whitespace-nowrap">
+                                                    {p.number}
+                                                </td>
+                                                <td className="px-4 py-4 text-[#A0AEC0] whitespace-nowrap">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Calendar className="h-3 w-3" />
+                                                        {formatDate(p.created_at)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <div className="font-semibold text-[#FDFBF7]">{p.name}</div>
+                                                    <div className="text-xs text-[#D4AF37] mt-0.5">{p.phone}</div>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                                        {p.type === 'donatur' ? 'Donatur' : 'Sponsorship'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    {p.payment_status === 'confirmed' ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                            <CheckCircle className="h-3 w-3 mr-1" /> Lunas
+                                                        </span>
+                                                    ) : p.payment_status === 'cancelled' ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                            Batal
+                                                        </span>
+                                                    ) : (p.contribution_value > 0 || p.contribution_form) ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                            Komitmen Dicatat
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                            <Clock className="h-3 w-3 mr-1" /> Terkirim
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile View Cards */}
+                            <div className="block md:hidden space-y-4">
+                                {filteredProposals.map((p) => (
+                                    <div 
+                                        key={p.id}
+                                        onClick={() => handleOpenView(p)}
+                                        className="p-4 bg-[#022c22]/40 border border-[#D4AF37]/20 rounded-xl hover:bg-[#022c22]/60 active:bg-[#022c22]/70 transition-colors cursor-pointer space-y-3"
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-mono text-sm font-semibold text-[#FDFBF7]">
                                                 {p.number}
-                                            </td>
-                                            <td className="px-4 py-4 text-[#A0AEC0] whitespace-nowrap">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Calendar className="h-3 w-3" />
-                                                    {formatDate(p.created_at)}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4">
-                                                <div className="font-semibold text-[#FDFBF7]">{p.name}</div>
-                                                <div className="text-xs text-[#D4AF37] mt-0.5">{p.phone}</div>
-                                            </td>
-                                            <td className="px-4 py-4 whitespace-nowrap">
-                                                <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
-                                                    {p.type === 'donatur' ? 'Donatur' : 'Sponsorship'}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-4 whitespace-nowrap">
+                                            </span>
+                                            <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                                {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="space-y-1">
+                                            <div className="font-bold text-[#FDFBF7] text-base">{p.name}</div>
+                                            {p.company_name && (
+                                                <div className="text-xs text-white/60">{p.company_name}</div>
+                                            )}
+                                            <div className="text-xs text-[#D4AF37] font-medium">{p.phone}</div>
+                                        </div>
+                                        
+                                        <div className="flex justify-between items-center pt-2 border-t border-[#D4AF37]/10 text-xs">
+                                            <div className="text-[#A0AEC0] flex items-center gap-1">
+                                                <Calendar className="h-3.5 w-3.5" />
+                                                {formatDate(p.created_at)}
+                                            </div>
+                                            <div>
                                                 {p.payment_status === 'confirmed' ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                                         <CheckCircle className="h-3 w-3 mr-1" /> Lunas
                                                     </span>
                                                 ) : p.payment_status === 'cancelled' ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                                         Batal
                                                     </span>
                                                 ) : (p.contribution_value > 0 || p.contribution_form) ? (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
                                                         Komitmen Dicatat
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                                                         <Clock className="h-3 w-3 mr-1" /> Terkirim
                                                     </span>
                                                 )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
                     )}
                 </CardContent>
             </Card>

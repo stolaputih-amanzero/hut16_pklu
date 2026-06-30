@@ -17,6 +17,7 @@ interface SearchableSelectProps {
     searchPlaceholder?: string
     emptyMessage?: string
     className?: string
+    disabled?: boolean
 }
 
 export function SearchableSelect({
@@ -26,7 +27,8 @@ export function SearchableSelect({
     placeholder = 'Pilih salah satu...',
     searchPlaceholder = 'Cari...',
     emptyMessage = 'Tidak ditemukan.',
-    className = ''
+    className = '',
+    disabled = false
 }: SearchableSelectProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -60,8 +62,10 @@ export function SearchableSelect({
         <div ref={containerRef} className={`relative w-full ${className}`}>
             {/* Trigger Button */}
             <div
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full p-3 bg-black/20 border border-[#D4AF37]/30 text-[#FDFBF7] rounded-lg cursor-pointer flex items-center justify-between transition-all hover:bg-black/35 focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                className={`w-full p-3 bg-black/20 border border-[#D4AF37]/30 text-[#FDFBF7] rounded-lg flex items-center justify-between transition-all ${
+                    disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-black/35 focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37]'
+                }`}
             >
                 <div className="flex flex-col text-left">
                     <span className={selectedOption ? 'text-[#FDFBF7]' : 'text-white/30'}>

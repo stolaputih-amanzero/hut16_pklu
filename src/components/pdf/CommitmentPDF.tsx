@@ -7,7 +7,7 @@ const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/'
 
 const styles = StyleSheet.create({
     page: {
-        padding: 30,
+        padding: 25,
         backgroundColor: '#FFFFFF',
         fontFamily: 'Times-Roman',
         color: '#1a1a1a',
@@ -23,12 +23,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         border: '1pt solid #D4AF37',
-        padding: 35,
+        padding: 25,
         position: 'relative',
     },
     header: {
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     logo: {
         width: 55,
@@ -54,25 +54,25 @@ const styles = StyleSheet.create({
     divider: {
         borderBottom: '1pt solid #D4AF37',
         marginHorizontal: 30,
-        marginBottom: 25,
+        marginBottom: 15,
     },
     titleSection: {
         alignItems: 'center',
-        marginBottom: 25,
+        marginBottom: 15,
     },
     docTitle: {
         fontFamily: 'Times-Bold',
-        fontSize: 16,
+        fontSize: 14,
         color: '#022c22',
         textAlign: 'center',
         letterSpacing: 1,
-        lineHeight: 1.3,
+        lineHeight: 1.2,
     },
     docSubtitle: {
         fontFamily: 'Helvetica-Bold',
         fontSize: 8,
         color: '#D4AF37',
-        marginTop: 6,
+        marginTop: 4,
         textAlign: 'center',
         textTransform: 'uppercase',
         letterSpacing: 1.5,
@@ -83,33 +83,33 @@ const styles = StyleSheet.create({
     },
     salutation: {
         fontSize: 11,
-        marginBottom: 12,
+        marginBottom: 8,
         lineHeight: 1.5,
     },
     bodyParagraph: {
         fontSize: 10.5,
-        lineHeight: 1.6,
+        lineHeight: 1.5,
         color: '#374151',
-        marginBottom: 16,
+        marginBottom: 10,
         textAlign: 'justify',
     },
     detailContainer: {
-        marginVertical: 12,
+        marginVertical: 8,
         paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingVertical: 10,
         backgroundColor: '#FAFAFA',
         borderRadius: 4,
         border: '0.5pt solid #E5E7EB',
     },
     detailRow: {
         flexDirection: 'row',
-        paddingVertical: 6,
+        paddingVertical: 4,
         borderBottom: '0.5pt solid #F3F4F6',
     },
     detailLabel: {
         width: '35%',
         fontFamily: 'Helvetica-Bold',
-        fontSize: 8,
+        fontSize: 7.5,
         color: '#6B7280',
         textTransform: 'uppercase',
         letterSpacing: 1,
@@ -122,15 +122,15 @@ const styles = StyleSheet.create({
     },
     detailValueHighlight: {
         fontFamily: 'Times-Bold',
-        fontSize: 12,
+        fontSize: 11.5,
         color: '#022c22',
     },
     bankCard: {
         backgroundColor: '#F8FBF9',
         borderLeft: '3pt solid #022c22',
-        padding: 15,
-        marginTop: 10,
-        marginBottom: 15,
+        padding: 12,
+        marginTop: 6,
+        marginBottom: 10,
     },
     bankTitle: {
         fontFamily: 'Helvetica-Bold',
@@ -143,11 +143,11 @@ const styles = StyleSheet.create({
     bankText: {
         fontSize: 9.5,
         color: '#374151',
-        lineHeight: 1.6,
+        lineHeight: 1.5,
     },
     footerContainer: {
         marginTop: 'auto',
-        paddingTop: 30,
+        paddingTop: 15,
     },
     signatureRow: {
         flexDirection: 'row',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Helvetica-Bold',
         fontSize: 8.5,
         color: '#374151',
-        marginBottom: 40,
+        marginBottom: 30,
         textAlign: 'center',
     },
     signatureLine: {
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
         width: 90,
     },
     qrCode: {
-        width: 65,
-        height: 65,
-        marginBottom: 6,
+        width: 55,
+        height: 55,
+        marginBottom: 4,
     },
     qrText: {
         fontFamily: 'Helvetica',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         fontSize: 7.5,
         color: '#D4AF37',
         textAlign: 'center',
-        marginTop: 30,
+        marginTop: 15,
         letterSpacing: 2,
         textTransform: 'uppercase',
     }

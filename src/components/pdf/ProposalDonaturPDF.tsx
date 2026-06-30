@@ -439,7 +439,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
     const commitmentMsg = isId
         ? `Halo Panitia HUT 16 PKLU GPIB, saya ingin memberikan komitmen dukungan untuk Proposal Donatur No: ${data.number}. Nama saya: ${data.name}.`
         : `Hello 16th PKLU GPIB Anniversary Committee, I would like to make a support commitment for Donor Proposal No: ${data.number}. My name is: ${data.name}.`
-    const commitmentWaUrl = `https://wa.me/${CENTRAL_CONTACT_PHONE}?text=${encodeURIComponent(commitmentMsg)}`
+    const commitmentWaUrl = `https://api.whatsapp.com/send?phone=${CENTRAL_CONTACT_PHONE}&text=${encodeURIComponent(commitmentMsg)}`
     const commitmentWaQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(commitmentWaUrl)}&size=140&margin=1&dark=022c22`
 
     const categoryMap: Record<string, string> = {

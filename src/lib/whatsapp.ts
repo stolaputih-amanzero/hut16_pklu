@@ -171,5 +171,5 @@ export function buildWhatsAppLink(
     const normalized = normalizePhone(phone)
     const message = TEMPLATES[lang][templateType](data)
     const encoded = encodeURIComponent(message)
-    return `https://wa.me/${normalized}?text=${encoded}`
+    return `https://api.whatsapp.com/send?phone=${normalized}&text=${encoded}`
 }

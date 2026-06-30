@@ -333,7 +333,7 @@ export default function Home() {
                       Hotel Santika Mega Mall Bekasi <br/>
                       <span className="opacity-70 text-sm">Jl. Ahmad Yani No.1, Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi, Jawa Barat 17141</span>
                     </p>
-                    <a href="https://maps.app.goo.gl/uBvR9Wn3MhKxRQ8c7" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#F3E5AB] transition-colors text-sm font-medium border-b border-transparent hover:border-[#F3E5AB] pb-1">
+                    <a href="https://www.google.com/maps/search/?api=1&query=Bekasi+Convention+Center" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#F3E5AB] transition-colors text-sm font-medium border-b border-transparent hover:border-[#F3E5AB] pb-1">
                       Buka di Google Maps <ArrowRight className="w-4 h-4" />
                     </a>
                   </div>

@@ -235,7 +235,7 @@ export default function DashboardPage() {
                                         <Tooltip 
                                             cursor={{ fill: 'rgba(212, 175, 55, 0.1)' }}
                                             contentStyle={{ backgroundColor: '#022c22', borderColor: 'rgba(212, 175, 55, 0.3)', borderRadius: '12px', color: '#FDFBF7', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}
-                                            formatter={(value: number) => [formatRupiah(value), 'Total']}
+                                            formatter={(value: any) => [formatRupiah(Number(value) || 0), 'Total']}
                                         />
                                         <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={60}>
                                             {

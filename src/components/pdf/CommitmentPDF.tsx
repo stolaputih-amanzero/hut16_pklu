@@ -7,174 +7,180 @@ const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/'
 
 const styles = StyleSheet.create({
     page: {
-        padding: 50,
-        backgroundColor: '#FCFAF5', // Elegant soft ivory
-        fontFamily: 'Helvetica',
-        color: '#1f2937',
+        padding: 30,
+        backgroundColor: '#FFFFFF',
+        fontFamily: 'Times-Roman',
+        color: '#1a1a1a',
     },
-    outerBorder: {
-        border: '1.5pt solid #D4AF37', // Gold outer border
-        padding: 10,
-        height: '100%',
+    backgroundLogo: {
+        position: 'absolute',
+        top: '30%',
+        left: '25%',
+        width: '50%',
+        opacity: 0.04,
+        zIndex: -1,
     },
-    innerBorder: {
-        border: '0.5pt solid #022c22', // Emerald inner border
-        padding: 25,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
+    container: {
+        flex: 1,
+        border: '1pt solid #D4AF37',
+        padding: 35,
+        position: 'relative',
     },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottom: '1pt solid #D4AF37',
-        paddingBottom: 8,
-        marginBottom: 10,
-    },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
+        marginBottom: 15,
     },
     logo: {
-        width: 40,
-        height: 40,
+        width: 55,
+        height: 55,
+        marginBottom: 12,
     },
     headerTitle: {
-        fontFamily: 'Times-Bold',
-        fontSize: 11,
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 10.5,
         color: '#022c22',
-        letterSpacing: 0.5,
+        letterSpacing: 1.5,
+        marginBottom: 4,
+        textAlign: 'center',
     },
     headerSubtitle: {
-        fontSize: 6.5,
+        fontFamily: 'Helvetica',
+        fontSize: 7.5,
         color: '#718096',
-        marginTop: 2,
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        textAlign: 'center',
     },
-    headerRight: {
-        fontSize: 8,
-        color: '#D4AF37',
-        fontWeight: 'bold',
-        letterSpacing: 1,
+    divider: {
+        borderBottom: '1pt solid #D4AF37',
+        marginHorizontal: 30,
+        marginBottom: 25,
     },
     titleSection: {
         alignItems: 'center',
-        marginVertical: 8,
+        marginBottom: 25,
     },
     docTitle: {
         fontFamily: 'Times-Bold',
-        fontSize: 13,
+        fontSize: 16,
         color: '#022c22',
         textAlign: 'center',
-        letterSpacing: 0.5,
-        lineHeight: 1.2,
-    },
-    docSubtitle: {
-        fontSize: 7.5,
-        color: '#D4AF37',
-        marginTop: 3,
-        textAlign: 'center',
-        textTransform: 'uppercase',
         letterSpacing: 1,
-    },
-    salutation: {
-        fontSize: 9.5,
-        marginBottom: 6,
         lineHeight: 1.3,
     },
+    docSubtitle: {
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 8,
+        color: '#D4AF37',
+        marginTop: 6,
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        letterSpacing: 1.5,
+    },
+    contentWrapper: {
+        paddingHorizontal: 15,
+        flex: 1,
+    },
+    salutation: {
+        fontSize: 11,
+        marginBottom: 12,
+        lineHeight: 1.5,
+    },
     bodyParagraph: {
-        fontSize: 9,
-        lineHeight: 1.4,
-        color: '#4b5563',
-        marginBottom: 8,
+        fontSize: 10.5,
+        lineHeight: 1.6,
+        color: '#374151',
+        marginBottom: 16,
         textAlign: 'justify',
     },
-    detailCard: {
-        backgroundColor: '#ffffff',
-        border: '1pt solid #E2E8F0',
-        borderRadius: 6,
-        padding: 10,
-        marginVertical: 8,
+    detailContainer: {
+        marginVertical: 12,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        backgroundColor: '#FAFAFA',
+        borderRadius: 4,
+        border: '0.5pt solid #E5E7EB',
     },
     detailRow: {
         flexDirection: 'row',
-        paddingVertical: 5,
-        borderBottom: '0.5pt solid #F7FAFC',
+        paddingVertical: 6,
+        borderBottom: '0.5pt solid #F3F4F6',
     },
     detailLabel: {
         width: '35%',
-        fontSize: 8.5,
-        color: '#718096',
-        fontWeight: 'bold',
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 8,
+        color: '#6B7280',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        letterSpacing: 1,
     },
     detailValue: {
         width: '65%',
-        fontSize: 9.5,
-        color: '#1f2937',
-        fontFamily: 'Times-Roman',
+        fontFamily: 'Times-Bold',
+        fontSize: 10.5,
+        color: '#111827',
     },
     detailValueHighlight: {
-        width: '65%',
-        fontSize: 10.5,
-        color: '#D4AF37',
         fontFamily: 'Times-Bold',
+        fontSize: 12,
+        color: '#022c22',
     },
     bankCard: {
-        backgroundColor: '#022c22',
-        borderLeft: '3pt solid #D4AF37',
-        padding: 10,
-        marginVertical: 6,
+        backgroundColor: '#F8FBF9',
+        borderLeft: '3pt solid #022c22',
+        padding: 15,
+        marginTop: 10,
+        marginBottom: 15,
     },
     bankTitle: {
+        fontFamily: 'Helvetica-Bold',
         fontSize: 8.5,
-        color: '#D4AF37',
-        fontWeight: 'bold',
+        color: '#022c22',
         textTransform: 'uppercase',
-        marginBottom: 4,
+        letterSpacing: 0.5,
+        marginBottom: 6,
     },
     bankText: {
-        fontSize: 9,
-        color: '#FDFBF7',
-        lineHeight: 1.4,
+        fontSize: 9.5,
+        color: '#374151',
+        lineHeight: 1.6,
     },
     footerContainer: {
-        marginTop: 15,
-        borderTop: '0.5pt solid #D4AF37',
-        paddingTop: 10,
+        marginTop: 'auto',
+        paddingTop: 30,
     },
     signatureRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
+        paddingHorizontal: 10,
     },
     signatureBox: {
         alignItems: 'center',
         width: 140,
     },
     signatureTitle: {
-        fontSize: 8,
-        color: '#022c22',
-        fontWeight: 'bold',
-        marginBottom: 25,
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 8.5,
+        color: '#374151',
+        marginBottom: 40,
         textAlign: 'center',
     },
     signatureLine: {
-        width: 120,
-        borderBottom: '1pt solid #022c22',
-        marginBottom: 4,
+        width: 130,
+        borderBottom: '1pt solid #111827',
+        marginBottom: 6,
     },
     signatureName: {
         fontFamily: 'Times-Bold',
-        fontSize: 10,
-        color: '#022c22',
+        fontSize: 11,
+        color: '#111827',
     },
     signatureRole: {
-        fontSize: 7.5,
-        color: '#718096',
+        fontFamily: 'Helvetica',
+        fontSize: 8,
+        color: '#6B7280',
+        marginTop: 2,
     },
     qrBox: {
         alignItems: 'center',
@@ -182,21 +188,25 @@ const styles = StyleSheet.create({
         width: 90,
     },
     qrCode: {
-        width: 50,
-        height: 50,
-        marginBottom: 4,
+        width: 65,
+        height: 65,
+        marginBottom: 6,
     },
     qrText: {
-        fontSize: 5,
-        color: '#718096',
+        fontFamily: 'Helvetica',
+        fontSize: 5.5,
+        color: '#9CA3AF',
         textAlign: 'center',
+        letterSpacing: 0.5,
     },
     footerTagline: {
-        fontSize: 7,
-        color: '#A0AEC0',
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 7.5,
+        color: '#D4AF37',
         textAlign: 'center',
-        marginTop: 15,
-        letterSpacing: 1,
+        marginTop: 30,
+        letterSpacing: 2,
+        textTransform: 'uppercase',
     }
 })
 
@@ -277,25 +287,24 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
     return (
         <Document>
             <Page size="A4" style={styles.page}>
-                <View style={styles.outerBorder}>
-                    <View style={styles.innerBorder}>
-                        
-                        {/* Header */}
-                        <View style={styles.header}>
-                            <View style={styles.headerLeft}>
-                                <Image src={logoUrl} style={styles.logo} />
-                                <View>
-                                    <Text style={styles.headerTitle}>
-                                        {isId ? 'PANITIA HUT KE-16 PELKAT PKLU' : '16TH PKLU ANNIVERSARY COMMITTEE'}
-                                    </Text>
-                                    <Text style={styles.headerSubtitle}>
-                                        {isId ? 'MUPEL BEKASI - GEREJA PROTESTAN di INDONESIA bagian BARAT' : 'MUPEL BEKASI - PROTESTANT CHURCH IN WESTERN INDONESIA'}
-                                    </Text>
-                                </View>
-                            </View>
-                            <Text style={styles.headerRight}>2026</Text>
-                        </View>
+                <View style={styles.container}>
+                    {/* Watermark Logo */}
+                    <Image src={logoUrl} style={styles.backgroundLogo} />
+                    
+                    {/* Centered Header */}
+                    <View style={styles.header}>
+                        <Image src={logoUrl} style={styles.logo} />
+                        <Text style={styles.headerTitle}>
+                            {isId ? 'PANITIA HUT KE-16 PELKAT PKLU' : '16TH PKLU ANNIVERSARY COMMITTEE'}
+                        </Text>
+                        <Text style={styles.headerSubtitle}>
+                            {isId ? 'MUPEL BEKASI - GEREJA PROTESTAN di INDONESIA bagian BARAT' : 'MUPEL BEKASI - PROTESTANT CHURCH IN WESTERN INDONESIA'}
+                        </Text>
+                    </View>
+                    
+                    <View style={styles.divider} />
 
+                    <View style={styles.contentWrapper}>
                         {/* Title Section */}
                         <View style={styles.titleSection}>
                             <Text style={styles.docTitle}>
@@ -319,12 +328,12 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                         {/* Body Paragraph */}
                         <Text style={styles.bodyParagraph}>
                             {isId
-                                ? 'Dengan penuh rasa syukur, kami dari Panitia Pelaksana menyampaikan terima kasih yang sebesar-besarnya atas kabar baik dan komitmen dukungan yang telah Bapak/Ibu berikan untuk mensukseskan Perayaan Ibadah Syukur Hari Ulang Tahun ke-16 Pelayanan Kategorial Persekutuan Kaum Lanjut Usia (Pelkat PKLU) GPIB yang akan dilaksanakan pada tanggal 12 Oktober 2026 di Bekasi Convention Center.'
+                                ? 'Dengan penuh rasa syukur, kami dari Panitia Pelaksana menyampaikan terima kasih yang sebesar-besarnya atas kabar baik dan komitmen dukungan yang telah Bapak/Ibu berikan untuk menyukseskan Perayaan Ibadah Syukur Hari Ulang Tahun ke-16 Pelayanan Kategorial Persekutuan Kaum Lanjut Usia (Pelkat PKLU) GPIB yang akan dilaksanakan pada tanggal 12 Oktober 2026 di Bekasi Convention Center.'
                                 : 'With deep gratitude, we from the Organizing Committee express our utmost appreciation for the good news and commitment of support you have provided to ensure the success of the 16th Anniversary Thanksgiving Celebration of the Categorical Fellowship of the Elderly (Pelkat PKLU) GPIB, to be held on October 12, 2026, at the Bekasi Convention Center.'}
                         </Text>
 
                         {/* Detail Card */}
-                        <View style={styles.detailCard}>
+                        <View style={styles.detailContainer}>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>
                                     {isId ? (isSponsorship ? 'Nama Sponsor' : 'Nama Donatur') : (isSponsorship ? 'Sponsor Name' : 'Donor Name')}
@@ -343,11 +352,13 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>{isId ? 'Nilai Komitmen' : 'Commitment Value'}</Text>
-                                <Text style={styles.detailValueHighlight}>
-                                    {data.contribution_value && Number(data.contribution_value) > 0 
-                                        ? formatRupiah(Number(data.contribution_value))
-                                        : (isId ? 'In-Kind / Non-Moneter' : 'In-Kind / Non-Monetary')}
-                                </Text>
+                                <View style={{ width: '65%' }}>
+                                    <Text style={styles.detailValueHighlight}>
+                                        {data.contribution_value && Number(data.contribution_value) > 0 
+                                            ? formatRupiah(Number(data.contribution_value))
+                                            : (isId ? 'In-Kind / Non-Moneter' : 'In-Kind / Non-Monetary')}
+                                    </Text>
+                                </View>
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>
@@ -375,7 +386,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                 </Text>
                                 <Text style={styles.bankText}>
                                     {isId 
-                                        ? 'Dukungan dana dapat ditransfer ke rekening panitia: PT. BANK ............................................... No. Rekening: ............................................... A.N. ...............................................\nMohon mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: 628111550543 (Vevi Mayo) untuk pencatatan kelunasan.'
+                                        ? 'Dukungan dana dapat ditransfer ke rekening panitia: PT. BANK ............................................... No. Rekening: ............................................... A.N. ...............................................\nMohon mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: +62 811-1550-543 (Vevi Mayo) untuk pencatatan kelunasan.'
                                         : 'Financial support can be transferred to the committee account: PT. BANK ............................................... Account No: ............................................... A.N. ...............................................\nPlease kindly send the transfer receipt via WhatsApp to the Committee Secretary: +62 811-1550-543 (Vevi Mayo) for reconciliation.'}
                                 </Text>
                             </View>
@@ -383,7 +394,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
 
                         {/* Non-monetary instructions (shown if in-kind or no monetary support) */}
                         {(!data.contribution_value || Number(data.contribution_value) === 0) && (
-                            <View style={[styles.bankCard, { backgroundColor: '#105b44' }]}>
+                            <View style={[styles.bankCard, { borderLeft: '3pt solid #D4AF37' }]}>
                                 <Text style={styles.bankTitle}>
                                     {isId ? 'Koordinasi Serah Terima Komitmen' : 'Commitment Handover Coordination'}
                                 </Text>
@@ -395,7 +406,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                             </View>
                         )}
 
-                        <Text style={[styles.bodyParagraph, { marginTop: 10, marginBottom: 25 }]}>
+                        <Text style={[styles.bodyParagraph, { marginTop: 15 }]}>
                             {isId
                                 ? 'Kiranya persembahan kasih ini membawa kemuliaan bagi nama Tuhan dan menjadi berkat melimpah bagi pelayanan Kaum Lanjut Usia. Atas kebaikan dan doa Bapak/Ibu, kami ucapkan terima kasih yang sedalam-dalamnya. Tuhan memberkati.'
                                 : 'May this gift of love bring glory to the Lord and abundant blessings to the ministry of our Elderly. For your outstanding kindness and prayers, we express our heartfelt gratitude. God bless you.'}
@@ -410,6 +421,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
+                                    <Text style={styles.signatureRole}>{committeeRole}</Text>
                                 </View>
 
                                 {/* Verification QR Code */}
@@ -429,6 +441,7 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>
+                                    <Text style={styles.signatureRole}>{isId ? 'Sekretaris Panitia' : 'Committee Secretary'}</Text>
                                 </View>
                             </View>
 
@@ -436,7 +449,6 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                 {isId ? 'Untuk Lansia • Oleh Lansia • Bersama PKLU GPIB' : 'For the Elderly • By the Elderly • With PKLU GPIB'}
                             </Text>
                         </View>
-
                     </View>
                 </View>
             </Page>

@@ -78,8 +78,7 @@ Kami mengucapkan terima kasih yang sebesar-besarnya atas komitmen dukungan yang 
 
 Berikut kami lampirkan *Surat Konfirmasi Komitmen & Ucapan Terima Kasih* resmi yang mencatat partisipasi Bapak/Ibu.
 
-📄 *Tautan Surat Konfirmasi Komitmen:*
-${d.commitment_url}
+📄 *Surat Konfirmasi Komitmen Terlampir*
 
 Kiranya Tuhan Yesus Kristus senantiasa memberkati setiap kebaikan dan pelayanan Bapak/Ibu.
 
@@ -151,8 +150,7 @@ We express our deepest gratitude for the commitment of support you have provided
 
 We have attached your official *Commitment Confirmation & Thank You Letter* below.
 
-📄 *Commitment Confirmation Link:*
-${d.commitment_url}
+📄 *Commitment Confirmation Attached*
 
 May the Lord Jesus Christ continuously bless you and your family.
 

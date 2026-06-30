@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users } from 'lucide-react'
+import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users, MessageCircle } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getNextNumber } from '@/lib/numbering'
+import { buildWhatsAppLink } from '@/lib/whatsapp'
 
 export default function DaftarProposalPage() {
     const [proposals, setProposals] = useState<any[]>([])
@@ -272,6 +273,40 @@ export default function DaftarProposalPage() {
         const result = await response.json()
         if (result.error) throw new Error(result.error)
         return result.url
+    }
+
+    const sendProposalViaWA = () => {
+        if (!selectedProposal || !selectedProposal.proposal_pdf_url) return
+        
+        const waLink = buildWhatsAppLink(
+            formData.phone,
+            'proposal',
+            formData.lang as 'id' | 'en',
+            {
+                number: formData.number,
+                name: formData.name,
+                type: formData.type,
+                pdfUrl: selectedProposal.proposal_pdf_url
+            }
+        )
+        window.open(waLink, '_blank', 'noopener,noreferrer')
+        toast.success('Membuka WhatsApp...')
+    }
+
+    const sendCommitmentViaWA = () => {
+        if (!selectedProposal || !selectedProposal.commitment_pdf_url) return
+        
+        const waLink = buildWhatsAppLink(
+            formData.phone,
+            'commitment',
+            formData.lang as 'id' | 'en',
+            {
+                name: formData.name,
+                commitment_url: selectedProposal.commitment_pdf_url
+            }
+        )
+        window.open(waLink, '_blank', 'noopener,noreferrer')
+        toast.success('Membuka WhatsApp...')
     }
 
     const handleSave = async () => {
@@ -656,26 +691,48 @@ export default function DaftarProposalPage() {
                             </div>
                             <div className="flex items-center gap-2">
                                 {formData.id && selectedProposal?.proposal_pdf_url && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => window.open(selectedProposal.proposal_pdf_url, '_blank')}
-                                        className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] h-8 gap-1.5 rounded-full"
-                                    >
-                                        <ExternalLink className="h-3.5 w-3.5" />
-                                        Lihat PDF
-                                    </Button>
+                                    <div className="flex gap-1 border-r border-[#D4AF37]/20 pr-2 mr-1">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => window.open(selectedProposal.proposal_pdf_url, '_blank')}
+                                            className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] h-8 gap-1.5 rounded-l-full rounded-r-none"
+                                        >
+                                            <ExternalLink className="h-3.5 w-3.5" />
+                                            Unduh PDF
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={sendProposalViaWA}
+                                            className="border-[#D4AF37] text-[#022c22] bg-[#D4AF37] hover:bg-[#D4AF37]/80 h-8 gap-1.5 rounded-r-full rounded-l-none"
+                                        >
+                                            <MessageCircle className="h-3.5 w-3.5" />
+                                            Kirim WA
+                                        </Button>
+                                    </div>
                                 )}
                                 {formData.id && selectedProposal?.commitment_pdf_url && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => window.open(selectedProposal.commitment_pdf_url, '_blank')}
-                                        className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-[#022c22] h-8 gap-1.5 rounded-full"
-                                    >
-                                        <ExternalLink className="h-3.5 w-3.5" />
-                                        Lihat Surat Komitmen
-                                    </Button>
+                                    <div className="flex gap-1">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => window.open(selectedProposal.commitment_pdf_url, '_blank')}
+                                            className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-[#022c22] h-8 gap-1.5 rounded-l-full rounded-r-none"
+                                        >
+                                            <ExternalLink className="h-3.5 w-3.5" />
+                                            Unduh Surat Komitmen
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={sendCommitmentViaWA}
+                                            className="border-blue-400 text-[#022c22] bg-blue-400 hover:bg-blue-400/80 h-8 gap-1.5 rounded-r-full rounded-l-none"
+                                        >
+                                            <MessageCircle className="h-3.5 w-3.5" />
+                                            Kirim WA
+                                        </Button>
+                                    </div>
                                 )}
                                 <Button 
                                     variant="ghost" 

@@ -709,7 +709,7 @@ export default function DaftarProposalPage() {
                                     <Label className="text-xs text-[#D4AF37]">Nilai Kemitraan (Rp)</Label>
                                     <Input
                                         name="contribution_value"
-                                        value={formData.contribution_value}
+                                        value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
                                         onChange={handleCurrencyChange}
                                         disabled={!isEditMode}
                                         className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] font-semibold text-amber-400"

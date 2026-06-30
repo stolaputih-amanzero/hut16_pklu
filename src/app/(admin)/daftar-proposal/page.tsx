@@ -1,5 +1,5 @@
 'use client'
-
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -459,13 +459,14 @@ export default function DaftarProposalPage() {
                         Seluruh riwayat proposal dukungan yang telah diterbitkan
                     </p>
                 </div>
-                <Button 
-                    onClick={handleOpenCreate}
-                    className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"
-                >
-                    <Plus className="h-4 w-4" />
-                    Buat Proposal Baru
-                </Button>
+                <Link href="/buat-proposal" passHref>
+                    <Button 
+                        className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Buat Proposal Baru
+                    </Button>
+                </Link>
             </div>
 
             <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">

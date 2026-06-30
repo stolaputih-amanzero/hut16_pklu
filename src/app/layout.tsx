@@ -16,6 +16,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "HUT ke-16 Pelkat PKLU GPIB",
   description: "Teruskan Baktimu! Lansia Teladan dalam Iman, Karya, dan Pelayanan.",
+  icons: {
+    icon: [
+      { url: "/icon_apps.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon_apps.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/icon_apps.png",
+    apple: [
+      { url: "/icon_apps.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

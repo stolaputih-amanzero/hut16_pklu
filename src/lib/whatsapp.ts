@@ -1,4 +1,4 @@
-export type WATemplateType = 'proposal' | 'token' | 'confirmation'
+export type WATemplateType = 'proposal' | 'token' | 'confirmation' | 'commitment'
 export type Lang = 'id' | 'en'
 
 function formatRupiah(amount?: number): string {
@@ -68,6 +68,24 @@ Terima kasih yang sebesar-besarnya atas kepedulian dan kemurahan hati Bapak/Ibu 
 
 Hormat kami,
 *Panitia HUT ke-16 PKLU GPIB*`,
+
+        commitment: (d) =>
+            `*Yth. Bapak/Ibu ${d.name}*
+
+Salam sejahtera dalam kasih Kristus,
+
+Kami mengucapkan terima kasih yang sebesar-besarnya atas komitmen dukungan yang telah Bapak/Ibu berikan untuk perayaan HUT ke-16 Pelkat PKLU GPIB.
+
+Berikut kami lampirkan *Surat Konfirmasi Komitmen & Ucapan Terima Kasih* resmi yang mencatat partisipasi Bapak/Ibu.
+
+📄 *Tautan Surat Konfirmasi Komitmen:*
+${d.commitment_url}
+
+Kiranya Tuhan Yesus Kristus senantiasa memberkati setiap kebaikan dan pelayanan Bapak/Ibu.
+
+Hormat kami,
+*Panitia HUT ke-16 PKLU GPIB*
+"Teruskan Baktimu!"`,
     },
 
     en: {
@@ -123,6 +141,24 @@ Thank you very much for your outstanding care and generosity in ensuring the suc
 
 Sincerely,
 *The 16th PKLU GPIB Anniversary Committee*`,
+
+        commitment: (d) =>
+            `*Dear Mr./Ms. ${d.name},*
+
+Warm greetings in the love of Christ,
+
+We express our deepest gratitude for the commitment of support you have provided for the 16th Anniversary of Pelkat PKLU GPIB.
+
+We have attached your official *Commitment Confirmation & Thank You Letter* below.
+
+📄 *Commitment Confirmation Link:*
+${d.commitment_url}
+
+May the Lord Jesus Christ continuously bless you and your family.
+
+Sincerely,
+*The 16th PKLU GPIB Anniversary Committee*
+"Continue Your Service!"`,
     },
 }
 

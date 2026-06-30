@@ -16,12 +16,12 @@ export default function manifest(): MetadataRoute.Manifest {
         type: 'image/x-icon',
       },
       {
-        src: '/logo_hut16_pklu.png',
+        src: '/icon_apps.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/logo_hut16_pklu.png',
+        src: '/icon_apps.png',
         sizes: '512x512',
         type: 'image/png',
       },

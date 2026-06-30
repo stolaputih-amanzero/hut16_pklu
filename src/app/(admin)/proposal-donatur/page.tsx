@@ -33,6 +33,7 @@ export default function ProposalDonaturPage() {
         email: '',
         congregation: '',
         contribution_value: '',
+        contribution_form: '',
         specific_support: '',
         message: '',
         language: 'id',
@@ -51,6 +52,7 @@ export default function ProposalDonaturPage() {
     const [isConfirmed, setIsConfirmed] = useState(false)
     const [tokenUrl, setTokenUrl] = useState('')
     const [proposalPdfUrl, setProposalPdfUrl] = useState('')
+    const [commitmentPdfUrl, setCommitmentPdfUrl] = useState('')
 
     const [committees, setCommittees] = useState<any[]>([])
     const [pendingProposals, setPendingProposals] = useState<any[]>([])
@@ -279,6 +281,7 @@ export default function ProposalDonaturPage() {
             setProposalNumber(selected.number)
             setTokenUrl(selected.token_pdf_url || '')
             setProposalPdfUrl(selected.proposal_pdf_url || '')
+            setCommitmentPdfUrl(selected.commitment_pdf_url || '')
             setIsConfirmed(selected.payment_status === 'confirmed')
             // Set language to proposal's language
             setFormData(prev => ({ 
@@ -291,6 +294,7 @@ export default function ProposalDonaturPage() {
                 email: selected.email || '',
                 congregation: selected.congregation || '', 
                 contribution_value: selected.contribution_value?.toString() || '', 
+                contribution_form: selected.contribution_form || '',
                 donatur_category: selected.donatur_category || '', 
                 message: selected.message || '',
                 specific_support: selected.specific_support || '',
@@ -300,11 +304,63 @@ export default function ProposalDonaturPage() {
         }
     }
 
+    const generateCommitmentPDF = async (id: string) => {
+        try {
+            const response = await fetch('/api/generate-commitment', {
+                method: 'POST',
+                body: JSON.stringify({ id, lang: formData.language })
+            })
+            const result = await response.json()
+            if (result.error) throw new Error(result.error)
+            toast.success('Surat komitmen berhasil dibuat')
+            return result.url
+        } catch (error) {
+            toast.error('Gagal menghasilkan surat komitmen')
+            throw error
+        }
+    }
+
+    const sendCommitmentViaWA = async () => {
+        if (!proposalId || !commitmentPdfUrl) {
+            toast.error('Surat komitmen belum dibuat')
+            return
+        }
+
+        try {
+            setIsSending(true)
+
+            // Build WhatsApp message
+            const waLink = buildWhatsAppLink(
+                formData.phone,
+                'commitment',
+                formData.language as 'id' | 'en',
+                {
+                    number: proposalNumber,
+                    name: formData.name,
+                    commitment_url: commitmentPdfUrl
+                }
+            )
+
+            // Open WhatsApp
+            window.open(waLink, '_blank', 'noopener,noreferrer')
+            toast.success('Pesan WhatsApp terbuka')
+        } catch (error) {
+            toast.error('Gagal membuka WhatsApp')
+        } finally {
+            setIsSending(false)
+        }
+    }
+
     const handleSaveCommitment = async () => {
         if (!proposalId) return
-        const val = Number(formData.contribution_value)
-        if (!val || val <= 0) {
-            toast.error('Nilai komitmen harus diisi lebih dari 0')
+        const val = Number(formData.contribution_value) || 0
+        const form = formData.contribution_form
+        if (!form) {
+            toast.error('Silakan pilih Jenis Komitmen')
+            return
+        }
+        if ((form === 'tunai' || form === 'transfer') && val <= 0) {
+            toast.error('Nilai komitmen dana harus lebih dari 0')
             return
         }
 
@@ -312,7 +368,7 @@ export default function ProposalDonaturPage() {
             setSavingCommitment(true)
 
             let category = formData.donatur_category
-            if (!category) {
+            if (val > 0) {
                 if (val >= 10000000) category = 'sahabat_kasih'
                 else if (val >= 5000000) category = 'sahabat_berkat'
                 else if (val >= 2500000) category = 'sahabat_pelayanan'
@@ -323,8 +379,9 @@ export default function ProposalDonaturPage() {
             const { error } = await supabase
                 .from('proposals')
                 .update({
-                    contribution_value: val,
-                    donatur_category: category,
+                    contribution_value: val > 0 ? val : null,
+                    contribution_form: form,
+                    donatur_category: category || null,
                     display_name: formData.display_name || formData.name,
                     specific_support: formData.specific_support || null,
                     message: formData.message || null
@@ -333,9 +390,12 @@ export default function ProposalDonaturPage() {
 
             if (error) throw error
 
-            // Regenerate PDF
+            // Regenerate PDF proposal & generate commitment PDF
             const newPdfUrl = await generateProposalPDF(proposalId)
             setProposalPdfUrl(newPdfUrl)
+
+            const newCommitmentUrl = await generateCommitmentPDF(proposalId)
+            setCommitmentPdfUrl(newCommitmentUrl)
 
             // Refresh pending list
             const { data: pends } = await supabase
@@ -351,6 +411,7 @@ export default function ProposalDonaturPage() {
                     setFormData(prev => ({
                         ...prev,
                         contribution_value: updated.contribution_value?.toString() || '',
+                        contribution_form: updated.contribution_form || '',
                         donatur_category: updated.donatur_category || '',
                         display_name: updated.display_name || updated.name,
                         company_name: updated.company_name || '',
@@ -358,6 +419,7 @@ export default function ProposalDonaturPage() {
                         message: updated.message || '',
                         payment_proof_url: updated.payment_proof_url || ''
                     }))
+                    setCommitmentPdfUrl(updated.commitment_pdf_url || '')
                 }
             }
 
@@ -569,7 +631,10 @@ export default function ProposalDonaturPage() {
 
                         {selectedVerificationId && (() => {
                             const selectedProposal = pendingProposals.find(p => p.id === selectedVerificationId)
-                            const hasCommitment = selectedProposal && selectedProposal.contribution_value && Number(selectedProposal.contribution_value) > 0
+                            const hasCommitment = selectedProposal && (
+                                (selectedProposal.contribution_value && Number(selectedProposal.contribution_value) > 0) || 
+                                selectedProposal.contribution_form
+                            )
                             
                             return (
                                 <motion.div 
@@ -598,6 +663,24 @@ export default function ProposalDonaturPage() {
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
+                                                    <Label htmlFor="edit_contribution_form" className="text-[#FDFBF7]/85 text-xs">Jenis Komitmen</Label>
+                                                    <Select
+                                                        value={formData.contribution_form}
+                                                        onValueChange={(value) => setFormData({ ...formData, contribution_form: value })}
+                                                    >
+                                                        <SelectTrigger id="edit_contribution_form" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
+                                                            <SelectValue placeholder="Pilih jenis komitmen" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                            <SelectItem value="tunai">Uang Tunai</SelectItem>
+                                                            <SelectItem value="transfer">Transfer Bank</SelectItem>
+                                                            <SelectItem value="barang">Barang (In-Kind)</SelectItem>
+                                                            <SelectItem value="jasa">Jasa</SelectItem>
+                                                            <SelectItem value="konsumsi">Konsumsi</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
                                                     <Label htmlFor="edit_contribution_value" className="text-[#FDFBF7]/85 text-xs">Nilai Dukungan (Rp)</Label>
                                                     <Input
                                                         id="edit_contribution_value"
@@ -605,10 +688,13 @@ export default function ProposalDonaturPage() {
                                                         type="text"
                                                         value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
                                                         onChange={handleCurrencyChange}
-                                                        placeholder="Contoh: 500.000"
+                                                        placeholder="Contoh: 500.000 (jika ada)"
                                                         className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]"
                                                     />
                                                 </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <Label htmlFor="edit_display_name" className="text-[#FDFBF7]/85 text-xs">Nama yang Dicantumkan</Label>
                                                     <Input
@@ -619,6 +705,21 @@ export default function ProposalDonaturPage() {
                                                         placeholder="Kosongkan jika sama dengan nama donatur"
                                                         className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]"
                                                     />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="edit_language" className="text-[#FDFBF7]/85 text-xs">Bahasa PDF</Label>
+                                                    <Select
+                                                        value={formData.language}
+                                                        onValueChange={(value) => setFormData({ ...formData, language: value })}
+                                                    >
+                                                        <SelectTrigger id="edit_language" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                            <SelectItem value="id">Bahasa Indonesia</SelectItem>
+                                                            <SelectItem value="en">English</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
                                                 </div>
                                             </div>
 
@@ -658,41 +759,24 @@ export default function ProposalDonaturPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="edit_specific_support" className="text-[#FDFBF7]/85 text-xs">Dukungan Spesifik</Label>
-                                                    <Select
-                                                        value={formData.specific_support}
-                                                        onValueChange={(value) => setFormData({ ...formData, specific_support: value })}
-                                                    >
-                                                        <SelectTrigger id="edit_specific_support" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
-                                                            <SelectValue placeholder="Pilih dukungan spesifik" />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                            <SelectItem value="konsumsi_lansia">Konsumsi Lansia</SelectItem>
-                                                            <SelectItem value="hadiah_lomba">Hadiah Lomba</SelectItem>
-                                                            <SelectItem value="souvenir_peserta">Souvenir Peserta</SelectItem>
-                                                            <SelectItem value="dokumentasi">Dokumentasi</SelectItem>
-                                                            <SelectItem value="webinar">Webinar</SelectItem>
-                                                            <SelectItem value="peserta_lansia">Dukung Peserta Lansia</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="edit_language" className="text-[#FDFBF7]/85 text-xs">Bahasa PDF</Label>
-                                                    <Select
-                                                        value={formData.language}
-                                                        onValueChange={(value) => setFormData({ ...formData, language: value })}
-                                                    >
-                                                        <SelectTrigger id="edit_language" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                            <SelectItem value="id">Bahasa Indonesia</SelectItem>
-                                                            <SelectItem value="en">English</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="edit_specific_support" className="text-[#FDFBF7]/85 text-xs">Dukungan Spesifik</Label>
+                                                <Select
+                                                    value={formData.specific_support}
+                                                    onValueChange={(value) => setFormData({ ...formData, specific_support: value })}
+                                                >
+                                                    <SelectTrigger id="edit_specific_support" className="form-input border-[#D4AF37]/30 bg-black/20 text-[#FDFBF7]">
+                                                        <SelectValue placeholder="Pilih dukungan spesifik" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                        <SelectItem value="konsumsi_lansia">Konsumsi Lansia</SelectItem>
+                                                        <SelectItem value="hadiah_lomba">Hadiah Lomba</SelectItem>
+                                                        <SelectItem value="souvenir_peserta">Souvenir Peserta</SelectItem>
+                                                        <SelectItem value="dokumentasi">Dokumentasi</SelectItem>
+                                                        <SelectItem value="webinar">Webinar</SelectItem>
+                                                        <SelectItem value="peserta_lansia">Dukung Peserta Lansia</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
 
                                             <div className="space-y-2">
@@ -766,9 +850,17 @@ export default function ProposalDonaturPage() {
                                                     <p className="text-[#FDFBF7] font-medium">{formData.congregation || '-'}</p>
                                                 </div>
                                                 <div>
+                                                    <p className="text-white/40 text-xs">Jenis Komitmen</p>
+                                                    <p className="text-[#FDFBF7] font-medium capitalize">
+                                                        {formData.contribution_form ? (formData.contribution_form === 'tunai' ? 'Uang Tunai' : formData.contribution_form === 'transfer' ? 'Transfer Bank' : formData.contribution_form) : '-'}
+                                                    </p>
+                                                </div>
+                                                <div>
                                                     <p className="text-white/40 text-xs">Nilai Dukungan</p>
                                                     <p className="text-[#D4AF37] font-bold">
-                                                        Rp {Number(formData.contribution_value)?.toLocaleString('id-ID')} 
+                                                        {formData.contribution_value && Number(formData.contribution_value) > 0 
+                                                            ? `Rp ${Number(formData.contribution_value).toLocaleString('id-ID')}`
+                                                            : 'In-Kind / Non-Moneter'} 
                                                         <span className="text-white/60 text-xs font-normal ml-2">
                                                             ({formData.donatur_category ? formData.donatur_category.replace('_', ' ').toUpperCase() : '-'})
                                                         </span>
@@ -881,6 +973,26 @@ export default function ProposalDonaturPage() {
                                                             Lihat PDF Proposal (Ter-update)
                                                         </Button>
                                                     )}
+                                                    {commitmentPdfUrl && (
+                                                         <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                                                             <Button
+                                                                 type="button"
+                                                                 onClick={sendCommitmentViaWA}
+                                                                 disabled={isSending}
+                                                                 className="bg-[#25D366] hover:bg-[#128C7E] text-white flex-1 rounded-full font-semibold transition-all shadow-[0_4px_14px_0_rgba(37,211,102,0.39)]"
+                                                             >
+                                                                 <Send className="mr-2 h-4 w-4" /> Kirim Bukti Komitmen via WA
+                                                             </Button>
+                                                             <Button
+                                                                 type="button"
+                                                                 variant="outline"
+                                                                 onClick={() => window.open(commitmentPdfUrl, '_blank')}
+                                                                 className="flex-1 rounded-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] transition-colors"
+                                                             >
+                                                                 Lihat Bukti Komitmen
+                                                             </Button>
+                                                         </div>
+                                                     )}
                                                 </div>
                                             ) : (
                                                 <div className="pt-4 border-t border-[#D4AF37]/20 space-y-4">

@@ -27,6 +27,8 @@ export default function DaftarProposalPage() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [uploadingProof, setUploadingProof] = useState(false)
 
+    const [statusFilter, setStatusFilter] = useState('all')
+
     // Form states
     const [formData, setFormData] = useState({
         id: '',
@@ -39,13 +41,15 @@ export default function DaftarProposalPage() {
         email: '',
         congregation: '',
         contribution_value: '',
+        contribution_form: '',
         specific_support: '',
         message: '',
         donatur_category: 'sahabat_bakti',
         lang: 'id',
         payment_status: 'pending',
         committee_id: '',
-        payment_proof_url: ''
+        payment_proof_url: '',
+        commitment_pdf_url: ''
     })
 
     useEffect(() => {
@@ -91,13 +95,15 @@ export default function DaftarProposalPage() {
             email: proposal.email || '',
             congregation: proposal.congregation || '',
             contribution_value: proposal.contribution_value?.toString() || '',
+            contribution_form: proposal.contribution_form || '',
             specific_support: proposal.specific_support || '',
             message: proposal.message || '',
             donatur_category: proposal.donatur_category || 'sahabat_bakti',
             lang: proposal.lang || 'id',
             payment_status: proposal.payment_status || 'pending',
             committee_id: proposal.committee_id || '',
-            payment_proof_url: proposal.payment_proof_url || ''
+            payment_proof_url: proposal.payment_proof_url || '',
+            commitment_pdf_url: proposal.commitment_pdf_url || ''
         })
         setIsOpen(true)
     }
@@ -116,13 +122,15 @@ export default function DaftarProposalPage() {
             email: '',
             congregation: '',
             contribution_value: '',
+            contribution_form: '',
             specific_support: '',
             message: '',
             donatur_category: 'sahabat_bakti',
             lang: 'id',
             payment_status: 'pending',
             committee_id: committees[0]?.id || '',
-            payment_proof_url: ''
+            payment_proof_url: '',
+            commitment_pdf_url: ''
         })
         setIsOpen(true)
     }
@@ -131,9 +139,36 @@ export default function DaftarProposalPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
+    const generateCommitmentPDF = async (id: string, language: string) => {
+        try {
+            const response = await fetch('/api/generate-commitment', {
+                method: 'POST',
+                body: JSON.stringify({ id, lang: language })
+            })
+            const result = await response.json()
+            if (result.error) throw new Error(result.error)
+            return result.url
+        } catch (error) {
+            console.error('Gagal menghasilkan surat komitmen:', error)
+        }
+    }
+
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/\D/g, '')
-        setFormData({ ...formData, [e.target.name]: rawValue })
+        const val = Number(rawValue) || 0
+        let category = formData.donatur_category
+        if (val > 0) {
+            if (val >= 10000000) category = 'sahabat_kasih'
+            else if (val >= 5000000) category = 'sahabat_berkat'
+            else if (val >= 2500000) category = 'sahabat_pelayanan'
+            else if (val >= 1000000) category = 'sahabat_teladan'
+            else category = 'sahabat_bakti'
+        }
+        setFormData({ 
+            ...formData, 
+            [e.target.name]: rawValue,
+            donatur_category: category
+        })
     }
 
     const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,6 +284,7 @@ export default function DaftarProposalPage() {
                         email: formData.email || null,
                         congregation: formData.congregation,
                         contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
+                        contribution_form: formData.contribution_form || null,
                         specific_support: formData.specific_support || null,
                         message: formData.message || null,
                         donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
@@ -261,6 +297,9 @@ export default function DaftarProposalPage() {
 
                 // Regenerate PDF
                 await generateProposalPDF(formData.id, formData.lang)
+                if (formData.type === 'donatur' && formData.contribution_form) {
+                    await generateCommitmentPDF(formData.id, formData.lang)
+                }
                 if (formData.payment_status === 'confirmed') {
                     await generateTokenPDF(formData.id, formData.lang)
                 }
@@ -282,6 +321,7 @@ export default function DaftarProposalPage() {
                         email: formData.email || null,
                         congregation: formData.congregation,
                         contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
+                        contribution_form: formData.contribution_form || null,
                         specific_support: formData.specific_support || null,
                         message: formData.message || null,
                         donatur_category: formData.type === 'donatur' ? (formData.donatur_category || null) : null,
@@ -296,6 +336,9 @@ export default function DaftarProposalPage() {
 
                 // Generate PDF
                 await generateProposalPDF(newProp.id, formData.lang)
+                if (formData.type === 'donatur' && formData.contribution_form) {
+                    await generateCommitmentPDF(newProp.id, formData.lang)
+                }
                 toast.success(`Proposal ${number} berhasil dibuat!`)
             }
 
@@ -362,10 +405,27 @@ export default function DaftarProposalPage() {
         }
     }
 
-    const filteredProposals = proposals.filter(p => 
-        p.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const filteredProposals = proposals.filter(p => {
+        const matchesSearch = p.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.company_name && p.company_name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+        if (!matchesSearch) return false
+
+        if (statusFilter === 'all') return true
+
+        const isLunas = p.payment_status === 'confirmed'
+        const isBatal = p.payment_status === 'cancelled'
+        const isKomitmen = p.payment_status === 'pending' && (p.contribution_value > 0 || p.contribution_form)
+        const isTerkirim = p.payment_status === 'pending' && !p.contribution_value && !p.contribution_form
+
+        if (statusFilter === 'terkirim') return isTerkirim
+        if (statusFilter === 'komitmen') return isKomitmen
+        if (statusFilter === 'lunas') return isLunas
+        if (statusFilter === 'batal') return isBatal
+
+        return true
+    })
 
     const formatDate = (dateString: string) => {
         const d = new Date(dateString)
@@ -404,14 +464,30 @@ export default function DaftarProposalPage() {
                                 {filteredProposals.length} proposal ditemukan
                             </CardDescription>
                         </div>
-                        <div className="relative w-full md:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
-                            <Input
-                                placeholder="Cari nomor atau nama..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                            />
+                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            {/* Filter Status */}
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger className="w-full sm:w-44 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
+                                    <SelectValue placeholder="Filter Status" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                    <SelectItem value="all">Semua Status</SelectItem>
+                                    <SelectItem value="terkirim">Terkirim (Belum Follow Up)</SelectItem>
+                                    <SelectItem value="komitmen">Komitmen Dicatat</SelectItem>
+                                    <SelectItem value="lunas">Lunas</SelectItem>
+                                    <SelectItem value="batal">Batal</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <div className="relative w-full sm:w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
+                                <Input
+                                    placeholder="Cari nomor atau nama..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-9 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                                />
+                            </div>
                         </div>
                     </div>
                 </CardHeader>
@@ -464,16 +540,20 @@ export default function DaftarProposalPage() {
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
                                                 {p.payment_status === 'confirmed' ? (
-                                                    <span className="flex items-center text-xs text-emerald-400">
-                                                        <CheckCircle className="h-3.5 w-3.5 mr-1" /> Lunas
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                        <CheckCircle className="h-3 w-3 mr-1" /> Lunas
                                                     </span>
                                                 ) : p.payment_status === 'cancelled' ? (
-                                                    <span className="flex items-center text-xs text-red-400">
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                                         Batal
                                                     </span>
+                                                ) : (p.contribution_value > 0 || p.contribution_form) ? (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                        Komitmen Dicatat
+                                                    </span>
                                                 ) : (
-                                                    <span className="flex items-center text-xs text-amber-400">
-                                                        <Clock className="h-3.5 w-3.5 mr-1" /> Menunggu
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                        <Clock className="h-3 w-3 mr-1" /> Terkirim
                                                     </span>
                                                 )}
                                             </td>
@@ -510,6 +590,17 @@ export default function DaftarProposalPage() {
                                     >
                                         <ExternalLink className="h-3.5 w-3.5" />
                                         Lihat PDF
+                                    </Button>
+                                )}
+                                {formData.id && selectedProposal?.commitment_pdf_url && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.open(selectedProposal.commitment_pdf_url, '_blank')}
+                                        className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-[#022c22] h-8 gap-1.5 rounded-full"
+                                    >
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                        Lihat Surat Komitmen
                                     </Button>
                                 )}
                                 <Button 
@@ -643,6 +734,25 @@ export default function DaftarProposalPage() {
                                 {formData.type === 'donatur' && (
                                     <>
                                         <div>
+                                            <Label className="text-xs text-[#D4AF37]">Jenis Komitmen</Label>
+                                            <Select 
+                                                disabled={!isEditMode}
+                                                value={formData.contribution_form} 
+                                                onValueChange={(val) => setFormData({ ...formData, contribution_form: val })}
+                                            >
+                                                <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                    <SelectValue placeholder="Pilih jenis komitmen..." />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                    <SelectItem value="tunai">Uang Tunai</SelectItem>
+                                                    <SelectItem value="transfer">Transfer Bank</SelectItem>
+                                                    <SelectItem value="barang">Barang (In-Kind)</SelectItem>
+                                                    <SelectItem value="jasa">Jasa</SelectItem>
+                                                    <SelectItem value="konsumsi">Konsumsi</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div>
                                             <Label className="text-xs text-[#D4AF37]">Kategori Donatur</Label>
                                             <Select 
                                                 disabled={!isEditMode}
@@ -661,16 +771,25 @@ export default function DaftarProposalPage() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div>
+                                        <div className="md:col-span-2">
                                             <Label className="text-xs text-[#D4AF37]">Dukungan Spesifik</Label>
-                                            <Input
-                                                name="specific_support"
-                                                value={formData.specific_support}
-                                                onChange={handleInputChange}
+                                            <Select
                                                 disabled={!isEditMode}
-                                                placeholder="Contoh: Konsumsi Lansia, Hadiah Lomba..."
-                                                className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                            />
+                                                value={formData.specific_support}
+                                                onValueChange={(val) => setFormData({ ...formData, specific_support: val })}
+                                            >
+                                                <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                    <SelectValue placeholder="Pilih dukungan spesifik..." />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                    <SelectItem value="konsumsi_lansia">Konsumsi Lansia</SelectItem>
+                                                    <SelectItem value="hadiah_lomba">Hadiah Lomba</SelectItem>
+                                                    <SelectItem value="souvenir_peserta">Souvenir Peserta</SelectItem>
+                                                    <SelectItem value="dokumentasi">Dokumentasi</SelectItem>
+                                                    <SelectItem value="webinar">Webinar</SelectItem>
+                                                    <SelectItem value="peserta_lansia">Dukung Peserta Lansia</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </>
                                 )}

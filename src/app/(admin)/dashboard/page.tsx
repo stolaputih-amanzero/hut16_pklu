@@ -11,7 +11,8 @@ import {
     CheckCircle,
     Send,
     Plus,
-    PieChart
+    PieChart,
+    TrendingUp
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
@@ -23,7 +24,9 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Cell
+    Cell,
+    AreaChart,
+    Area
 } from 'recharts'
 import { formatRupiah } from '@/lib/utils'
 
@@ -39,6 +42,8 @@ export default function DashboardPage() {
         { name: 'Donatur', amount: 0, fill: '#10b981' },
         { name: 'Sponsorship', amount: 0, fill: '#f59e0b' }
     ])
+
+    const [trendData, setTrendData] = useState<any[]>([])
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -94,6 +99,40 @@ export default function DashboardPage() {
                     confirmed: confirmedCount || 0,
                     tokens: tokensCount || 0
                 })
+
+                // Get trend data (confirmed contributions grouped by date)
+                const { data: trendRaw } = await supabase
+                    .from('proposals')
+                    .select('created_at, contribution_value')
+                    .eq('payment_status', 'confirmed')
+                    .not('contribution_value', 'is', null)
+                    .order('created_at', { ascending: true })
+
+                const trendMapDb: { [key: string]: number } = {}
+                trendRaw?.forEach(item => {
+                    if (!item.created_at) return
+                    const dbDate = item.created_at.split('T')[0] // 'YYYY-MM-DD'
+                    trendMapDb[dbDate] = (trendMapDb[dbDate] || 0) + (item.contribution_value || 0)
+                })
+
+                const sortedDates = Object.keys(trendMapDb).sort()
+                let runningTotal = 0
+                const formattedTrend = sortedDates.map(dateKey => {
+                    const dailyAmount = trendMapDb[dateKey]
+                    runningTotal += dailyAmount
+                    
+                    const displayDate = new Date(dateKey).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short'
+                    })
+                    return {
+                        date: displayDate,
+                        amount: dailyAmount,
+                        cumulative: runningTotal
+                    }
+                })
+
+                setTrendData(formattedTrend)
             } catch (error) {
                 console.error('Error fetching stats:', error)
             }
@@ -281,6 +320,84 @@ export default function DashboardPage() {
                                     <span>Buka Halaman Pembuatan Proposal</span>
                                 </a>
                             </Button>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </motion.div>
+
+            {/* Trend Perolehan Section */}
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="mt-6"
+            >
+                <motion.div variants={itemVariants}>
+                    <Card className="border-emerald shadow-emerald bg-[#033B2B]/40 backdrop-blur-xl cursor-default">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
+                                <TrendingUp className="mr-2 h-5 w-5 text-[#D4AF37]" />
+                                Tren Akumulasi Perolehan Dana (Terkonfirmasi Lunas)
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {trendData.length === 0 ? (
+                                <div className="h-[250px] flex items-center justify-center text-[#FDFBF7]/40 text-sm">
+                                    Belum ada data perolehan terkonfirmasi untuk menampilkan tren.
+                                </div>
+                            ) : (
+                                <div className="h-[280px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                            <defs>
+                                                <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4}/>
+                                                    <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} vertical={false} />
+                                            <XAxis 
+                                                dataKey="date" 
+                                                stroke="#FDFBF7" 
+                                                opacity={0.6}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tick={{ fill: '#FDFBF7', fontSize: 11 }}
+                                            />
+                                            <YAxis 
+                                                stroke="#FDFBF7" 
+                                                opacity={0.6}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tickFormatter={(value) => value >= 1000000 ? `Rp ${(value / 1000000).toFixed(1)}M` : `Rp ${value.toLocaleString('id-ID')}`}
+                                                tick={{ fill: '#FDFBF7', fontSize: 11 }}
+                                                width={80}
+                                            />
+                                            <Tooltip 
+                                                cursor={{ stroke: '#D4AF37', strokeWidth: 1, strokeDasharray: '3 3' }}
+                                                contentStyle={{ 
+                                                    backgroundColor: '#022c22', 
+                                                    borderColor: 'rgba(212, 175, 55, 0.4)', 
+                                                    borderRadius: '8px', 
+                                                    color: '#FDFBF7', 
+                                                    boxShadow: '0 8px 30px rgba(0,0,0,0.6)' 
+                                                }}
+                                                itemStyle={{ color: '#FDFBF7', fontSize: '13px', fontWeight: 500 }}
+                                                labelStyle={{ color: '#D4AF37', fontSize: '14px', fontWeight: 'bold', paddingBottom: '4px', borderBottom: '1px solid rgba(212, 175, 55, 0.2)', marginBottom: '8px' }}
+                                                formatter={(value: any) => [formatRupiah(Number(value) || 0), 'Akumulasi']}
+                                            />
+                                            <Area 
+                                                type="monotone" 
+                                                dataKey="cumulative" 
+                                                stroke="#D4AF37" 
+                                                strokeWidth={2}
+                                                fillOpacity={1} 
+                                                fill="url(#colorCumulative)" 
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </motion.div>

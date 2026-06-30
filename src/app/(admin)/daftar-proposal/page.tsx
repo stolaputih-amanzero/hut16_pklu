@@ -688,260 +688,300 @@ export default function DaftarProposalPage() {
                         </div>
 
                         {/* Body */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-8">
                             {!formData.id && (
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, type: 'donatur' })}
-                                        className={`p-4 rounded-xl border text-center transition-all ${formData.type === 'donatur' ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]' : 'bg-[#033B2B]/20 border-[#D4AF37]/20 text-[#FDFBF7]/60'}`}
-                                    >
-                                        <FileText className="mx-auto h-6 w-6 mb-2" />
-                                        Donatur
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, type: 'sponsorship' })}
-                                        className={`p-4 rounded-xl border text-center transition-all ${formData.type === 'sponsorship' ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]' : 'bg-[#033B2B]/20 border-[#D4AF37]/20 text-[#FDFBF7]/60'}`}
-                                    >
-                                        <Users className="mx-auto h-6 w-6 mb-2" />
-                                        Sponsorship
-                                    </button>
+                                <div className="space-y-4">
+                                    <h3 className="text-[#D4AF37] font-semibold text-sm border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                        Pilih Jenis Proposal
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, type: 'donatur' })}
+                                            className={`p-4 rounded-xl border text-center transition-all ${formData.type === 'donatur' ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]' : 'bg-[#033B2B]/20 border-[#D4AF37]/20 text-[#FDFBF7]/60'}`}
+                                        >
+                                            <FileText className="mx-auto h-6 w-6 mb-2" />
+                                            Donatur
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, type: 'sponsorship' })}
+                                            className={`p-4 rounded-xl border text-center transition-all ${formData.type === 'sponsorship' ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]' : 'bg-[#033B2B]/20 border-[#D4AF37]/20 text-[#FDFBF7]/60'}`}
+                                        >
+                                            <Users className="mx-auto h-6 w-6 mb-2" />
+                                            Sponsorship
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">Nama Donatur / Sponsor</Label>
-                                    <Input
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        disabled={!isEditMode}
-                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                    />
+                            {/* Section 1: Pengaturan Proposal */}
+                            <div className="space-y-4">
+                                <h3 className="text-[#D4AF37] font-semibold text-sm border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-xs">1</span>
+                                    Pengaturan & Status
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="md:col-span-2">
+                                        <Label className="text-xs text-[#D4AF37]">Panitia Penanggung Jawab</Label>
+                                        <Select 
+                                            disabled={!isEditMode}
+                                            value={formData.committee_id} 
+                                            onValueChange={(val) => setFormData({ ...formData, committee_id: val })}
+                                        >
+                                            <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                <SelectValue placeholder="Pilih Penanggung Jawab..." />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                {committees.map((comm) => (
+                                                    <SelectItem key={comm.id} value={comm.id}>
+                                                        {comm.name} ({comm.role})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div>
+                                        <Label className="text-xs text-[#D4AF37]">Bahasa PDF</Label>
+                                        <Select 
+                                            disabled={!isEditMode}
+                                            value={formData.lang} 
+                                            onValueChange={(val) => setFormData({ ...formData, lang: val })}
+                                        >
+                                            <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                <SelectItem value="id">Indonesia</SelectItem>
+                                                <SelectItem value="en">English</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div>
+                                        <Label className="text-xs text-[#D4AF37]">Status Pembayaran</Label>
+                                        <Select 
+                                            disabled={!isEditMode}
+                                            value={formData.payment_status} 
+                                            onValueChange={(val) => setFormData({ ...formData, payment_status: val })}
+                                        >
+                                            <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                <SelectItem value="pending">Terkirim / Dicatat</SelectItem>
+                                                <SelectItem value="confirmed">Lunas</SelectItem>
+                                                <SelectItem value="cancelled">Batal</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
-                                {formData.type === 'donatur' && (
-                                    <>
-                                        <div>
-                                            <Label className="text-xs text-[#D4AF37]">Nama untuk Buku Acara</Label>
-                                            <Input
-                                                name="display_name"
-                                                value={formData.display_name}
-                                                onChange={handleInputChange}
-                                                disabled={!isEditMode}
-                                                className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                            />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <Label className="text-xs text-[#D4AF37]">Perusahaan / Komunitas / Keluarga (Opsional)</Label>
-                                            <Input
-                                                name="company_name"
-                                                value={formData.company_name}
-                                                onChange={handleInputChange}
-                                                disabled={!isEditMode}
-                                                placeholder="Contoh: Keluarga Rondonuwu, PT Aman Berkat"
-                                                className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">WhatsApp (Format: 628xxx)</Label>
-                                    <Input
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                        disabled={!isEditMode}
-                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                    />
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">Asal Jemaat / Wilayah</Label>
-                                    <Input
-                                        name="congregation"
-                                        value={formData.congregation}
-                                        onChange={handleInputChange}
-                                        disabled={!isEditMode}
-                                        placeholder="GPIB Jemaat / Wilayah (Opsional)"
-                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                    />
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">Email (Opsional)</Label>
-                                    <Input
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        disabled={!isEditMode}
-                                        placeholder="donatur@email.com"
-                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                    />
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">Nilai Kemitraan (Rp)</Label>
-                                    <Input
-                                        name="contribution_value"
-                                        value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
-                                        onChange={handleCurrencyChange}
-                                        disabled={!isEditMode}
-                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] font-semibold text-amber-400"
-                                    />
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">Bahasa PDF</Label>
-                                    <Select 
-                                        disabled={!isEditMode}
-                                        value={formData.lang} 
-                                        onValueChange={(val) => setFormData({ ...formData, lang: val })}
-                                    >
-                                        <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                            <SelectItem value="id">Indonesia</SelectItem>
-                                            <SelectItem value="en">English</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-[#D4AF37]">Status Pembayaran</Label>
-                                    <Select 
-                                        disabled={!isEditMode}
-                                        value={formData.payment_status} 
-                                        onValueChange={(val) => setFormData({ ...formData, payment_status: val })}
-                                    >
-                                        <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                            <SelectItem value="pending">Terkirim / Dicatat</SelectItem>
-                                            <SelectItem value="confirmed">Lunas</SelectItem>
-                                            <SelectItem value="cancelled">Batal</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                {(formData.type === 'donatur' || formData.type === 'sponsorship') && (
-                                    <>
-                                        <div>
-                                            <Label className="text-xs text-[#D4AF37]">Jenis Komitmen</Label>
-                                            <Select 
-                                                disabled={!isEditMode}
-                                                value={formData.contribution_form} 
-                                                onValueChange={(val) => setFormData({ ...formData, contribution_form: val })}
-                                            >
-                                                <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                                    <SelectValue placeholder="Pilih jenis komitmen..." />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                    <SelectItem value="tunai">Uang Tunai</SelectItem>
-                                                    <SelectItem value="transfer">Transfer Bank</SelectItem>
-                                                    <SelectItem value="barang">Barang (In-Kind)</SelectItem>
-                                                    <SelectItem value="jasa">Jasa</SelectItem>
-                                                    <SelectItem value="konsumsi">Konsumsi</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                            </div>
 
-                                        {formData.type === 'donatur' && (
+                            {/* Section 2: Informasi Target */}
+                            <div className="space-y-4">
+                                <h3 className="text-[#D4AF37] font-semibold text-sm border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-xs">2</span>
+                                    Informasi Target Dukungan
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label className="text-xs text-[#D4AF37]">Nama Lengkap / Instansi</Label>
+                                        <Input
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditMode}
+                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                        />
+                                    </div>
+                                    {formData.type === 'donatur' && (
+                                        <>
                                             <div>
-                                                <Label className="text-xs text-[#D4AF37]">Kategori Donatur</Label>
+                                                <Label className="text-xs text-[#D4AF37]">Nama untuk Buku Acara</Label>
+                                                <Input
+                                                    name="display_name"
+                                                    value={formData.display_name}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditMode}
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <Label className="text-xs text-[#D4AF37]">Perusahaan / Komunitas (Opsional)</Label>
+                                                <Input
+                                                    name="company_name"
+                                                    value={formData.company_name}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditMode}
+                                                    placeholder="Contoh: Keluarga Rondonuwu, PT Aman Berkat"
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                    <div>
+                                        <Label className="text-xs text-[#D4AF37]">WhatsApp (Format: 628xxx)</Label>
+                                        <Input
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditMode}
+                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label className="text-xs text-[#D4AF37]">Email (Opsional)</Label>
+                                        <Input
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditMode}
+                                            placeholder="donatur@email.com"
+                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <Label className="text-xs text-[#D4AF37]">Asal Jemaat / Wilayah</Label>
+                                        <Input
+                                            name="congregation"
+                                            value={formData.congregation}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditMode}
+                                            placeholder="GPIB Jemaat / Wilayah (Opsional)"
+                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Section 3: Data Komitmen */}
+                            <div className="space-y-4">
+                                <h3 className="text-[#D4AF37] font-semibold text-sm border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-xs">3</span>
+                                    Rincian Dukungan
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label className="text-xs text-[#D4AF37]">Nilai Kemitraan (Rp)</Label>
+                                        <Input
+                                            name="contribution_value"
+                                            value={formData.contribution_value ? new Intl.NumberFormat('id-ID').format(Number(formData.contribution_value)) : ''}
+                                            onChange={handleCurrencyChange}
+                                            disabled={!isEditMode}
+                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] font-semibold text-amber-400"
+                                        />
+                                    </div>
+                                    {(formData.type === 'donatur' || formData.type === 'sponsorship') && (
+                                        <>
+                                            <div>
+                                                <Label className="text-xs text-[#D4AF37]">Jenis Komitmen</Label>
                                                 <Select 
                                                     disabled={!isEditMode}
-                                                    value={formData.donatur_category} 
-                                                    onValueChange={(val) => setFormData({ ...formData, donatur_category: val })}
+                                                    value={formData.contribution_form} 
+                                                    onValueChange={(val) => setFormData({ ...formData, contribution_form: val })}
                                                 >
                                                     <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                                        <SelectValue />
+                                                        <SelectValue placeholder="Pilih jenis komitmen..." />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                        <SelectItem value="sahabat_bakti">Sahabat Bakti (Rp500Rb+)</SelectItem>
-                                                        <SelectItem value="sahabat_teladan">Sahabat Teladan (Rp1Jt+)</SelectItem>
-                                                        <SelectItem value="sahabat_pelayanan">Sahabat Pelayan (Rp2.5Jt+)</SelectItem>
-                                                        <SelectItem value="sahabat_berkat">Sahabat Berkat (Rp5Jt+)</SelectItem>
-                                                        <SelectItem value="sahabat_kasih">Sahabat Kasih (Rp10Jt+)</SelectItem>
+                                                        <SelectItem value="tunai">Uang Tunai</SelectItem>
+                                                        <SelectItem value="transfer">Transfer Bank</SelectItem>
+                                                        <SelectItem value="barang">Barang (In-Kind)</SelectItem>
+                                                        <SelectItem value="jasa">Jasa</SelectItem>
+                                                        <SelectItem value="konsumsi">Konsumsi</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
-                                        )}
 
-                                        {formData.type === 'sponsorship' && (
-                                            <div>
-                                                <Label className="text-xs text-[#D4AF37]">Paket Sponsor</Label>
-                                                <Select 
+                                            {formData.type === 'donatur' && (
+                                                <div>
+                                                    <Label className="text-xs text-[#D4AF37]">Kategori Donatur</Label>
+                                                    <Select 
+                                                        disabled={!isEditMode}
+                                                        value={formData.donatur_category} 
+                                                        onValueChange={(val) => setFormData({ ...formData, donatur_category: val })}
+                                                    >
+                                                        <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                            <SelectItem value="sahabat_bakti">Sahabat Bakti (Rp500Rb+)</SelectItem>
+                                                            <SelectItem value="sahabat_teladan">Sahabat Teladan (Rp1Jt+)</SelectItem>
+                                                            <SelectItem value="sahabat_pelayanan">Sahabat Pelayan (Rp2.5Jt+)</SelectItem>
+                                                            <SelectItem value="sahabat_berkat">Sahabat Berkat (Rp5Jt+)</SelectItem>
+                                                            <SelectItem value="sahabat_kasih">Sahabat Kasih (Rp10Jt+)</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            )}
+
+                                            {formData.type === 'sponsorship' && (
+                                                <div>
+                                                    <Label className="text-xs text-[#D4AF37]">Paket Sponsor</Label>
+                                                    <Select 
+                                                        disabled={!isEditMode}
+                                                        value={formData.sponsor_package} 
+                                                        onValueChange={(val) => setFormData({ ...formData, sponsor_package: val })}
+                                                    >
+                                                        <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
+                                                            <SelectValue placeholder="Pilih paket..." />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                            <SelectItem value="platinum">Platinum (Rp50Jt+)</SelectItem>
+                                                            <SelectItem value="gold">Emas / Gold (Rp25Jt+)</SelectItem>
+                                                            <SelectItem value="silver">Perak / Silver (Rp15Jt+)</SelectItem>
+                                                            <SelectItem value="bronze">Perunggu / Bronze (Rp5Jt+)</SelectItem>
+                                                            <SelectItem value="in_kind">In-Kind (Barang/Jasa)</SelectItem>
+                                                            <SelectItem value="donatur">Partisipasi (Bebas)</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            )}
+
+                                            <div className="md:col-span-2">
+                                                <Label className="text-xs text-[#D4AF37]">Dukungan Spesifik</Label>
+                                                <Select
                                                     disabled={!isEditMode}
-                                                    value={formData.sponsor_package} 
-                                                    onValueChange={(val) => setFormData({ ...formData, sponsor_package: val })}
+                                                    value={formData.specific_support}
+                                                    onValueChange={(val) => setFormData({ ...formData, specific_support: val })}
                                                 >
                                                     <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                                        <SelectValue placeholder="Pilih paket..." />
+                                                        <SelectValue placeholder="Pilih dukungan spesifik..." />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                        <SelectItem value="platinum">Platinum (Rp50Jt+)</SelectItem>
-                                                        <SelectItem value="gold">Emas / Gold (Rp25Jt+)</SelectItem>
-                                                        <SelectItem value="silver">Perak / Silver (Rp15Jt+)</SelectItem>
-                                                        <SelectItem value="bronze">Perunggu / Bronze (Rp5Jt+)</SelectItem>
-                                                        <SelectItem value="in_kind">In-Kind (Barang/Jasa)</SelectItem>
-                                                        <SelectItem value="donatur">Partisipasi (Bebas)</SelectItem>
+                                                        <SelectItem value="konsumsi_lansia">Konsumsi Lansia</SelectItem>
+                                                        <SelectItem value="hadiah_lomba">Hadiah Lomba</SelectItem>
+                                                        <SelectItem value="souvenir_peserta">Souvenir Peserta</SelectItem>
+                                                        <SelectItem value="dokumentasi">Dokumentasi</SelectItem>
+                                                        <SelectItem value="webinar">Webinar</SelectItem>
+                                                        <SelectItem value="peserta_lansia">Dukung Peserta Lansia</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
-                                        )}
+                                        </>
+                                    )}
+                                    <div className="md:col-span-2">
+                                        <Label className="text-xs text-[#D4AF37]">Ucapan / Harapan untuk Buku Acara (Maks 40 Kata)</Label>
+                                        <Textarea
+                                            name="message"
+                                            value={formData.message}
+                                            onChange={handleInputChange}
+                                            disabled={!isEditMode}
+                                            rows={3}
+                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] focus:ring-[#D4AF37]"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
 
-                                        <div className="md:col-span-2">
-                                            <Label className="text-xs text-[#D4AF37]">Dukungan Spesifik</Label>
-                                            <Select
-                                                disabled={!isEditMode}
-                                                value={formData.specific_support}
-                                                onValueChange={(val) => setFormData({ ...formData, specific_support: val })}
-                                            >
-                                                <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                                    <SelectValue placeholder="Pilih dukungan spesifik..." />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                    <SelectItem value="konsumsi_lansia">Konsumsi Lansia</SelectItem>
-                                                    <SelectItem value="hadiah_lomba">Hadiah Lomba</SelectItem>
-                                                    <SelectItem value="souvenir_peserta">Souvenir Peserta</SelectItem>
-                                                    <SelectItem value="dokumentasi">Dokumentasi</SelectItem>
-                                                    <SelectItem value="webinar">Webinar</SelectItem>
-                                                    <SelectItem value="peserta_lansia">Dukung Peserta Lansia</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </>
-                                )}
-                                <div className="md:col-span-2">
-                                    <Label className="text-xs text-[#D4AF37]">Panitia Penanggung Jawab</Label>
-                                    <Select 
-                                        disabled={!isEditMode}
-                                        value={formData.committee_id} 
-                                        onValueChange={(val) => setFormData({ ...formData, committee_id: val })}
-                                    >
-                                        <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
-                                            <SelectValue placeholder="Pilih Penanggung Jawab..." />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                            {committees.map((comm) => (
-                                                <SelectItem key={comm.id} value={comm.id}>
-                                                    {comm.name} ({comm.role})
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <Label className="text-xs text-[#D4AF37]">Ucapan / Harapan untuk Buku Acara (Maks 40 Kata)</Label>
-                                    <Textarea
-                                        name="message"
-                                        value={formData.message}
-                                        onChange={handleInputChange}
-                                        disabled={!isEditMode}
-                                        rows={3}
-                                        className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7] focus:ring-[#D4AF37]"
-                                    />
-                                </div>
-                                {formData.id && (
-                                    <div className="md:col-span-2 border-t border-[#D4AF37]/25 pt-4 space-y-2">
+                            {/* Section 4: Bukti Pembayaran */}
+                            {formData.id && (
+                                <div className="space-y-4">
+                                    <h3 className="text-[#D4AF37] font-semibold text-sm border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                        <span className="w-5 h-5 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-xs">4</span>
+                                        Dokumen & Bukti
+                                    </h3>
+                                    <div className="space-y-2">
                                         <Label className="text-xs text-[#D4AF37] font-semibold flex items-center gap-1.5">
                                             <FileText className="h-4 w-4" /> Bukti Pembayaran
                                         </Label>
@@ -1011,8 +1051,8 @@ export default function DaftarProposalPage() {
                                             </div>
                                         )}
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Footer / Action buttons */}

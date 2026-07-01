@@ -352,9 +352,9 @@ export default function DashboardPage() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                className="grid grid-cols-1 gap-6"
             >
-                <motion.div variants={itemVariants} className="md:col-span-2">
+                <motion.div variants={itemVariants}>
                     <Card className="border-emerald shadow-emerald h-full cursor-default bg-[#033B2B]/40 backdrop-blur-xl">
                         <CardHeader>
                             <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="h-[200px] md:h-[250px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="99%" height="100%">
                                     <BarChart data={fundData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} vertical={false} />
                                         <XAxis 
@@ -407,32 +407,6 @@ export default function DashboardPage() {
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="md:col-span-1 flex flex-col">
-                    <Card className="border-emerald shadow-emerald relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
-                                <FileText className="mr-2 h-5 w-5 text-[#D4AF37]" />
-                                Buat Proposal Baru
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-1 flex flex-col justify-between">
-                            <p className="text-[#FDFBF7]/60 mb-6 text-sm">
-                                Kelola pendaftaran proposal donatur pribadi maupun sponsorship institusi dalam satu alur yang mudah dan terintegrasi.
-                            </p>
-                            <Button
-                                asChild
-                                className="emerald-button w-full justify-center px-4 py-6 whitespace-normal h-auto text-center"
-                            >
-                                <a href="/buat-proposal">
-                                    <Plus className="mr-2 h-4 w-4 shrink-0" />
-                                    <span>Buka Halaman Pembuatan Proposal</span>
-                                </a>
-                            </Button>
                         </CardContent>
                     </Card>
                 </motion.div>

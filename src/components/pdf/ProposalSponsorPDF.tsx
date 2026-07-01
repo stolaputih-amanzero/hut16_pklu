@@ -410,8 +410,8 @@ interface Props {
 export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png", origin = "https://pklu.amanloka.com" }: Props) {
     const isId = lang === 'id'
 
-    const CENTRAL_CONTACT_NAME = 'Vevi Mayo'
-    const CENTRAL_CONTACT_PHONE = '628111550543'
+    const CENTRAL_CONTACT_NAME = 'Anastasia Christine Dolo'
+    const CENTRAL_CONTACT_PHONE = '6281291451945'
 
     const formatDateLong = (dateStr: string, isId: boolean) => {
         try {
@@ -829,7 +829,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
                     <View style={styles.edTableRow}>
                         <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Konsumsi Lansia</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Membantu penyediaan makanan, snack, dan air mineral peserta.' : 'Helping provide food, snacks, and mineral water for participants.'}</Text>
+                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Mendukung penyediaan makanan, snack, dan air mineral peserta.' : 'Helping provide food, snacks, and mineral water for participants.'}</Text>
                     </View>
                     <View style={styles.edTableRow}>
                         <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Hadiah Lomba</Text>
@@ -981,8 +981,8 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                                 <Image src={commitmentWaQrUrl} style={{ width: 140, height: 140, marginBottom: 15 }} />
                                 <Text style={[styles.bodyText, { textAlign: 'center', fontSize: 9, color: '#718096' }]}>
                                     {isId
-                                        ? 'Atau hubungi WhatsApp: 0811-1550-543 (Vevi Mayo)'
-                                        : 'Or contact WhatsApp: +62 811-1550-543 (Vevi Mayo)'
+                                        ? 'Atau hubungi WhatsApp: 0812-9145-1945 (Anastasia Christine Dolo)'
+                                        : 'Or contact WhatsApp: +62 812-9145-1945 (Anastasia Christine Dolo)'
                                     }
                                 </Text>
                             </View>

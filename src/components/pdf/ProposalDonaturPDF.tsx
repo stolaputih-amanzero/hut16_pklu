@@ -410,8 +410,8 @@ interface Props {
 export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png", origin = "https://pklu.amanloka.com" }: Props) {
     const isId = lang === 'id'
 
-    const CENTRAL_CONTACT_NAME = 'Vevi Mayo'
-    const CENTRAL_CONTACT_PHONE = '628111550543'
+    const CENTRAL_CONTACT_NAME = 'Anastasia Christine Dolo'
+    const CENTRAL_CONTACT_PHONE = '6281291451945'
 
     const formatDateLong = (dateStr: string, isId: boolean) => {
         try {
@@ -980,10 +980,10 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                                 </Text>
                                 <Image src={commitmentWaQrUrl} style={{ width: 140, height: 140, marginBottom: 15 }} />
                                 <Text style={[styles.bodyText, { textAlign: 'center', fontSize: 9, color: '#718096' }]}>
-                                    {isId
-                                        ? 'Atau hubungi WhatsApp: 0811-1550-543 (Vevi Mayo)'
-                                        : 'Or contact WhatsApp: +62 811-1550-543 (Vevi Mayo)'
-                                    }
+                                     {isId
+                                         ? 'Atau hubungi WhatsApp: 0812-9145-1945 (Anastasia Christine Dolo)'
+                                         : 'Or contact WhatsApp: +62 812-9145-1945 (Anastasia Christine Dolo)'
+                                     }
                                 </Text>
                             </View>
                         </View>

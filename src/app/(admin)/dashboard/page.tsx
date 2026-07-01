@@ -152,10 +152,14 @@ export default function DashboardPage() {
             const dailyAmount = trendMapDb[dateKey]
             runningTotal += dailyAmount
             
-            const displayDate = new Date(dateKey).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short'
-            })
+            const parts = dateKey.split('-')
+            let displayDate = dateKey
+            if (parts.length === 3) {
+                const day = parseInt(parts[2], 10)
+                const monthIdx = parseInt(parts[1], 10) - 1
+                const monthsId = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+                displayDate = `${day} ${monthsId[monthIdx] || parts[1]}`
+            }
             return {
                 date: displayDate,
                 amount: dailyAmount,
@@ -391,7 +395,7 @@ export default function DashboardPage() {
                                 </div>
                             ) : (
                                 <div className="h-[220px] md:h-[280px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="99%" height="100%" key={filterType}>
                                         <AreaChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                             <defs>
                                                 <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">

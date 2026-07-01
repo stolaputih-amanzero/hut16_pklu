@@ -1,16 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700'], style: ['normal', 'italic'] })
 
 export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText('00179-01-88-000447-9')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   const fadeIn = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -355,6 +363,112 @@ export default function Home() {
                 ></iframe>
               </div>
 
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Informasi Rekening Panitia Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 1 }}
+          className="w-full max-w-xl mb-12 text-center space-y-6"
+        >
+          <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <h2 className={`text-2xl md:text-3xl text-[#D4AF37] ${playfair.className}`}>Rekening Resmi Panitia</h2>
+          <p className="text-sm text-[#FDFBF7]/70 max-w-md mx-auto font-light leading-relaxed">
+            Seluruh dukungan dana disalurkan secara aman dan transparan melalui satu pintu rekening resmi Kepanitiaan berikut:
+          </p>
+          
+          <div className="relative p-6 rounded-2xl bg-[#022c22]/60 backdrop-blur-md border border-[#D4AF37]/20 shadow-xl overflow-hidden group">
+            {/* Ambient hover effect */}
+            <div className="absolute inset-0 bg-[#D4AF37]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="space-y-5 relative z-10">
+              <div className="flex flex-col items-center">
+                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1">Bank</span>
+                <span className={`text-xl font-bold text-[#FDFBF7] ${playfair.className}`}>Bank BTN</span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1">Nomor Rekening</span>
+                <div className="flex items-center gap-3 mt-1 bg-[#022c22]/80 px-4 py-2 rounded-lg border border-[#D4AF37]/10 group/number">
+                  <span className="text-xl md:text-2xl font-mono tracking-wider text-[#FDFBF7] font-semibold select-all">
+                    00179-01-88-000447-9
+                  </span>
+                  <button 
+                    onClick={handleCopy}
+                    className="p-1.5 rounded-md hover:bg-[#D4AF37]/20 text-[#D4AF37] hover:text-[#FDFBF7] transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative"
+                    title="Salin Nomor Rekening"
+                  >
+                    <AnimatePresence mode="wait" initial={false}>
+                      {copied ? (
+                        <motion.div
+                          key="check"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Check className="w-5 h-5 text-emerald-400" />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="copy"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Copy className="w-5 h-5 transition-transform group-hover/number:scale-110" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </button>
+                </div>
+                
+                <div className="h-4 flex items-center justify-center mt-1">
+                  <AnimatePresence>
+                    {copied && (
+                      <motion.span 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        className="text-xs text-emerald-400 font-medium"
+                      >
+                        Nomor rekening berhasil disalin!
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1">Atas Nama</span>
+                <span className="text-base font-semibold text-[#FDFBF7] uppercase tracking-wide">
+                  PANITIA MUPEL GPIB BEKASI
+                </span>
+              </div>
+
+              {/* Elegant Divider */}
+              <div className="h-[1px] w-full bg-[#D4AF37]/20 my-4" />
+
+              <div className="flex flex-col items-center">
+                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1.5">Kontak Konfirmasi (WhatsApp)</span>
+                <span className="text-base font-semibold text-[#FDFBF7] tracking-wide mb-2">
+                  ANASTASIA CHRISTINE DOLO
+                </span>
+                <a 
+                  href="https://wa.me/6281291451945" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#047857]/20 hover:bg-[#047857]/40 text-[#FDFBF7] hover:text-[#D4AF37] border border-[#047857]/30 hover:border-[#D4AF37]/30 transition-all duration-300 active:scale-95 text-sm font-medium cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4 text-[#D4AF37]" />
+                  <span className="font-mono tracking-wider">+62 812-9145-1945</span>
+                </a>
+              </div>
             </div>
           </div>
         </motion.div>

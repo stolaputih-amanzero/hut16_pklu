@@ -177,7 +177,7 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
     const committeeRole = data.committees?.role || (isId ? 'Ketua Panitia' : 'Committee Chairperson')
     
     // Fix QR URL: No 'TKN-' prefix in the URL path, verify/[id] expects exactly the UUID
-    const baseUrl = origin || 'https://hut16pklu.org'
+    const baseUrl = origin || 'https://pklu.amanloka.com'
     const verifyUrl = `${baseUrl}/verify/${data.id || '0000-0000'}`
     const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=200&margin=1&dark=022c22`
 

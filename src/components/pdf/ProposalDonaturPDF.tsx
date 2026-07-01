@@ -4,7 +4,7 @@ import {
 import { formatRupiah } from '@/lib/utils'
 
 // Define the dummy verification URL base
-const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/DON-'
+const VERIFY_BASE_URL = 'https://pklu.amanloka.com/verify/DON-'
 
 const styles = StyleSheet.create({
     page: {

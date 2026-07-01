@@ -3,7 +3,7 @@ import {
 } from '@react-pdf/renderer'
 import { formatRupiah } from '@/lib/utils'
 
-const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/'
+const VERIFY_BASE_URL = 'https://pklu.amanloka.com/verify/'
 
 const styles = StyleSheet.create({
     page: {

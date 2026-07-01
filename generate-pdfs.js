@@ -7,7 +7,7 @@ const generatePdfComponent = (type) => `import {
 import { formatRupiah } from '@/lib/utils'
 
 // Define the dummy verification URL base
-const VERIFY_BASE_URL = 'https://hut16pklu.org/verify/${type === 'donatur' ? 'DON' : 'SPO'}-'
+const VERIFY_BASE_URL = 'https://pklu.amanloka.com/verify/${type === 'donatur' ? 'DON' : 'SPO'}-'
 
 const styles = StyleSheet.create({
     page: {
@@ -407,9 +407,10 @@ interface Props {
     lang: 'id' | 'en'
     logoUrl?: string
     gpibLogoUrl?: string
+    origin?: string
 }
 
-export function ${type === 'donatur' ? 'ProposalDonaturPDF' : 'ProposalSponsorPDF'}({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png" }: Props) {
+export function ${type === 'donatur' ? 'ProposalDonaturPDF' : 'ProposalSponsorPDF'}({ data, lang, logoUrl = "/logo_hut16_pklu.png", gpibLogoUrl = "/logo_gpib.png", origin = "https://pklu.amanloka.com" }: Props) {
     const isId = lang === 'id'
 
     const committeeName = data.committees?.name || 'Vrilly Rondonuwu'

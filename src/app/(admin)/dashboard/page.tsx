@@ -35,7 +35,10 @@ export default function DashboardPage() {
         donatur: 0,
         sponsorship: 0,
         confirmed: 0,
-        tokens: 0
+        tokens: 0,
+        totalConfirmedFunds: 0,
+        donaturConfirmedFunds: 0,
+        sponsorConfirmedFunds: 0
     })
 
     const [fundData, setFundData] = useState([
@@ -95,11 +98,33 @@ export default function DashboardPage() {
                     { name: 'Sponsorship', amount: sumSponsor, fill: '#f59e0b' }
                 ])
 
+                // Get confirmed funds
+                const { data: donaturConfirmedFunds } = await supabase
+                    .from('proposals')
+                    .select('contribution_value')
+                    .eq('type', 'donatur')
+                    .eq('payment_status', 'confirmed')
+                    .not('contribution_value', 'is', null)
+
+                const { data: sponsorConfirmedFunds } = await supabase
+                    .from('proposals')
+                    .select('contribution_value')
+                    .eq('type', 'sponsorship')
+                    .eq('payment_status', 'confirmed')
+                    .not('contribution_value', 'is', null)
+
+                const sumDonaturConfirmed = donaturConfirmedFunds?.reduce((acc, curr) => acc + (curr.contribution_value || 0), 0) || 0
+                const sumSponsorConfirmed = sponsorConfirmedFunds?.reduce((acc, curr) => acc + (curr.contribution_value || 0), 0) || 0
+                const totalConfirmed = sumDonaturConfirmed + sumSponsorConfirmed
+
                 setStats({
                     donatur: donaturCount || 0,
                     sponsorship: sponsorshipCount || 0,
                     confirmed: confirmedCount || 0,
-                    tokens: tokensCount || 0
+                    tokens: tokensCount || 0,
+                    totalConfirmedFunds: totalConfirmed,
+                    donaturConfirmedFunds: sumDonaturConfirmed,
+                    sponsorConfirmedFunds: sumSponsorConfirmed
                 })
 
                 // Get trend data (confirmed contributions grouped by date)
@@ -258,6 +283,65 @@ export default function DashboardPage() {
                             <div className="text-3xl font-bold text-[#D4AF37]">{stats.tokens}</div>
                             <p className="text-xs text-[#FDFBF7]/50 mt-1">
                                 Penghargaan dibuat
+                            </p>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </motion.div>
+
+            {/* Financial Summary Cards */}
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+            >
+                <motion.div variants={itemVariants}>
+                    <Card className="border-emerald shadow-emerald bg-[#033B2B]/40 backdrop-blur-xl h-full transition-transform hover:scale-105 duration-300 cursor-default">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-semibold text-[#FDFBF7]/90 uppercase tracking-wider">Total Lunas (Terkonfirmasi)</CardTitle>
+                            <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl md:text-3xl font-black text-[#D4AF37] font-mono">
+                                {formatRupiah(stats.totalConfirmedFunds)}
+                            </div>
+                            <p className="text-xs text-[#FDFBF7]/55 mt-1.5">
+                                Akumulasi dana masuk terkonfirmasi
+                            </p>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                    <Card className="border-emerald shadow-emerald bg-[#033B2B]/40 backdrop-blur-xl h-full transition-transform hover:scale-105 duration-300 cursor-default">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-semibold text-[#FDFBF7]/90 uppercase tracking-wider">Lunas - Donor</CardTitle>
+                            <Heart className="h-5 w-5 text-emerald-400" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl md:text-3xl font-black text-emerald-400 font-mono">
+                                {formatRupiah(stats.donaturConfirmedFunds)}
+                            </div>
+                            <p className="text-xs text-[#FDFBF7]/55 mt-1.5">
+                                Total dana lunas dari kategori Donatur
+                            </p>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                    <Card className="border-emerald shadow-emerald bg-[#033B2B]/40 backdrop-blur-xl h-full transition-transform hover:scale-105 duration-300 cursor-default">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-semibold text-[#FDFBF7]/90 uppercase tracking-wider">Lunas - Sponsor</CardTitle>
+                            <Users className="h-5 w-5 text-amber-400" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl md:text-3xl font-black text-amber-400 font-mono">
+                                {formatRupiah(stats.sponsorConfirmedFunds)}
+                            </div>
+                            <p className="text-xs text-[#FDFBF7]/55 mt-1.5">
+                                Total dana lunas dari kategori Sponsor
                             </p>
                         </CardContent>
                     </Card>

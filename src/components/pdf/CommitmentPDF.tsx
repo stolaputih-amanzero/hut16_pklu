@@ -400,8 +400,8 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                 </Text>
                                 <Text style={styles.bankText}>
                                     {isId 
-                                        ? 'Dukungan dana dapat ditransfer ke rekening panitia: PT. BANK ............................................... No. Rekening: ............................................... A.N. ...............................................\nMohon mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: +62 811-1550-543 (Vevi Mayo) untuk pencatatan kelunasan.'
-                                        : 'Financial support can be transferred to the committee account: PT. BANK ............................................... Account No: ............................................... A.N. ...............................................\nPlease kindly send the transfer receipt via WhatsApp to the Committee Secretary: +62 811-1550-543 (Vevi Mayo) for reconciliation.'}
+                                        ? 'Dukungan dana dapat ditransfer ke rekening panitia: Bank BTN, No. Rekening: 00179-01-88-000447-9 A.N. PANITIA MUPEL GPIB BEKASI.\nMohon mengirimkan bukti transfer via WhatsApp ke nomor Kontak Person: +62 812-9145-1945 (Anastasia Christine Dolo) untuk pencatatan kelunasan.'
+                                        : 'Financial support can be transferred to the committee account: Bank BTN, Account No: 00179-01-88-000447-9 A.N. PANITIA MUPEL GPIB BEKASI.\nPlease kindly send the transfer receipt via WhatsApp to the Contact Person: +62 812-9145-1945 (Anastasia Christine Dolo) for reconciliation.'}
                                 </Text>
                             </View>
                         )}

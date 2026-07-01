@@ -1003,18 +1003,18 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                 <View style={[styles.quoteContainer, { padding: '4 15', marginVertical: 4, borderLeftWidth: 3 }]}>
                     <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 1, fontSize: 7.5 }]}>Bank Pembayaran / Payment Bank</Text>
-                    <Text style={[styles.vipValueGold, { marginBottom: 4, fontSize: 10 }]}>PT. BANK ...............................................</Text>
+                    <Text style={[styles.vipValueGold, { marginBottom: 4, fontSize: 10 }]}>Bank BTN</Text>
                     
                     <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 1, fontSize: 7.5 }]}>Nomor Rekening / Account Number</Text>
-                    <Text style={[styles.vipValueGold, { marginBottom: 4, fontSize: 10 }]}>...............................................................</Text>
+                    <Text style={[styles.vipValueGold, { marginBottom: 4, fontSize: 10 }]}>00179-01-88-000447-9</Text>
                     
                     <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 1, fontSize: 7.5 }]}>Nama Penerima / Beneficiary Name</Text>
-                    <Text style={[styles.vipValueGold, { color: '#FDFBF7', fontSize: 10 }]}>...............................................................</Text>
+                    <Text style={[styles.vipValueGold, { color: '#FDFBF7', fontSize: 10 }]}>PANITIA MUPEL GPIB BEKASI</Text>
                 </View>
                 
                 <Text style={[styles.bodyText, { textAlign: 'center', marginTop: 2, marginBottom: 6, fontSize: 8 }]}>
-                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor Sekretaris Panitia: ' : 'Please kindly send the transfer receipt via WhatsApp to the Committee Secretary: '}
-                    <Text style={styles.bodyTextBold}>{CENTRAL_CONTACT_PHONE} ({CENTRAL_CONTACT_NAME})</Text>
+                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor Kontak Person: ' : 'Please kindly send the transfer receipt via WhatsApp to the Contact Person: '}
+                    <Text style={styles.bodyTextBold}>+62 812-9145-1945 (Anastasia Christine Dolo)</Text>
                 </Text>
 
                 <Text style={[styles.sectionTitle, { fontSize: 12, marginBottom: 4 }]}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>

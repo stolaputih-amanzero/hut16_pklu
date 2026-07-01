@@ -899,18 +899,18 @@ export function ${type === 'donatur' ? 'ProposalDonaturPDF' : 'ProposalSponsorPD
 
                 <View style={styles.quoteContainer}>
                     <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 5 }]}>Bank Pembayaran / Payment Bank</Text>
-                    <Text style={[styles.vipValueGold, { marginBottom: 15 }]}>PT. BANK ...............................................</Text>
+                    <Text style={[styles.vipValueGold, { marginBottom: 15 }]}>Bank BTN</Text>
                     
                     <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 5 }]}>Nomor Rekening / Account Number</Text>
-                    <Text style={[styles.vipValueGold, { marginBottom: 15 }]}>...............................................................</Text>
+                    <Text style={[styles.vipValueGold, { marginBottom: 15 }]}>00179-01-88-000447-9</Text>
                     
                     <Text style={[styles.edTableCellLabel, { color: '#A0AEC0', marginBottom: 5 }]}>Nama Penerima / Beneficiary Name</Text>
-                    <Text style={[styles.vipValueGold, { color: '#FDFBF7' }]}>...............................................................</Text>
+                    <Text style={[styles.vipValueGold, { color: '#FDFBF7' }]}>PANITIA MUPEL GPIB BEKASI</Text>
                 </View>
                 
                 <Text style={[styles.bodyText, { textAlign: 'center', marginTop: -10, marginBottom: 40 }]}>
-                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor pengurus: ' : 'Please kindly send the transfer receipt via WhatsApp to the board number: '}
-                    <Text style={styles.bodyTextBold}>{data.phone}</Text>
+                    {isId ? 'Mohon berkenan mengirimkan bukti transfer via WhatsApp ke nomor Kontak Person: ' : 'Please kindly send the transfer receipt via WhatsApp to the Contact Person: '}
+                    <Text style={styles.bodyTextBold}>+62 812-9145-1945 (Anastasia Christine Dolo)</Text>
                 </Text>
 
                 <Text style={styles.sectionTitle}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>

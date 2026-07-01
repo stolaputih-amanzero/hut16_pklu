@@ -105,7 +105,7 @@ export default function DashboardPage() {
                 // Get trend data (confirmed contributions grouped by date)
                 const { data: trendRaw } = await supabase
                     .from('proposals')
-                    .select('created_at, contribution_value, type')
+                    .select('created_at, confirmed_at, confirmed_date, contribution_value, type')
                     .eq('payment_status', 'confirmed')
                     .not('contribution_value', 'is', null)
                     .order('created_at', { ascending: true })
@@ -132,9 +132,16 @@ export default function DashboardPage() {
 
         const trendMapDb: { [key: string]: number } = {}
         filtered.forEach(item => {
-            if (!item.created_at) return
-            const dbDate = item.created_at.split('T')[0] // 'YYYY-MM-DD'
-            trendMapDb[dbDate] = (trendMapDb[dbDate] || 0) + (item.contribution_value || 0)
+            let targetDate = ''
+            if (item.confirmed_date) {
+                targetDate = item.confirmed_date
+            } else if (item.confirmed_at) {
+                targetDate = item.confirmed_at.split('T')[0]
+            } else if (item.created_at) {
+                targetDate = item.created_at.split('T')[0]
+            }
+            if (!targetDate) return
+            trendMapDb[targetDate] = (trendMapDb[targetDate] || 0) + (item.contribution_value || 0)
         })
 
         const sortedDates = Object.keys(trendMapDb).sort()

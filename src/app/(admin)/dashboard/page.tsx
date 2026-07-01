@@ -44,6 +44,8 @@ export default function DashboardPage() {
     ])
 
     const [trendData, setTrendData] = useState<any[]>([])
+    const [filterType, setFilterType] = useState<'all' | 'donatur' | 'sponsorship'>('all')
+    const [rawTrendData, setRawTrendData] = useState<any[]>([])
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -103,36 +105,12 @@ export default function DashboardPage() {
                 // Get trend data (confirmed contributions grouped by date)
                 const { data: trendRaw } = await supabase
                     .from('proposals')
-                    .select('created_at, contribution_value')
+                    .select('created_at, contribution_value, type')
                     .eq('payment_status', 'confirmed')
                     .not('contribution_value', 'is', null)
                     .order('created_at', { ascending: true })
 
-                const trendMapDb: { [key: string]: number } = {}
-                trendRaw?.forEach(item => {
-                    if (!item.created_at) return
-                    const dbDate = item.created_at.split('T')[0] // 'YYYY-MM-DD'
-                    trendMapDb[dbDate] = (trendMapDb[dbDate] || 0) + (item.contribution_value || 0)
-                })
-
-                const sortedDates = Object.keys(trendMapDb).sort()
-                let runningTotal = 0
-                const formattedTrend = sortedDates.map(dateKey => {
-                    const dailyAmount = trendMapDb[dateKey]
-                    runningTotal += dailyAmount
-                    
-                    const displayDate = new Date(dateKey).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short'
-                    })
-                    return {
-                        date: displayDate,
-                        amount: dailyAmount,
-                        cumulative: runningTotal
-                    }
-                })
-
-                setTrendData(formattedTrend)
+                setRawTrendData(trendRaw || [])
             } catch (error) {
                 console.error('Error fetching stats:', error)
             }
@@ -140,6 +118,44 @@ export default function DashboardPage() {
 
         fetchStats()
     }, [])
+
+    useEffect(() => {
+        if (rawTrendData.length === 0) {
+            setTrendData([])
+            return
+        }
+
+        const filtered = rawTrendData.filter(item => {
+            if (filterType === 'all') return true
+            return item.type === filterType
+        })
+
+        const trendMapDb: { [key: string]: number } = {}
+        filtered.forEach(item => {
+            if (!item.created_at) return
+            const dbDate = item.created_at.split('T')[0] // 'YYYY-MM-DD'
+            trendMapDb[dbDate] = (trendMapDb[dbDate] || 0) + (item.contribution_value || 0)
+        })
+
+        const sortedDates = Object.keys(trendMapDb).sort()
+        let runningTotal = 0
+        const formattedTrend = sortedDates.map(dateKey => {
+            const dailyAmount = trendMapDb[dateKey]
+            runningTotal += dailyAmount
+            
+            const displayDate = new Date(dateKey).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short'
+            })
+            return {
+                date: displayDate,
+                amount: dailyAmount,
+                cumulative: runningTotal
+            }
+        })
+
+        setTrendData(formattedTrend)
+    }, [rawTrendData, filterType])
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -334,11 +350,30 @@ export default function DashboardPage() {
             >
                 <motion.div variants={itemVariants}>
                     <Card className="border-emerald shadow-emerald bg-[#033B2B]/40 backdrop-blur-xl cursor-default">
-                        <CardHeader>
+                        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <CardTitle className="text-xl font-bold text-[#FDFBF7] flex items-center">
                                 <TrendingUp className="mr-2 h-5 w-5 text-[#D4AF37]" />
                                 Tren Akumulasi Perolehan Dana (Terkonfirmasi Lunas)
                             </CardTitle>
+                            <div className="flex gap-2 bg-[#022c22]/80 p-1 rounded-lg border border-[#D4AF37]/20 select-none self-start sm:self-auto relative z-10">
+                                {[
+                                    { id: 'all', label: 'Keduanya' },
+                                    { id: 'donatur', label: 'Donor' },
+                                    { id: 'sponsorship', label: 'Sponsor' }
+                                ].map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setFilterType(tab.id as any)}
+                                        className={`px-3.5 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                                            filterType === tab.id
+                                                ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_2px_8px_rgba(212,175,55,0.3)]'
+                                                : 'text-[#FDFBF7]/60 hover:text-[#FDFBF7] hover:bg-[#D4AF37]/10'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
                         </CardHeader>
                         <CardContent>
                             {trendData.length === 0 ? (

@@ -10,7 +10,6 @@ import { Playfair_Display } from 'next/font/google'
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700'], style: ['normal', 'italic'] })
 
 export default function Home() {
-  const [mapLoaded, setMapLoaded] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -330,52 +329,35 @@ export default function Home() {
               <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
               
-              <div className="space-y-10">
-                <div className="flex gap-6 items-start">
-                  <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/20">
-                    <Calendar className="w-6 h-6 text-[#D4AF37]" strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold text-[#FDFBF7] text-3xl mb-1 ${playfair.className}`}>12 Oktober 2026</h3>
-                    <p className="text-[#D4AF37] font-medium uppercase tracking-widest text-sm mb-2">Senin</p>
-                    <p className="text-[#FDFBF7]/60 font-light text-sm flex items-center gap-2">
-                      <Clock className="w-4 h-4" /> Ibadah Syukur & Perayaan
-                    </p>
-                  </div>
+              <div className="flex gap-6 items-start">
+                <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/20">
+                  <Calendar className="w-6 h-6 text-[#D4AF37]" strokeWidth={1.5} />
                 </div>
-                
-                <div className="flex gap-6 items-start">
-                  <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/20">
-                    <MapPin className="w-6 h-6 text-[#D4AF37]" strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold text-[#FDFBF7] text-2xl mb-2 ${playfair.className}`}>Bekasi Convention Center</h3>
-                    <p className="text-[#FDFBF7]/80 tracking-wide font-light leading-relaxed mb-4">
-                      Hotel Santika Mega Mall Bekasi <br/>
-                      <span className="opacity-70 text-sm">Jl. Ahmad Yani No.1, Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi, Jawa Barat 17141</span>
-                    </p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Bekasi+Convention+Center" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#F3E5AB] transition-colors text-sm font-medium border-b border-transparent hover:border-[#F3E5AB] pb-1">
-                      Buka di Google Maps <ArrowRight className="w-4 h-4" />
-                    </a>
-                  </div>
+                <div>
+                  <h3 className={`font-semibold text-[#FDFBF7] text-2xl md:text-3xl mb-1 ${playfair.className}`}>12 Oktober 2026</h3>
+                  <p className="text-[#D4AF37] font-medium uppercase tracking-widest text-xs mb-2">Senin</p>
+                  <p className="text-[#FDFBF7]/60 font-light text-xs flex items-center gap-2">
+                    <Clock className="w-4 h-4" /> Ibadah Syukur & Perayaan
+                  </p>
                 </div>
               </div>
-
-              {/* Peta Interaktif */}
-              <div className="relative h-[300px] lg:h-[400px] w-full rounded-2xl overflow-hidden border border-[#D4AF37]/20 group shadow-2xl">
-                <div className={`absolute inset-0 bg-[#022c22] flex items-center justify-center transition-opacity duration-500 z-10 ${mapLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                  <div className="w-8 h-8 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+              
+              <div className="flex gap-6 items-start">
+                <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/20">
+                  <MapPin className="w-6 h-6 text-[#D4AF37]" strokeWidth={1.5} />
                 </div>
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.0520261394336!2d106.99238317585523!3d-6.250284793739777!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698dd26cd7d463%3A0x133da8fcb359f4f4!2sBekasi%20Convention%20Center!5e0!3m2!1sen!2sid!4v1715694295325!5m2!1sen!2sid" 
-                  className="absolute inset-0 w-full h-full border-0 transition-all duration-700"
-                  allowFullScreen={true} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  onLoad={() => setMapLoaded(true)}
-                ></iframe>
+                <div>
+                  <h3 className={`font-semibold text-[#FDFBF7] text-xl md:text-2xl mb-2 ${playfair.className}`}>Bekasi Convention Center</h3>
+                  <p className="text-[#FDFBF7]/85 tracking-wide font-light leading-relaxed mb-4 text-sm md:text-base">
+                    Hotel Santika Mega Mall Bekasi <br/>
+                    <span className="opacity-70 text-xs md:text-sm">Jl. Ahmad Yani No.1, Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi, Jawa Barat 17141</span>
+                  </p>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Bekasi+Convention+Center" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#F3E5AB] transition-colors text-xs md:text-sm font-medium border-b border-transparent hover:border-[#F3E5AB] pb-1">
+                    Buka di Google Maps <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
               </div>
 
             </div>

@@ -53,13 +53,17 @@ export default function BuatProposalPage() {
 
     useEffect(() => {
         const fetchCommittees = async () => {
-            const { data: comms, error } = await supabase
-                .from('committees')
-                .select('*')
-                .eq('is_active', true)
-                .order('name', { ascending: true })
-            if (error) console.error('Error fetching committees:', error)
-            if (comms) setCommittees(comms)
+            try {
+                const { data: comms, error } = await supabase
+                    .from('committees')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('name', { ascending: true })
+                if (error) console.error('Error fetching committees:', error)
+                if (comms) setCommittees(comms)
+            } catch (error: any) {
+                console.error('Unexpected error fetching committees:', error)
+            }
         }
         fetchCommittees()
     }, [])

@@ -68,26 +68,42 @@ export default function DaftarProposalPage() {
 
     const fetchProposals = async () => {
         setLoading(true)
-        const { data, error } = await supabase
-            .from('proposals')
-            .select('*')
-            .order('created_at', { ascending: false })
+        try {
+            const { data, error } = await supabase
+                .from('proposals')
+                .select('*')
+                .order('created_at', { ascending: false })
 
-        if (error) {
-            console.error('Error fetching proposals:', error)
-        } else {
-            setProposals(data || [])
+            if (error) {
+                console.error('Error fetching proposals:', error)
+                toast.error('Gagal mengambil data proposal: ' + error.message)
+            } else {
+                setProposals(data || [])
+            }
+        } catch (error: any) {
+            console.error('Unexpected error fetching proposals:', error)
+            toast.error('Terjadi kesalahan koneksi database: ' + error.message)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     const fetchCommittees = async () => {
-        const { data } = await supabase
-            .from('committees')
-            .select('*')
-            .eq('is_active', true)
-            .order('name', { ascending: true })
-        if (data) setCommittees(data)
+        try {
+            const { data, error } = await supabase
+                .from('committees')
+                .select('*')
+                .eq('is_active', true)
+                .order('name', { ascending: true })
+            
+            if (error) {
+                console.error('Error fetching committees:', error)
+            } else if (data) {
+                setCommittees(data)
+            }
+        } catch (error: any) {
+            console.error('Unexpected error fetching committees:', error)
+        }
     }
 
     const handleOpenView = (proposal: any) => {

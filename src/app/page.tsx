@@ -47,7 +47,7 @@ export default function Home() {
             opacity: [0.1, 0.15, 0.1],
           }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#D4AF37] rounded-full blur-[120px] md:blur-[200px]"
+          className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#D4AF37] rounded-full blur-[120px] md:blur-[200px] gpu-accelerated will-change-transform"
         />
         
         {/* Soft Emerald Orb */}
@@ -57,12 +57,12 @@ export default function Home() {
             opacity: [0.2, 0.3, 0.2],
           }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-[#047857] rounded-full blur-[120px] md:blur-[200px]"
+          className="absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-[#047857] rounded-full blur-[120px] md:blur-[200px] gpu-accelerated will-change-transform"
         />
 
         {/* Subtle noise texture for material feel */}
         <div 
-          className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
           style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
         />
       </div>
@@ -74,7 +74,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-72 h-72 md:w-96 md:h-96 mb-12"
+          className="relative w-72 h-72 md:w-96 md:h-96 mb-12 gpu-accelerated will-change-transform"
         >
           {/* Very subtle glow exactly behind the token, no boxy shape */}
           <div className="absolute inset-0 bg-radial-gradient from-[#D4AF37]/30 to-transparent blur-2xl rounded-full scale-75 opacity-70" />
@@ -82,7 +82,7 @@ export default function Home() {
           <motion.div
             animate={{ y: [-10, 10, -10] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="w-full h-full relative"
+            className="w-full h-full relative gpu-accelerated will-change-transform"
           >
             <Image
               src="/logo_hut16_pklu.png"
@@ -145,7 +145,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="w-full flex justify-center gap-6 mb-24 relative z-20"
+          className="w-full flex flex-col items-center gap-6 mb-24 relative z-20"
         >
           <Link href="/buat-proposal">
             <button className="group relative overflow-hidden rounded-full bg-transparent px-10 py-5 transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
@@ -158,11 +158,26 @@ export default function Home() {
               <div className="relative flex items-center justify-center gap-4">
                 <span className="font-semibold text-[#022c22] text-sm md:text-base tracking-widest uppercase">
                   Dukung Pelayanan Ini
-                </span>
+                 </span>
                 <ArrowRight className="w-5 h-5 text-[#022c22] transition-transform duration-300 group-hover:translate-x-2" />
               </div>
             </button>
           </Link>
+
+          {/* Premium Scroll Down Indicator */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.7, 0] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 2, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2 pointer-events-none mt-4 select-none"
+          >
+            <span className="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37]/50 font-semibold">GULIR KE BAWAH</span>
+            <motion.div 
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="w-1 h-3 bg-gradient-to-b from-[#D4AF37]/60 to-transparent rounded-full"
+            />
+          </motion.div>
         </motion.div>
 
 

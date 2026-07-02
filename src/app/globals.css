@@ -190,3 +190,48 @@
     @apply shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-[#D4AF37]/20 bg-black/40 backdrop-blur-md;
   }
 }
+
+/* --- Premium Smooth Scroll & Mobile Optimizations --- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+  }
+}
+
+/* Custom Scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #011a14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 9999px;
+  border: 2px solid #011a14;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8860B;
+}
+
+/* Mobile First Performance Optimization */
+.will-change-transform {
+  will-change: transform, opacity;
+}
+
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Content Visibility for heavy blocks below the fold */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}

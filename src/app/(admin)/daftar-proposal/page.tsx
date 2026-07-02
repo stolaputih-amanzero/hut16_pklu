@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -676,8 +677,11 @@ export default function DaftarProposalPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[#D4AF37]/10">
-                                        {filteredProposals.map((p) => (
-                                            <tr 
+                                        {filteredProposals.map((p, idx) => (
+                                            <motion.tr 
+                                                initial={{ opacity: 0, y: 8 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.25, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
                                                 key={p.id} 
                                                 onClick={() => handleOpenView(p)}
                                                 className="hover:bg-[#022c22]/40 transition-colors cursor-pointer"
@@ -719,65 +723,68 @@ export default function DaftarProposalPage() {
                                                         </span>
                                                     )}
                                                 </td>
-                                            </tr>
+                                            </motion.tr>
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
-
-                            {/* Mobile View Cards */}
-                            <div className="block md:hidden space-y-4">
-                                {filteredProposals.map((p) => (
-                                    <div 
-                                        key={p.id}
-                                        onClick={() => handleOpenView(p)}
-                                        className="p-4 bg-[#022c22]/40 border border-[#D4AF37]/20 rounded-xl hover:bg-[#022c22]/60 active:bg-[#022c22]/70 transition-colors cursor-pointer space-y-3"
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-mono text-sm font-semibold text-[#FDFBF7]">
-                                                {p.number}
-                                            </span>
-                                            <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
-                                                {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
-                                            </span>
-                                        </div>
-                                        
-                                        <div className="space-y-1">
-                                            <div className="font-bold text-[#FDFBF7] text-base">{p.name}</div>
-                                            {p.company_name && (
-                                                <div className="text-xs text-white/60">{p.company_name}</div>
-                                            )}
-                                            <div className="text-xs text-[#D4AF37] font-medium">{p.phone}</div>
-                                        </div>
-                                        
-                                        <div className="flex justify-between items-center pt-2 border-t border-[#D4AF37]/10 text-xs">
-                                            <div className="text-[#A0AEC0] flex items-center gap-1">
-                                                <Calendar className="h-3.5 w-3.5" />
-                                                {formatDate(p.proposal_date || p.created_at)}
-                                            </div>
-                                            <div>
-                                                {p.payment_status === 'confirmed' ? (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                                        <CheckCircle className="h-3 w-3 mr-1" /> Lunas
-                                                    </span>
-                                                ) : p.payment_status === 'cancelled' ? (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
-                                                        Batal
-                                                    </span>
-                                                ) : (p.contribution_value > 0 || p.contribution_form) ? (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                        Komitmen Dicatat
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                                        <Clock className="h-3 w-3 mr-1" /> Terkirim
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                             </div>
+ 
+                             {/* Mobile View Cards */}
+                             <div className="block md:hidden space-y-4">
+                                 {filteredProposals.map((p, idx) => (
+                                     <motion.div 
+                                         initial={{ opacity: 0, y: 12 }}
+                                         animate={{ opacity: 1, y: 0 }}
+                                         transition={{ duration: 0.3, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
+                                         key={p.id}
+                                         onClick={() => handleOpenView(p)}
+                                         className="p-4 bg-[#022c22]/40 border border-[#D4AF37]/20 rounded-xl hover:bg-[#022c22]/60 active:bg-[#022c22]/70 transition-colors cursor-pointer space-y-3"
+                                     >
+                                         <div className="flex justify-between items-center">
+                                             <span className="font-mono text-sm font-semibold text-[#FDFBF7]">
+                                                 {p.number}
+                                             </span>
+                                             <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                                 {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
+                                             </span>
+                                         </div>
+                                         
+                                         <div className="space-y-1">
+                                             <div className="font-bold text-[#FDFBF7] text-base">{p.name}</div>
+                                             {p.company_name && (
+                                                 <div className="text-xs text-white/60">{p.company_name}</div>
+                                             )}
+                                             <div className="text-xs text-[#D4AF37] font-medium">{p.phone}</div>
+                                         </div>
+                                         
+                                         <div className="flex justify-between items-center pt-2 border-t border-[#D4AF37]/10 text-xs">
+                                             <div className="text-[#A0AEC0] flex items-center gap-1">
+                                                 <Calendar className="h-3.5 w-3.5" />
+                                                 {formatDate(p.proposal_date || p.created_at)}
+                                             </div>
+                                             <div>
+                                                 {p.payment_status === 'confirmed' ? (
+                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                         <CheckCircle className="h-3 w-3 mr-1" /> Lunas
+                                                     </span>
+                                                 ) : p.payment_status === 'cancelled' ? (
+                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                         Batal
+                                                     </span>
+                                                 ) : (p.contribution_value > 0 || p.contribution_form) ? (
+                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                         Komitmen Dicatat
+                                                     </span>
+                                                 ) : (
+                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                         <Clock className="h-3 w-3 mr-1" /> Terkirim
+                                                     </span>
+                                                 )}
+                                             </div>
+                                         </div>
+                                     </motion.div>
+                                 ))}
+                             </div>
                         </>
                     )}
                 </CardContent>

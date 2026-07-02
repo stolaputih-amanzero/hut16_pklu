@@ -107,6 +107,29 @@ export default function DaftarProposalPage() {
         }
     }
 
+    const handleDownloadLpj = async () => {
+        const loadingToast = toast.loading('Sedang menyiapkan Laporan LPJ...')
+        try {
+            const res = await fetch('/api/generate-lpj')
+            if (!res.ok) throw new Error('Gagal mengunduh file')
+            
+            const blob = await res.blob()
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `Laporan_LPJ_HUT16_PKLU_${new Date().toISOString().split('T')[0]}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+            toast.dismiss(loadingToast)
+            toast.success('Laporan LPJ berhasil diunduh!')
+        } catch (err: any) {
+            toast.dismiss(loadingToast)
+            toast.error('Gagal mengunduh Laporan LPJ: ' + err.message)
+        }
+    }
+
     const handleOpenView = (proposal: any) => {
         setSelectedProposal(proposal)
         setIsEditMode(false)
@@ -606,15 +629,14 @@ export default function DaftarProposalPage() {
                     </p>
                 </div>
                 <div className="flex gap-3 mt-4 md:mt-0">
-                    <a href="/api/generate-lpj" target="_blank" rel="noopener noreferrer">
-                        <Button 
-                            variant="outline"
-                            className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2"
-                        >
-                            <Printer className="h-4 w-4" />
-                            Unduh Laporan LPJ
-                        </Button>
-                    </a>
+                    <Button 
+                        variant="outline"
+                        onClick={handleDownloadLpj}
+                        className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2 cursor-pointer"
+                    >
+                        <Printer className="h-4 w-4" />
+                        Unduh Laporan LPJ
+                    </Button>
                     <Link href="/buat-proposal" passHref>
                         <Button 
                             className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"

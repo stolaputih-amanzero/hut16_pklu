@@ -425,8 +425,8 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
     const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=140&margin=1&dark=022c22`
 
     const commitmentMsg = isId
-        ? `Halo Panitia HUT 16 PKLU GPIB, saya mewakili perusahaan/instansi ingin memberikan komitmen dukungan untuk Proposal Sponsorship No: ${data.number}. Nama Sponsor: ${data.name}.`
-        : `Hello 16th PKLU GPIB Anniversary Committee, on behalf of my company/institution, I would like to make a support commitment for Sponsorship Proposal No: ${data.number}. Sponsor Name: ${data.name}.`
+        ? `Sponsorship HUT 16 PKLU: No ${data.number} - ${data.name}`
+        : `Sponsorship 16th PKLU: No ${data.number} - ${data.name}`
     const commitmentWaUrl = `https://api.whatsapp.com/send?phone=${CENTRAL_CONTACT_PHONE}&text=${encodeURIComponent(commitmentMsg)}`
     const commitmentWaQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(commitmentWaUrl)}&size=140&margin=1&dark=022c22`
 
@@ -1091,7 +1091,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                                     </Text>
                                 </View>
                                 <View style={{ width: '25%', alignItems: 'center' }}>
-                                    <Image src={commitmentWaQrUrl} style={{ width: 45, height: 45, marginBottom: 2 }} />
+                                    <Image src={commitmentWaQrUrl} style={{ width: 60, height: 60, marginBottom: 2 }} />
                                     <Text style={{ fontSize: 5.0, color: '#022c22', fontWeight: 'bold' }}>SCAN WA</Text>
                                 </View>
                             </View>

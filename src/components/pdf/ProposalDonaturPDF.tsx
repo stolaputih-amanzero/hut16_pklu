@@ -1205,7 +1205,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                         <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -25 }}>
                             <Image 
-                                src={`https://quickchart.io/qr?size=100&text=${encodeURIComponent(`${origin}/verify/${data.id}`)}`} 
+                                src={`https://quickchart.io/qr?size=100&text=${encodeURIComponent(`https://pklu.amanloka.com/verify/${data.id}`)}`} 
                                 style={{ width: 40, height: 40, marginBottom: 4 }} 
                             />
                             <Text style={{ fontSize: 5.5, color: '#022c22', textAlign: 'center', fontWeight: 'bold', letterSpacing: 0.5 }}>

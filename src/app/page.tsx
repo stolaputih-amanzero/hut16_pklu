@@ -139,45 +139,7 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        {/* Premium Call To Action - Main Action */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="w-full flex flex-col items-center gap-6 mb-24 relative z-20"
-        >
-          <Link href="/buat-proposal">
-            <button className="group relative overflow-hidden rounded-full bg-transparent px-10 py-5 transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
-              {/* Button Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] opacity-90 transition-opacity group-hover:opacity-100" />
-              
-              {/* Shimmer Effect */}
-              <div className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-[#FDFBF7]/40 to-transparent transition-transform duration-1000 group-hover:translate-x-[100%]" />
-              
-              <div className="relative flex items-center justify-center gap-4">
-                <span className="font-semibold text-[#022c22] text-sm md:text-base tracking-widest uppercase">
-                  Dukung Pelayanan Ini
-                 </span>
-                <ArrowRight className="w-5 h-5 text-[#022c22] transition-transform duration-300 group-hover:translate-x-2" />
-              </div>
-            </button>
-          </Link>
 
-          {/* Premium Scroll Down Indicator */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.7, 0] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 2, ease: "easeInOut" }}
-            className="flex flex-col items-center gap-2 pointer-events-none mt-4 select-none"
-          >
-            <span className="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37]/50 font-semibold">GULIR KE BAWAH</span>
-            <motion.div 
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-1 h-3 bg-gradient-to-b from-[#D4AF37]/60 to-transparent rounded-full"
-            />
-          </motion.div>
-        </motion.div>
 
 
         {/* Pendahuluan Section */}
@@ -360,6 +322,56 @@ export default function Home() {
                 </div>
               </div>
 
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Himbauan Dukungan Pelayanan Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 1 }}
+          className="w-full max-w-4xl mb-16 text-center space-y-8 mt-12"
+        >
+          <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          
+          <div className="relative p-8 md:p-12 rounded-[2rem] bg-gradient-to-br from-[#033B2B]/60 to-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/35 shadow-2xl">
+            {/* Soft background glow */}
+            <div className="absolute -top-12 -left-12 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-[#047857]/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <h2 className={`text-3xl md:text-4xl text-[#D4AF37] mb-6 ${playfair.className} font-semibold`}>
+              Mari Menjadi Saluran Berkat
+            </h2>
+            
+            <div className="space-y-6 text-[#FDFBF7]/90 text-base md:text-lg leading-relaxed text-center font-light max-w-3xl mx-auto mb-10">
+              <p>
+                Setiap dukungan dan persembahan kasih yang Anda salurkan merupakan wujud nyata kepedulian bagi pelayanan kaum lanjut usia Pelkat PKLU GPIB. Mari bersama-sama kita sokong perayaan syukur HUT ke-16 ini agar para orang tua kita senantiasa dikuatkan untuk terus berkarya, menjadi teladan iman, serta saksi kasih Kristus yang hidup.
+              </p>
+              <p className={`text-[#D4AF37] ${playfair.className} italic font-medium text-lg md:text-xl`}>
+                "Sampai masa tuamu Aku tetap Dia dan sampai masa putih rambutmu Aku menggendong kamu." <br/>
+                <span className="text-xs not-italic font-sans text-[#FDFBF7]/60 block mt-2 uppercase tracking-widest">— Yesaya 46:4</span>
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <Link href="/buat-proposal">
+                <button className="group relative overflow-hidden rounded-full bg-transparent px-10 py-5 transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+                  {/* Button Background Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] opacity-90 transition-opacity group-hover:opacity-100" />
+                  
+                  {/* Shimmer Effect */}
+                  <div className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-[#FDFBF7]/40 to-transparent transition-transform duration-1000 group-hover:translate-x-[100%]" />
+                  
+                  <div className="relative flex items-center justify-center gap-4">
+                    <span className="font-semibold text-[#022c22] text-sm md:text-base tracking-widest uppercase">
+                      Salurkan Dukungan Kasih
+                    </span>
+                    <ArrowRight className="w-5 h-5 text-[#022c22] transition-transform duration-300 group-hover:translate-x-2" />
+                  </div>
+                </button>
+              </Link>
             </div>
           </div>
         </motion.div>

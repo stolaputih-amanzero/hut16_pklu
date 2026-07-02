@@ -4,8 +4,11 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
+import { supabase } from '@/lib/supabase/client'
+import { getNextNumber } from '@/lib/numbering'
+import { toast } from 'sonner'
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700'], style: ['normal', 'italic'] })
 
@@ -16,6 +19,71 @@ export default function Home() {
     navigator.clipboard.writeText('00179-01-88-000447-9')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const [isOpenModal, setIsOpenModal] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [modalForm, setModalForm] = useState({
+    name: '',
+    phone: '',
+    type: 'donatur' // 'donatur' | 'sponsorship'
+  })
+
+  const handleModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!modalForm.name.trim() || !modalForm.phone.trim()) {
+      toast.error('Silakan lengkapi nama dan nomor WhatsApp Anda')
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      
+      // 1. Get automatic next number for proposal
+      const number = await getNextNumber(modalForm.type as any, 2026)
+
+      // 2. Fetch first active committee member for database foreign key compliance
+      const { data: comms } = await supabase
+        .from('committees')
+        .select('id')
+        .eq('is_active', true)
+        .limit(1)
+      const committeeId = comms?.[0]?.id || null
+
+      // 3. Insert record to database
+      const { error: saveError } = await supabase
+        .from('proposals')
+        .insert({
+          type: modalForm.type,
+          number: number,
+          name: modalForm.name,
+          phone: modalForm.phone,
+          payment_status: 'pending',
+          committee_id: committeeId,
+          proposal_date: new Date().toISOString().split('T')[0]
+        })
+
+      if (saveError) throw saveError
+
+      // 4. Construct WA message and redirect
+      const waMessage = `Halo Ibu Anastasia Christine Dolo,\n\nSaya tertarik untuk mendukung perayaan HUT ke-16 Pelkat PKLU GPIB sebagai *${modalForm.type === 'donatur' ? 'Donatur' : 'Sponsor'}*.\n\nBerikut identitas saya:\n- Nama: ${modalForm.name}\n- No. WhatsApp: ${modalForm.phone}\n- No. Registrasi: ${number}\n\nMohon untuk dapat difollowup lebih lanjut. Terima kasih!`
+      
+      const waUrl = `https://wa.me/6281291451945?text=${encodeURIComponent(waMessage)}`
+      
+      toast.success('Dukungan Anda berhasil dicatat! Mengalihkan ke WhatsApp...')
+      
+      // Open WA link
+      window.open(waUrl, '_blank')
+
+      // Reset & close modal
+      setModalForm({ name: '', phone: '', type: 'donatur' })
+      setIsOpenModal(false)
+    } catch (err: any) {
+      console.error('Error submitting support:', err)
+      toast.error('Gagal mengirim dukungan: ' + err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const fadeIn = {
@@ -356,22 +424,23 @@ export default function Home() {
             </div>
             
             <div className="flex justify-center">
-              <Link href="/buat-proposal">
-                <button className="group relative overflow-hidden rounded-full bg-transparent px-10 py-5 transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
-                  {/* Button Background Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] opacity-90 transition-opacity group-hover:opacity-100" />
-                  
-                  {/* Shimmer Effect */}
-                  <div className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-[#FDFBF7]/40 to-transparent transition-transform duration-1000 group-hover:translate-x-[100%]" />
-                  
-                  <div className="relative flex items-center justify-center gap-4">
-                    <span className="font-semibold text-[#022c22] text-sm md:text-base tracking-widest uppercase">
-                      Salurkan Dukungan Kasih
-                    </span>
-                    <ArrowRight className="w-5 h-5 text-[#022c22] transition-transform duration-300 group-hover:translate-x-2" />
-                  </div>
-                </button>
-              </Link>
+              <button 
+                onClick={() => setIsOpenModal(true)}
+                className="group relative overflow-hidden rounded-full bg-transparent px-6 py-3 transition-all hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(212,175,55,0.15)] cursor-pointer"
+              >
+                {/* Button Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] opacity-90 transition-opacity group-hover:opacity-100" />
+                
+                {/* Shimmer Effect */}
+                <div className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-[#FDFBF7]/40 to-transparent transition-transform duration-1000 group-hover:translate-x-[100%]" />
+                
+                <div className="relative flex items-center justify-center gap-2">
+                  <span className="font-semibold text-[#022c22] text-xs md:text-sm tracking-wider uppercase">
+                    Salurkan Dukungan Kasih
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-[#022c22] transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -506,6 +575,136 @@ export default function Home() {
         </motion.div>
 
       </div>
+
+      {/* Modal Form Calon Donatur */}
+      <AnimatePresence>
+        {isOpenModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-md bg-[#022c22] border border-[#D4AF37]/30 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden"
+            >
+              {/* Gold light effects inside modal */}
+              <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-2xl pointer-events-none" />
+              
+              {/* Close Button */}
+              <button 
+                type="button"
+                onClick={() => {
+                  if (!submitting) {
+                    setIsOpenModal(false)
+                    setModalForm({ name: '', phone: '', type: 'donatur' })
+                  }
+                }}
+                className="absolute top-4 right-4 p-1.5 rounded-full border border-[#D4AF37]/20 text-[#D4AF37] hover:text-[#FDFBF7] hover:bg-[#D4AF37]/10 transition-all cursor-pointer"
+                disabled={submitting}
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="mb-6">
+                <h3 className={`text-2xl font-bold text-[#FDFBF7] ${playfair.className}`}>
+                  Formulir Dukungan Kasih
+                </h3>
+                <p className="text-xs text-[#D4AF37] mt-1.5 font-light leading-relaxed">
+                  Silakan masukkan identitas Anda. Panitia akan segera menghubungi Anda untuk follow-up dokumen cetak dan administrasi.
+                </p>
+              </div>
+
+              <form onSubmit={handleModalSubmit} className="space-y-5">
+                {/* Nama Input */}
+                <div>
+                  <label className="text-[#D4AF37] font-semibold text-xs uppercase tracking-wider">
+                    Nama Lengkap / Instansi
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={submitting}
+                    value={modalForm.name}
+                    onChange={(e) => setModalForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Contoh: Bpk. John Doe / PT. Makmur"
+                    className="w-full p-3 bg-black/20 border border-[#D4AF37]/30 text-[#FDFBF7] rounded-lg focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none transition-all text-sm mt-1.5 placeholder-white/20"
+                  />
+                </div>
+
+                {/* No WA Input */}
+                <div>
+                  <label className="text-[#D4AF37] font-semibold text-xs uppercase tracking-wider">
+                    Nomor WhatsApp (Aktif)
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    disabled={submitting}
+                    value={modalForm.phone}
+                    onChange={(e) => setModalForm(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="Contoh: 08123456789"
+                    className="w-full p-3 bg-black/20 border border-[#D4AF37]/30 text-[#FDFBF7] rounded-lg focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none transition-all text-sm mt-1.5 placeholder-white/20"
+                  />
+                </div>
+
+                {/* Jenis Dukungan */}
+                <div>
+                  <label className="text-[#D4AF37] font-semibold text-xs uppercase tracking-wider block mb-2">
+                    Jenis Dukungan
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => setModalForm(prev => ({ ...prev, type: 'donatur' }))}
+                      className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${
+                        modalForm.type === 'donatur'
+                          ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                          : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
+                      }`}
+                    >
+                      <div className="text-xs uppercase tracking-wider">Donasi</div>
+                      <div className="text-[10px] opacity-60 mt-0.5">Sebagai Donatur</div>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => setModalForm(prev => ({ ...prev, type: 'sponsorship' }))}
+                      className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${
+                        modalForm.type === 'sponsorship'
+                          ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                          : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
+                      }`}
+                    >
+                      <div className="text-xs uppercase tracking-wider">Sponsor</div>
+                      <div className="text-[10px] opacity-60 mt-0.5">Sponsorship Paket</div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] hover:opacity-90 disabled:opacity-50 text-[#022c22] py-3.5 text-sm font-semibold rounded-lg mt-6 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(212,175,55,0.2)] animate-in fade-in"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Memproses Data...
+                    </>
+                  ) : (
+                    <>
+                      <MessageSquare className="w-4 h-4" />
+                      Kirim & Chat WhatsApp
+                    </>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

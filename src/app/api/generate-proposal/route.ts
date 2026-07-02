@@ -40,9 +40,8 @@ export async function POST(req: NextRequest) {
         }
 
         const logoUrl = getBase64Image('logo_hut16_pklu.png')
-        const gpibLogoUrl = getBase64Image('logo_gpib.png')
 
-        const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang, logoUrl, gpibLogoUrl, origin: req.nextUrl.origin }) as any)
+        const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang, logoUrl, origin: req.nextUrl.origin }) as any)
 
         // 3. Kembalikan PDF secara langsung
         return new NextResponse(buffer as any, {

@@ -442,14 +442,15 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
     const commitmentWaUrl = `https://api.whatsapp.com/send?phone=${CENTRAL_CONTACT_PHONE}&text=${encodeURIComponent(commitmentMsg)}`
     const commitmentWaQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(commitmentWaUrl)}&size=140&margin=1&dark=022c22`
 
-    const categoryMap: Record<string, string> = {
-        sahabat_bakti: isId ? 'Sahabat Bakti' : 'Service Friend',
-        sahabat_teladan: isId ? 'Sahabat Teladan' : 'Role Model Friend',
-        sahabat_pelayanan: isId ? 'Sahabat Pelayan' : 'Servant Friend',
-        sahabat_berkat: isId ? 'Sahabat Berkat' : 'Blessing Friend',
-        sahabat_kasih: isId ? 'Sahabat Kasih' : 'Love Friend',
+    const packageMap: Record<string, string> = {
+        platinum: isId ? 'Platinum' : 'Platinum',
+        gold: isId ? 'Emas / Gold' : 'Gold',
+        silver: isId ? 'Perak / Silver' : 'Silver',
+        bronze: isId ? 'Perunggu / Bronze' : 'Bronze',
+        in_kind: isId ? 'In-Kind (Barang/Jasa)' : 'In-Kind',
+        donatur: isId ? 'Partisipasi' : 'Participation',
     }
-    const categoryLabel = categoryMap[data.donatur_category] || data.donatur_category
+    const packageLabel = packageMap[data.sponsor_package] || data.sponsor_package
 
     const Header = () => (
         <View style={styles.headerWrapper} fixed>
@@ -762,177 +763,174 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <Footer />
             </Page>
 
-            {/* PAGE 5: APRESIASI & DONASI SPESIFIK */}
+             {/* PAGE 6: PAKET SPONSORSHIP */}
             <Page size="A4" style={styles.page}>
                 <Header />
-                <Text style={styles.sectionTitle}>{isId ? 'V. Bentuk Dukungan Donatur' : 'V. Donor Support Forms'}</Text>
+                <Text style={styles.sectionTitle}>{isId ? 'V. Paket Sponsorship' : 'V. Sponsorship Packages'}</Text>
                 
                 <View style={styles.editorialTable}>
                     <View style={styles.edTableHeader}>
-                        <Text style={[styles.edTableHeadText, { width: '25%' }]}>{isId ? 'KATEGORI' : 'CATEGORY'}</Text>
-                        <Text style={[styles.edTableHeadText, { width: '35%' }]}>{isId ? 'NILAI DUKUNGAN' : 'SUPPORT VALUE'}</Text>
-                        <Text style={[styles.edTableHeadText, { width: '40%' }]}>{isId ? 'APRESIASI HANGAT' : 'WARM APPRECIATION'}</Text>
+                        <Text style={[styles.edTableHeadText, { width: '25%' }]}>{isId ? 'PAKET SPONSOR' : 'SPONSOR PACKAGE'}</Text>
+                        <Text style={[styles.edTableHeadText, { width: '25%' }]}>{isId ? 'KONTRIBUSI' : 'CONTRIBUTION'}</Text>
+                        <Text style={[styles.edTableHeadText, { width: '50%' }]}>{isId ? 'BENEFIT UTAMA SPONSOR' : 'MAIN SPONSOR BENEFITS'}</Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Sahabat Bakti</Text>
-                        <Text style={[styles.edTableCellValue, { width: '35%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 500.000 - Rp 999.999</Text>
-                        <Text style={[styles.edTableCellValue, { width: '40%', fontSize: 8 }]}>{isId ? 'Nama dicantumkan dalam ucapan terima kasih digital.' : 'Name listed in digital thank you notes.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Platinum</Text>
+                        <Text style={[styles.edTableCellValue, { width: '25%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>≥ Rp 50.000.000</Text>
+                        <Text style={[styles.edTableCellValue, { width: '50%', fontSize: 8 }]}>
+                            {isId 
+                                ? 'Logo utama backdrop & media digital, penyebutan MC, booth promosi, video greeting, dokumentasi khusus & laporan kegiatan.' 
+                                : 'Primary logo on backdrop & digital media, MC mentions, promo booth, video greeting, special docs & event report.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Sahabat Teladan</Text>
-                        <Text style={[styles.edTableCellValue, { width: '35%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 1.000.000 - Rp 2.499.999</Text>
-                        <Text style={[styles.edTableCellValue, { width: '40%', fontSize: 8 }]}>{isId ? 'Nama dicantumkan dalam buku acara elektronik.' : 'Name listed in electronic program book.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Gold</Text>
+                        <Text style={[styles.edTableCellValue, { width: '25%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 25Jt - 49.9Jt</Text>
+                        <Text style={[styles.edTableCellValue, { width: '50%', fontSize: 8 }]}>
+                            {isId 
+                                ? 'Logo backdrop & media digital, penyebutan MC, penyebaran materi promosi, laporan kegiatan.' 
+                                : 'Logo on backdrop & digital, MC mentions, promo material distribution, event report.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Sahabat Pelayan</Text>
-                        <Text style={[styles.edTableCellValue, { width: '35%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 2.500.000 - Rp 4.999.999</Text>
-                        <Text style={[styles.edTableCellValue, { width: '40%', fontSize: 8 }]}>{isId ? 'Nama di buku acara & ucapan terima kasih panitia.' : 'Name in program book & committee thank you.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Silver</Text>
+                        <Text style={[styles.edTableCellValue, { width: '25%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 10Jt - 24.9Jt</Text>
+                        <Text style={[styles.edTableCellValue, { width: '50%', fontSize: 8 }]}>
+                            {isId 
+                                ? 'Logo pada media publikasi tertentu, penyebutan oleh MC, pencantuman pada daftar sponsor.' 
+                                : 'Logo on select media, MC mentions, listing on sponsor page.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Sahabat Berkat</Text>
-                        <Text style={[styles.edTableCellValue, { width: '35%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 5.000.000 - Rp 9.999.999</Text>
-                        <Text style={[styles.edTableCellValue, { width: '40%', fontSize: 8 }]}>{isId ? 'Nama lebih menonjol di halaman apresiasi buku elektronik.' : 'Name prominently featured in appreciation page.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Bronze</Text>
+                        <Text style={[styles.edTableCellValue, { width: '25%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>Rp 5Jt - 9.9Jt</Text>
+                        <Text style={[styles.edTableCellValue, { width: '50%', fontSize: 8 }]}>
+                            {isId 
+                                ? 'Pencantuman nama / logo, penyebutan oleh MC, ucapan terima kasih panitia.' 
+                                : 'Name / logo listing, MC mentions, committee appreciation.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '25%' }]}>Sahabat Kasih</Text>
-                        <Text style={[styles.edTableCellValue, { width: '35%', fontFamily: 'Times-Roman', fontWeight: 700 }]}>≥ Rp 10.000.000</Text>
-                        <Text style={[styles.edTableCellValue, { width: '40%', fontSize: 8 }]}>{isId ? 'Halaman khusus ucapan syukur dan apresiasi.' : 'Dedicated gratitude page & appreciation.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '25%', color: '#D4AF37' }]}>In-Kind</Text>
+                        <Text style={[styles.edTableCellValue, { width: '25%', fontFamily: 'Times-Roman', fontWeight: 700, color: '#D4AF37' }]}>Barang / Jasa</Text>
+                        <Text style={[styles.edTableCellValue, { width: '50%', fontSize: 8, color: '#022c22', fontWeight: 700 }]}>
+                            {isId 
+                                ? 'Pencantuman nama / logo sebagai pendukung, penyebutan oleh MC sesuai bentuk dukungan.' 
+                                : 'Name / logo listing as supporter, MC mentions based on support form.'}
+                        </Text>
                     </View>
                     <View style={[styles.edTableRow, { borderBottom: '1.5pt solid #022c22' }]}>
-                        <Text style={[styles.edTableCellLabel, { width: '25%', color: '#D4AF37' }]}>Anonim / Sukacita</Text>
-                        <Text style={[styles.edTableCellValue, { width: '35%', fontFamily: 'Times-Roman', fontWeight: 700, color: '#D4AF37' }]}>Sukarela</Text>
-                        <Text style={[styles.edTableCellValue, { width: '40%', fontSize: 8, color: '#022c22', fontWeight: 700 }]}>{isId ? 'Dicatat sebagai NN / Keluarga yang Mengasihi Lansia.' : 'Recorded as Anonymous / Loving Family.'}</Text>
-                    </View>
-                </View>
-
-                <View style={{ marginTop: 20 }} />
-                <Text style={styles.sectionTitle}>{isId ? 'VI. Ide Apresiasi yang Hangat' : 'VI. Warm Appreciation Ideas'}</Text>
-                
-                <View style={styles.editorialTable}>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>Buku Acara Elektronik</Text>
-                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>{isId ? 'Nama pribadi/keluarga dicantumkan pada halaman "Ucapan Syukur".' : 'Name listed in "Thanksgiving" page.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>Pohon Syukur Digital</Text>
-                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>{isId ? 'Nama ditampilkan sebagai daun-daun pada Pohon Syukur.' : 'Name displayed as leaves on the Thanksgiving Tree.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>Halaman Doa & Ucapan</Text>
-                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>{isId ? 'Donatur menuliskan ucapan singkat maksimal 25-40 kata.' : 'Donors write a short message max 25-40 words.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>Sertifikat Digital</Text>
-                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>{isId ? 'Sertifikat apresiasi digital "Sahabat Pelayanan".' : 'Digital appreciation certificate.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>Kartu Terima Kasih</Text>
-                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>{isId ? 'Dikirimkan melalui WhatsApp disertai foto kegiatan.' : 'Sent via WhatsApp with event photos.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>Slideshow Ucapan</Text>
-                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>{isId ? 'Ditayangkan saat jeda tanpa nominal.' : 'Displayed during breaks without nominal.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '25%', color: '#D4AF37' }]}>Donatur</Text>
+                        <Text style={[styles.edTableCellValue, { width: '25%', fontFamily: 'Times-Roman', fontWeight: 700, color: '#D4AF37' }]}>Sukarela</Text>
+                        <Text style={[styles.edTableCellValue, { width: '50%', fontSize: 8, color: '#022c22', fontWeight: 700 }]}>
+                            {isId 
+                                ? 'Pencantuman nama sebagai pendukung (apabila berkenan), ucapan terima kasih panitia.' 
+                                : 'Name listing as supporter (optional), committee appreciation.'}
+                        </Text>
                     </View>
                 </View>
 
                 <Footer />
             </Page>
 
-            {/* PAGE 6: PAKET DONASI SPESIFIK & PENGGUNAAN DANA */}
+            {/* PAGE 7: KETENTUAN APRESIASI SPONSORSHIP */}
             <Page size="A4" style={styles.page}>
                 <Header />
-                <Text style={styles.sectionTitle}>{isId ? 'VII. Paket Donasi Spesifik' : 'VII. Specific Donation Packages'}</Text>
+                <Text style={styles.sectionTitle}>{isId ? 'VI. Apresiasi & Publikasi Kemitraan' : 'VI. Appreciation & Partnership Publicity'}</Text>
                 
                 <View style={styles.editorialTable}>
-                    <View style={styles.edTableHeader}>
-                        <Text style={[styles.edTableHeadText, { width: '40%' }]}>{isId ? 'PILIHAN DUKUNGAN' : 'SUPPORT OPTIONS'}</Text>
-                        <Text style={[styles.edTableHeadText, { width: '60%' }]}>{isId ? 'CONTOH PERUNTUKAN' : 'USAGE EXAMPLES'}</Text>
+                    <View style={styles.edTableRow}>
+                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>{isId ? 'Pencantuman Logo' : 'Logo Placement'}</Text>
+                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>
+                            {isId 
+                                ? 'Logo sponsor akan ditempatkan pada backdrop utama acara dan media digital panitia sesuai dengan kategori paket.' 
+                                : 'Sponsor logo will be placed on the main event backdrop and digital media based on package category.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Konsumsi Lansia</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Mendukung penyediaan makanan, snack, dan air mineral peserta.' : 'Helping provide food, snacks, and mineral water for participants.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>{isId ? 'Penyebutan MC' : 'MC Mentions'}</Text>
+                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>
+                            {isId 
+                                ? 'Nama perusahaan/lembaga sponsor akan dibacakan oleh pembawa acara (MC) selama rangkaian ibadah dan perayaan.' 
+                                : 'Sponsor name will be announced by the MC during the worship and celebration sequence.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Hadiah Lomba</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Mendukung apresiasi pemenang lomba puisi, artikel, dan video.' : 'Supporting appreciation for competition winners.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>{isId ? 'Materi Promosi' : 'Promo Materials'}</Text>
+                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>
+                            {isId 
+                                ? 'Pemberian kesempatan penyebaran brosur / flyer produk sponsor kepada jemaat dan tamu undangan di lokasi acara.' 
+                                : 'Opportunity to distribute sponsor brochures/flyers to attendees and guests at the event venue.'}
+                        </Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Souvenir Peserta</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Membantu pengadaan tanda kasih / merchandise sederhana.' : 'Helping procure simple merchandise for participants.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Dokumentasi</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Mendukung foto, video, dan dokumentasi kenangan pelayanan.' : 'Supporting photo, video, and memory documentation.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Webinar</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Mendukung teknis webinar dan narasumber lansia.' : 'Supporting webinar technicalities and elderly speakers.'}</Text>
-                    </View>
-                    <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellLabel, { width: '40%' }]}>Dukung Peserta Lansia</Text>
-                        <Text style={[styles.edTableCellValue, { width: '60%' }]}>{isId ? 'Membantu kebutuhan teknis & kenyamanan peserta lansia.' : 'Helping technical needs and comfort of elderly participants.'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '35%' }]}>{isId ? 'Laporan Kegiatan' : 'Event Report'}</Text>
+                        <Text style={[styles.edTableCellValue, { width: '65%' }]}>
+                            {isId 
+                                ? 'Laporan pertanggungjawaban kegiatan tertulis beserta dokumentasi foto/video akan dikirimkan pasca-acara.' 
+                                : 'Written accountability report and photo/video documentation will be sent after the event.'}
+                        </Text>
                     </View>
                 </View>
-
-                <View style={{ marginTop: 20 }} />
-                <Text style={styles.sectionTitle}>{isId ? 'VIII. Penggunaan Dana Donatur' : 'VIII. Use of Donor Funds'}</Text>
-                <Text style={styles.bodyText}>{isId ? 'Dukungan donatur akan digunakan untuk membantu kebutuhan kegiatan, antara lain:' : 'Donor support will be used to help event needs, including:'}</Text>
-                
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Pelaksanaan ibadah dan perayaan HUT ke-16.' : 'Execution of worship and 16th Anniversary celebration.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Konsumsi peserta dan dukungan kenyamanan peserta lansia.' : 'Participant consumption and comfort support for the elderly.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Perlengkapan kegiatan, dekorasi, dan kebutuhan teknis acara.' : 'Event equipment, decoration, and technical needs.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Hadiah lomba puisi, artikel, dan video singkat.' : 'Prizes for poetry, article, and short video competitions.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Pelaksanaan webinar dan Dokumentasi kegiatan.' : 'Webinar execution and event documentation.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Souvenir atau merchandise peserta.' : 'Participant souvenirs or merchandise.'}</Text></View>
 
                 <Footer />
             </Page>
 
-            {/* PAGE 7: BUKU ACARA & UCAPAN SINGKAT */}
+            {/* PAGE 8: PENGGUNAAN DANA SPONSORSHIP */}
             <Page size="A4" style={styles.page}>
                 <Header />
-                <Text style={styles.sectionTitle}>{isId ? 'IX. Contoh Halaman Buku Acara Elektronik' : 'IX. Electronic Program Book Page Example'}</Text>
+                <Text style={styles.sectionTitle}>{isId ? 'VII. Penggunaan Dana Sponsorship' : 'VII. Use of Sponsorship Funds'}</Text>
+                <Text style={styles.bodyText}>
+                    {isId 
+                        ? 'Dukungan dana dari pihak sponsor akan dialokasikan sepenuhnya untuk menyukseskan rangkaian kegiatan HUT ke-16 Pelkat PKLU GPIB, dengan perincian utama sebagai berikut:' 
+                        : 'Financial support from sponsors will be fully allocated to ensure the success of the 16th PKLU GPIB Anniversary events, with the following main details:'}
+                </Text>
+                
+                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Penyewaan tempat penyelenggaraan di Bekasi Convention Center (Hotel Santika Mega Mall).' : 'Venue rental at Bekasi Convention Center (Hotel Santika Mega Mall).'}</Text></View>
+                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Penyediaan konsumsi bergizi dan air mineral bagi ±600 orang jemaat lansia.' : 'Provision of nutritious meals and mineral water for ±600 elderly attendees.'}</Text></View>
+                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Pengadaan sistem suara (sound system), dekorasi panggung, videotron, dan pencahayaan.' : 'Procurement of sound system, stage decoration, videotron, and event lighting.'}</Text></View>
+                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Fasilitas kesehatan darurat (ketersediaan ambulans dan tim medis di lokasi).' : 'Emergency health facilities (on-site ambulance and medical team availability).'}</Text></View>
+                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Penyelenggaraan webinar pra-kegiatan tentang pengelolaan keuangan masa lansia.' : 'Organization of pre-event webinar on financial management for the elderly.'}</Text></View>
+                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Apresiasi hadiah bagi para lansia pemenang lomba puisi, artikel, dan video pendek.' : 'Prizes and appreciation for elderly winners of poetry, article, and short video contests.'}</Text></View>
+
+                <Footer />
+            </Page>
+
+            {/* PAGE 9: CONTOH HALAMAN BUKU ACARA & APRESIASI */}
+            <Page size="A4" style={styles.page}>
+                <Header />
+                <Text style={styles.sectionTitle}>{isId ? 'VIII. Contoh Apresiasi Buku Acara Elektronik' : 'VIII. Program Book Appreciation Example'}</Text>
                 
                 <View style={[styles.quoteContainer, { backgroundColor: '#FDFBF7', borderLeft: '4pt solid #D4AF37', border: '1pt solid #D4AF37' }]}>
                     <Text style={[styles.sectionTitle, { fontSize: 13, marginBottom: 15, textAlign: 'center', color: '#047857' }]}>
-                        {isId ? 'Dengan penuh syukur, Panitia HUT ke-16 Pelkat PKLU GPIB mengucapkan terima kasih kepada:' : 'With full gratitude, the 16th PKLU GPIB Anniversary Committee thanks:'}
+                        {isId ? 'Dengan penuh syukur, Panitia HUT ke-16 Pelkat PKLU GPIB mengucapkan terima kasih kepada Sponsor Kemitraan:' : 'With full gratitude, the 16th PKLU GPIB Anniversary Committee thanks our Partnership Sponsors:'}
                     </Text>
                     
-                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Sahabat Kasih</Text>
-                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 10 }]}>1. Keluarga .............................. 2. Bapak/Ibu ..............................</Text>
+                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Sponsor Platinum</Text>
+                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 10 }]}>1. PT. .............................................. 2. Lembaga ..............................................</Text>
 
-                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Sahabat Berkat</Text>
-                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 10 }]}>1. Keluarga .............................. 2. Bapak/Ibu ..............................</Text>
+                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Sponsor Gold</Text>
+                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 10 }]}>1. PT. .............................................. 2. Bpk/Ibu ..............................................</Text>
 
-                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Sahabat Pelayanan</Text>
-                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 15 }]}>1. Keluarga .............................. 2. Bapak/Ibu ..............................</Text>
-
-                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Donatur Anonim</Text>
-                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 20 }]}>Keluarga yang Mengasihi Pelayanan Lansia</Text>
+                    <Text style={[styles.bodyTextBold, { marginBottom: 5 }]}>Sponsor Silver & Bronze</Text>
+                    <Text style={[styles.bodyText, { marginLeft: 10, marginBottom: 15 }]}>1. PT. .............................................. 2. Instansi ..............................................</Text>
 
                     <Text style={[styles.bodyText, { textAlign: 'center', fontStyle: 'italic' }]}>
-                        {isId ? 'Kiranya Tuhan memberkati setiap dukungan, doa, dan kasih yang telah diberikan bagi pelayanan Pelkat PKLU GPIB.' : 'May God bless every support, prayer, and love given for the service of PKLU GPIB.'}
+                        {isId ? 'Kiranya Tuhan memberkati setiap bentuk kerja sama dan kemitraan demi pelayanan kaum lanjut usia.' : 'May God bless every form of cooperation and partnership for the service of the elderly.'}
                     </Text>
                 </View>
-
-                <View style={{ marginTop: 20 }} />
-                <Text style={styles.sectionTitle}>{isId ? 'X. Contoh Ucapan Singkat Donatur' : 'X. Donor Short Messages Examples'}</Text>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Selamat HUT ke-16 Pelkat PKLU GPIB. Teruskan baktimu dan jadilah lansia teladan dalam iman, karya, dan pelayanan.' : 'Happy 16th PKLU GPIB Anniversary. Continue your service and be an elderly role model in faith, work, and service.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Kiranya Pelkat PKLU GPIB terus menjadi berkat bagi gereja, keluarga, dan masyarakat.' : 'May PKLU GPIB continue to be a blessing to the church, family, and society.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Bersyukur dapat mendukung pelayanan kaum lanjut usia. Tuhan memberkati seluruh rangkaian HUT ke-16 Pelkat PKLU GPIB.' : 'Grateful to support elderly service. God bless the entire 16th PKLU GPIB Anniversary series.'}</Text></View>
-                <View style={styles.listItem}><Text style={styles.listBullet}>•</Text><Text style={styles.listText}>{isId ? 'Usia boleh bertambah, tetapi semangat pelayanan tetap menyala. Selamat melayani dan terus menjadi teladan.' : 'Age may increase, but the spirit of service remains lit. Happy serving and continue being a role model.'}</Text></View>
 
                 <Footer />
             </Page>
 
-            {/* PAGE 8: FORMAT KOMITMEN SPONSOR (DINAMIS - VIP FORMAT ATAU QR) */}
+            {/* PAGE 10: LEMBAR KOMITMEN */}
             <Page size="A4" style={styles.page}>
                 <Header />
                 {data.contribution_value ? (
                     <>
-                        <Text style={styles.sectionTitle}>{isId ? 'XI. Lembar Komitmen & Pengesahan' : 'XI. Commitment & Endorsement Sheet'}</Text>
+                        <Text style={styles.sectionTitle}>{isId ? 'IX. Lembar Komitmen & Pengesahan' : 'IX. Commitment & Endorsement Sheet'}</Text>
                         <Text style={styles.bodyText}>
-                            {isId ? 'Dengan kerendahan hati kami mengucapkan terima kasih atas komitmen dan dukungan yang Bapak/Ibu/Saudara berikan. Berikut adalah rincian data partisipasi resmi Anda yang telah tercatat dengan aman dalam sistem perbendaharaan kami.' : 'With humility, we thank you for your commitment and support. Below are the official details of your participation, securely recorded in our treasury system.'}
+                            {isId ? 'Dengan kerendahan hati kami mengucapkan terima kasih atas komitmen dan dukungan yang Bapak/Ibu/Saudara berikan. Berikut adalah rincian data kemitraan resmi Anda yang telah tercatat dengan aman dalam sistem perbendaharaan kami.' : 'With humility, we thank you for your commitment and support. Below are the official details of your partnership, securely recorded in our treasury system.'}
                         </Text>
 
                         {/* VIP Card Layout */}
@@ -944,16 +942,18 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                                 <Text style={[styles.vipValue, { fontFamily: 'Helvetica', fontSize: 10 }]}>{data.number}</Text>
                             </View>
                             <View style={styles.vipRow}>
-                                <Text style={styles.vipLabel}>{isId ? 'Nama Lengkap Sponsor' : 'Sponsor Full Name'}</Text>
+                                <Text style={styles.vipLabel}>{isId ? 'Perusahaan / Lembaga' : 'Company / Institution'}</Text>
                                 <Text style={styles.vipValue}>{data.name}</Text>
                             </View>
-                            <View style={styles.vipRow}>
-                                <Text style={styles.vipLabel}>{isId ? 'Nama Tercantum' : 'Published Name'}</Text>
-                                <Text style={styles.vipValue}>{data.display_name || data.name}</Text>
-                            </View>
+                            {data.pic_name && (
+                                <View style={styles.vipRow}>
+                                    <Text style={styles.vipLabel}>{isId ? 'Penanggung Jawab (PIC)' : 'Representative (PIC)'}</Text>
+                                    <Text style={styles.vipValue}>{data.pic_name} {data.pic_position ? `(${data.pic_position})` : ''}</Text>
+                                </View>
+                            )}
                             <View style={styles.vipRow}>
                                 <Text style={styles.vipLabel}>{isId ? 'Paket Sponsorship' : 'Sponsorship Package'}</Text>
-                                <Text style={[styles.vipValue, { color: '#D4AF37' }]}>{categoryLabel}</Text>
+                                <Text style={[styles.vipValue, { color: '#D4AF37', fontWeight: 700 }]}>{packageLabel}</Text>
                             </View>
                             <View style={styles.vipRow}>
                                 <Text style={styles.vipLabel}>{isId ? 'Nilai Dukungan' : 'Support Value'}</Text>
@@ -979,7 +979,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </>
                 ) : (
                     <>
-                        <Text style={styles.sectionTitle}>{isId ? 'XI. Formulir Komitmen Digital' : 'XI. Digital Commitment Form'}</Text>
+                        <Text style={styles.sectionTitle}>{isId ? 'IX. Formulir Komitmen Digital' : 'IX. Digital Commitment Form'}</Text>
                         <Text style={styles.bodyText}>
                             {isId 
                                 ? 'Bapak/Ibu Pimpinan Perusahaan/Instansi yang terkasih, jika Anda tergerak untuk menjalin kemitraan dan mendukung persekutuan serta pelayanan Kaum Lanjut Usia GPIB ini, Anda dapat menyatakan komitmen dukungan sponsorship Anda secara mudah secara digital.'
@@ -1014,10 +1014,10 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <Footer />
             </Page>
 
-            {/* PAGE 9: INFORMASI TRANSFER & PENUTUP */}
+            {/* PAGE 11: INFORMASI TRANSFER & PENUTUP */}
             <Page size="A4" style={[styles.page, { paddingBottom: 40 }]}>
                 <Header />
-                <Text style={[styles.sectionTitle, { fontSize: 13, marginBottom: 6 }]}>{isId ? 'XII. Informasi Transfer Dukungan' : 'XII. Support Transfer Information'}</Text>
+                <Text style={[styles.sectionTitle, { fontSize: 13, marginBottom: 6 }]}>{isId ? 'X. Informasi Transfer Dukungan' : 'X. Support Transfer Information'}</Text>
                 <Text style={[styles.bodyText, { fontSize: 8.5, marginBottom: 5 }]}>
                     {isId ? 'Guna memastikan transparansi dan akuntabilitas, seluruh dukungan dana hanya disalurkan melalui satu pintu rekening resmi Kepanitiaan berikut ini:' : 'To ensure transparency and accountability, all financial support is exclusively channeled through the following official Committee account:'}
                 </Text>
@@ -1038,17 +1038,17 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     <Text style={styles.bodyTextBold}>+62 812-9145-1945 (Anastasia Christine Dolo)</Text>
                 </Text>
 
-                <Text style={[styles.sectionTitle, { fontSize: 12, marginBottom: 4 }]}>{isId ? 'XIII. Penutup' : 'XIII. Closing'}</Text>
+                <Text style={[styles.sectionTitle, { fontSize: 12, marginBottom: 4 }]}>{isId ? 'XI. Penutup' : 'XI. Closing'}</Text>
                 <Text style={[styles.bodyText, { fontSize: 8.5, marginBottom: 3, lineHeight: 1.3 }]}>
-                    {isId ? 'Demikian proposal dukungan donatur ini disampaikan sebagai undangan pelayanan bagi pribadi, keluarga, dan sahabat Pelkat PKLU GPIB yang rindu mengambil bagian dalam Perayaan dan Ibadah Memperingati HUT ke-16 Pelkat PKLU GPIB.' : 'Thus this donor support proposal is presented as an invitation to serve for individuals, families, and friends of PKLU GPIB who wish to take part in the 16th Anniversary Celebration and Worship.'}
+                    {isId ? 'Demikian proposal kemitraan sponsorship ini disampaikan sebagai undangan kerja sama bagi instansi, perusahaan, dan lembaga untuk mengambil bagian dalam Perayaan dan Ibadah Memperingati HUT ke-16 Pelkat PKLU GPIB.' : 'Thus this sponsorship partnership proposal is presented as an invitation to cooperate for institutions, companies, and organizations to take part in the 16th Anniversary Celebration and Worship.'}
                 </Text>
                 <Text style={[styles.bodyText, { fontSize: 8.5, marginBottom: 6, lineHeight: 1.3 }]}>
-                    {isId ? 'Setiap dukungan, baik besar maupun kecil, merupakan wujud kasih dan kepedulian yang sangat berarti bagi pelayanan kaum lanjut usia. Kiranya melalui kegiatan ini, Pelkat PKLU GPIB semakin dikuatkan untuk terus menjadi lansia teladan dalam iman, karya, dan pelayanan.' : 'Every support, big or small, is a manifestation of love and care that means a lot to the elderly service. May through this event, PKLU GPIB be further strengthened to continue being elderly role models in faith, work, and service.'}
+                    {isId ? 'Setiap dukungan, baik dalam bentuk dana maupun in-kind, merupakan wujud kepedulian yang sangat berharga bagi peningkatan kesejahteraan dan pemberdayaan kaum lanjut usia. Kiranya kemitraan yang terjalin mendatangkan manfaat bersama dan berkat bagi pelayanan PKLU GPIB.' : 'Every support, whether financial or in-kind, is a highly valuable form of care for the improvement of welfare and empowerment of the elderly. May the partnership established bring mutual benefit and blessings for the PKLU GPIB service.'}
                 </Text>
                 
                 <Text style={[styles.sectionTitle, { fontSize: 10, marginTop: 25, marginBottom: 4, textAlign: 'center' }]}>Terima Kasih</Text>
                 <Text style={[styles.bodyText, { fontSize: 8.5, textAlign: 'center', marginBottom: 15 }]}>
-                    {isId ? 'Atas doa, dukungan, dan kasih yang diberikan, Panitia menyampaikan terima kasih.' : 'For the prayers, support, and love given, the Committee expresses gratitude.'}
+                    {isId ? 'Atas perhatian, dukungan, dan kerja sama yang diberikan, Panitia menyampaikan terima kasih.' : 'For the attention, support, and cooperation given, the Committee expresses gratitude.'}
                 </Text>
 
                 <View style={[styles.signRow, { marginTop: 10 }]}>

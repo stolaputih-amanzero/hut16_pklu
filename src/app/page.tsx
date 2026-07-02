@@ -39,10 +39,7 @@ export default function Home() {
     try {
       setSubmitting(true)
       
-      // 1. Get automatic next number for proposal
-      const number = await getNextNumber(modalForm.type as any, 2026)
-
-      // 2. Fetch first active committee member for database foreign key compliance
+      // 1. Fetch first active committee member for database foreign key compliance
       const { data: comms } = await supabase
         .from('committees')
         .select('id')
@@ -50,20 +47,45 @@ export default function Home() {
         .limit(1)
       const committeeId = comms?.[0]?.id || null
 
-      // 3. Insert record to database
-      const { error: saveError } = await supabase
-        .from('proposals')
-        .insert({
-          type: modalForm.type,
-          number: number,
-          name: modalForm.name,
-          phone: modalForm.phone,
-          payment_status: 'pending',
-          committee_id: committeeId,
-          proposal_date: new Date().toISOString().split('T')[0]
-        })
+      // 2. Insert record to database with retry logic for sequential proposal numbers
+      let success = false
+      let retries = 5
+      let number = ''
+      let saveError = null
 
-      if (saveError) throw saveError
+      while (retries > 0 && !success) {
+        // Get automatic next number for proposal
+        number = await getNextNumber(modalForm.type as any, 2026)
+
+        const { error } = await supabase
+          .from('proposals')
+          .insert({
+            type: modalForm.type,
+            number: number,
+            name: modalForm.name,
+            phone: modalForm.phone,
+            payment_status: 'pending',
+            committee_id: committeeId,
+            proposal_date: new Date().toISOString().split('T')[0]
+          })
+
+        if (!error) {
+          success = true
+        } else if (error.code === '23505') {
+          // Unique key violation (concurrency collision), retry with next number
+          retries--
+          saveError = error
+          // Wait briefly before retrying
+          await new Promise(resolve => setTimeout(resolve, 100))
+        } else {
+          // Other DB errors, fail immediately
+          throw error
+        }
+      }
+
+      if (!success && saveError) {
+        throw new Error(`Gagal mengunci nomor proposal: ${saveError.message}`)
+      }
 
       // 4. Construct WA message and redirect
       const waMessage = `Halo Ibu Anastasia Christine Dolo,\n\nSaya tertarik untuk mendukung perayaan HUT ke-16 Pelkat PKLU GPIB sebagai *${modalForm.type === 'donatur' ? 'Donatur' : 'Sponsor'}*.\n\nBerikut identitas saya:\n- Nama: ${modalForm.name}\n- No. WhatsApp: ${modalForm.phone}\n- No. Registrasi: ${number}\n\nMohon untuk dapat difollowup lebih lanjut. Terima kasih!`

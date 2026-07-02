@@ -100,33 +100,56 @@ export default function BuatProposalPage() {
         try {
             setIsGenerating(true)
 
-            // 1. Dapatkan nomor urut otomatis
-            const number = await getNextNumber(proposalType, 2026)
-            setProposalNumber(number)
+            let success = false
+            let retries = 5
+            let number = ''
+            let saveError = null
+            let proposal = null
 
-            // 2. Simpan ke database (status pending, nilai kosong karena ini tahap pertama)
-            const { data: proposal, error: saveError } = await supabase
-                .from('proposals')
-                .insert({
-                    type: proposalType,
-                    number: number,
-                    name: formData.name,
-                    display_name: proposalType === 'donatur' ? (formData.display_name || formData.name) : null,
-                    company_name: formData.company_name || null,
-                    pic_name: proposalType === 'sponsorship' ? (formData.pic_name || null) : null,
-                    pic_position: proposalType === 'sponsorship' ? (formData.pic_position || null) : null,
-                    phone: formData.phone,
-                    email: formData.email || null,
-                    congregation: proposalType === 'donatur' ? (formData.congregation || null) : null,
-                    lang: formData.language,
-                    payment_status: 'pending',
-                    committee_id: formData.committee_id,
-                    proposal_date: formData.proposal_date
-                })
-                .select()
-                .single()
+            while (retries > 0 && !success) {
+                // 1. Dapatkan nomor urut otomatis
+                number = await getNextNumber(proposalType, 2026)
 
-            if (saveError) throw saveError
+                // 2. Simpan ke database (status pending, nilai kosong karena ini tahap pertama)
+                const { data, error } = await supabase
+                    .from('proposals')
+                    .insert({
+                        type: proposalType,
+                        number: number,
+                        name: formData.name,
+                        display_name: proposalType === 'donatur' ? (formData.display_name || formData.name) : null,
+                        company_name: formData.company_name || null,
+                        pic_name: proposalType === 'sponsorship' ? (formData.pic_name || null) : null,
+                        pic_position: proposalType === 'sponsorship' ? (formData.pic_position || null) : null,
+                        phone: formData.phone,
+                        email: formData.email || null,
+                        congregation: proposalType === 'donatur' ? (formData.congregation || null) : null,
+                        lang: formData.language,
+                        payment_status: 'pending',
+                        committee_id: formData.committee_id,
+                        proposal_date: formData.proposal_date
+                    })
+                    .select()
+                    .single()
+
+                if (!error) {
+                    success = true
+                    proposal = data
+                    setProposalNumber(number)
+                } else if (error.code === '23505') {
+                    // Unique constraint violation (concurrency collision), retry with next number
+                    retries--
+                    saveError = error
+                    await new Promise(resolve => setTimeout(resolve, 100))
+                } else {
+                    // Other database errors, fail immediately
+                    throw error
+                }
+            }
+
+            if (!success || !proposal) {
+                throw new Error(`Gagal mengunci nomor proposal: ${saveError?.message || 'Kesalahan tidak diketahui'}`)
+            }
 
             setProposalId(proposal.id)
             

@@ -44,29 +44,13 @@ export async function POST(req: NextRequest) {
 
         const buffer = await renderToBuffer(React.createElement(PDFComponent, { data: proposal, lang, logoUrl, gpibLogoUrl, origin: req.nextUrl.origin }) as any)
 
-        // 3. Upload ke Supabase Storage
-        const fileName = `${proposal.year}/${proposal.type}/${proposal.number}.pdf`
-        const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-            .from('proposals')
-            .upload(fileName, buffer, {
-                contentType: 'application/pdf',
-                upsert: true,
-            })
-
-        if (uploadError) throw uploadError
-
-        // 4. Dapatkan public URL
-        const { data: urlData } = supabaseAdmin.storage
-            .from('proposals')
-            .getPublicUrl(fileName)
-
-        // 5. Update record
-        await supabaseAdmin
-            .from('proposals')
-            .update({ proposal_pdf_url: urlData.publicUrl, updated_at: new Date().toISOString() })
-            .eq('id', id)
-
-        return NextResponse.json({ url: urlData.publicUrl, number: proposal.number })
+        // 3. Kembalikan PDF secara langsung
+        return new NextResponse(buffer as any, {
+            headers: {
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': `attachment; filename="Proposal_${proposal.type}_${proposal.number.replace(/\//g, '_')}.pdf"`,
+            },
+        })
     } catch (err: any) {
         console.error(err)
         return NextResponse.json({ error: err.message }, { status: 500 })

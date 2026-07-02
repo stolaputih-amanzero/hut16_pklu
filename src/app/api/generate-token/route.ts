@@ -32,21 +32,13 @@ export async function POST(req: NextRequest) {
             }) as any
         )
 
-        const fileName = `${proposal.year}/tokens/${proposal.number}_${lang}.pdf`
-        const { error: uploadError } = await supabaseAdmin.storage
-            .from('proposals')
-            .upload(fileName, buffer, { contentType: 'application/pdf', upsert: true })
-
-        if (uploadError) throw uploadError
-
-        const { data: urlData } = supabaseAdmin.storage.from('proposals').getPublicUrl(fileName)
-
-        await supabaseAdmin
-            .from('proposals')
-            .update({ token_pdf_url: urlData.publicUrl, updated_at: new Date().toISOString() })
-            .eq('id', id)
-
-        return NextResponse.json({ url: urlData.publicUrl })
+        // Kembalikan PDF secara langsung
+        return new NextResponse(buffer as any, {
+            headers: {
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': `attachment; filename="TandaPenghargaan_${proposal.type}_${proposal.number.replace(/\//g, '_')}_${lang}.pdf"`,
+            },
+        })
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 })
     }

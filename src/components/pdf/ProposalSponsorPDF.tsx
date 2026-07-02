@@ -661,7 +661,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <Footer />
             </Page>
 
-            {/* PAGE 4: JADWAL & ANGGARAN */}
+            {/* PAGE 4: JADWAL */}
             <Page size="A4" style={styles.page}>
                 <Header />
                 <Text style={styles.sectionTitle}>{isId ? 'Rincian Agenda' : 'Agenda Details'}</Text>
@@ -704,13 +704,18 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
                 </View>
 
-                <View style={{ marginTop: 20 }} />
+                <Footer />
+            </Page>
+
+            {/* PAGE 5: ANGGARAN KEGIATAN */}
+            <Page size="A4" style={styles.page}>
+                <Header />
                 <Text style={styles.sectionTitle}>{isId ? 'IV. Anggaran Kegiatan' : 'IV. Budget Plan'}</Text>
                 
                 <View style={styles.editorialTable}>
                     <View style={styles.edTableHeader}>
-                        <Text style={[styles.edTableHeadText, { width: '70%' }]}>{isId ? 'REKAPITULASI PENGELUARAN' : 'EXPENDITURE RECAPITULATION'}</Text>
-                        <Text style={[styles.edTableHeadText, { width: '30%', textAlign: 'right', color: '#D4AF37' }]}>{isId ? 'JUMLAH (Rp)' : 'AMOUNT (Rp)'}</Text>
+                        <Text style={[styles.edTableHeadText, { width: '70%' }]}>{isId ? 'KOMPONEN ANGGARAN' : 'BUDGET COMPONENTS'}</Text>
+                        <Text style={[styles.edTableHeadText, { width: '30%', textAlign: 'right', color: '#D4AF37' }]}>{isId ? 'ESTIMASI BIAYA (Rp)' : 'ESTIMATED COST (Rp)'}</Text>
                     </View>
                     <View style={styles.edTableRow}>
                         <Text style={[styles.edTableCellValue, { width: '70%' }]}>1. Sekretariat</Text>
@@ -729,11 +734,27 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                         <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>51.250.000</Text>
                     </View>
                     <View style={styles.edTableRow}>
-                        <Text style={[styles.edTableCellValue, { width: '70%' }]}>5. Seksi Dokumentasi, Humas, Dana, Kesehatan, Keamanan</Text>
-                        <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>82.715.000</Text>
+                        <Text style={[styles.edTableCellValue, { width: '70%' }]}>5. Seksi Dokumentasi</Text>
+                        <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>19.150.000</Text>
+                    </View>
+                    <View style={styles.edTableRow}>
+                        <Text style={[styles.edTableCellValue, { width: '70%' }]}>6. Seksi Humas / Publikasi</Text>
+                        <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>1.440.000</Text>
+                    </View>
+                    <View style={styles.edTableRow}>
+                        <Text style={[styles.edTableCellValue, { width: '70%' }]}>7. Seksi Usaha Dana</Text>
+                        <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>56.000.000</Text>
+                    </View>
+                    <View style={styles.edTableRow}>
+                        <Text style={[styles.edTableCellValue, { width: '70%' }]}>8. Seksi Kesehatan</Text>
+                        <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>4.725.000</Text>
+                    </View>
+                    <View style={styles.edTableRow}>
+                        <Text style={[styles.edTableCellValue, { width: '70%' }]}>9. Seksi Keamanan</Text>
+                        <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700 }]}>1.400.000</Text>
                     </View>
                     <View style={[styles.edTableRow, { borderBottom: '1.5pt solid #022c22' }]}>
-                        <Text style={[styles.edTableCellLabel, { width: '70%' }]}>{isId ? 'TOTAL PENGELUARAN' : 'TOTAL EXPENDITURE'}</Text>
+                        <Text style={[styles.edTableCellLabel, { width: '70%' }]}>{isId ? 'TOTAL ESTIMASI BIAYA' : 'TOTAL ESTIMATED COST'}</Text>
                         <Text style={[styles.edTableCellValue, { width: '30%', textAlign: 'right', fontFamily: 'Times-Roman', fontWeight: 700, color: '#022c22', fontSize: 11 }]}>537.785.000</Text>
                     </View>
                 </View>

@@ -32,6 +32,8 @@ export default function BuatProposalPage() {
         name: '',
         display_name: '',
         company_name: '',
+        pic_name: '',
+        pic_position: '',
         phone: '',
         email: '',
         congregation: '',
@@ -72,6 +74,8 @@ export default function BuatProposalPage() {
             name: '',
             display_name: '',
             company_name: '',
+            pic_name: '',
+            pic_position: '',
             phone: '',
             email: '',
             congregation: '',
@@ -103,11 +107,13 @@ export default function BuatProposalPage() {
                     type: proposalType,
                     number: number,
                     name: formData.name,
-                    display_name: formData.display_name || formData.name,
+                    display_name: proposalType === 'donatur' ? (formData.display_name || formData.name) : null,
                     company_name: formData.company_name || null,
+                    pic_name: proposalType === 'sponsorship' ? (formData.pic_name || null) : null,
+                    pic_position: proposalType === 'sponsorship' ? (formData.pic_position || null) : null,
                     phone: formData.phone,
                     email: formData.email || null,
-                    congregation: formData.congregation || null,
+                    congregation: proposalType === 'donatur' ? (formData.congregation || null) : null,
                     lang: formData.language,
                     payment_status: 'pending',
                     committee_id: formData.committee_id,
@@ -137,11 +143,15 @@ export default function BuatProposalPage() {
     const generateProposalPDF = async (id: string, lang: string) => {
         const response = await fetch('/api/generate-proposal', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, lang })
         })
-        const result = await response.json()
-        if (result.error) throw new Error(result.error)
-        return result.url
+        if (!response.ok) {
+            const errResult = await response.json().catch(() => ({}))
+            throw new Error(errResult.error || 'Gagal menghasilkan PDF')
+        }
+        const blob = await response.blob()
+        return URL.createObjectURL(blob)
     }
 
     const handleDownload = async (url: string, filename: string) => {
@@ -377,43 +387,71 @@ export default function BuatProposalPage() {
                             <CardContent className="p-6 space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label className="text-[#FDFBF7]">Nama Lengkap (Sesuai Identitas) <span className="text-red-400">*</span></Label>
+                                        <Label className="text-[#FDFBF7]">
+                                            {proposalType === 'donatur' ? 'Nama Lengkap Donatur (Sesuai Identitas)' : 'Nama Sponsor / Perusahaan / Lembaga'} <span className="text-red-400">*</span>
+                                        </Label>
                                         <Input
                                             name="name"
                                             value={formData.name}
                                             onChange={handleInputChange}
-                                            placeholder="Cth: Bapak Budi Santoso"
+                                            placeholder={proposalType === 'donatur' ? 'Cth: Bapak Budi Santoso' : 'Cth: PT. Bank Mandiri'}
                                             className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[#FDFBF7]">Nama Tercantum (Di Buku Acara)</Label>
-                                        <Input
-                                            name="display_name"
-                                            value={formData.display_name}
-                                            onChange={handleInputChange}
-                                            placeholder="Kosongkan jika sama dengan nama lengkap"
-                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
-                                        />
-                                    </div>
+                                    {proposalType === 'donatur' ? (
+                                        <div className="space-y-2">
+                                            <Label className="text-[#FDFBF7]">Nama Tercantum (Di Buku Acara)</Label>
+                                            <Input
+                                                name="display_name"
+                                                value={formData.display_name}
+                                                onChange={handleInputChange}
+                                                placeholder="Kosongkan jika sama dengan nama lengkap"
+                                                className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <Label className="text-[#FDFBF7]">Nama Penanggung Jawab (PIC)</Label>
+                                            <Input
+                                                name="pic_name"
+                                                value={formData.pic_name}
+                                                onChange={handleInputChange}
+                                                placeholder="Cth: Ibu Rina Wijaya"
+                                                className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label className="text-[#FDFBF7] flex items-center gap-2">
-                                        Nama Perusahaan / Instansi
-                                        <span className="text-xs font-normal text-[#A0AEC0]">(Opsional - Untuk Pencantuman Gelar/Posisi)</span>
-                                    </Label>
-                                    <div className="relative">
-                                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0AEC0]" />
+                                {proposalType === 'donatur' ? (
+                                    <div className="space-y-2">
+                                        <Label className="text-[#FDFBF7] flex items-center gap-2">
+                                            Nama Perusahaan / Instansi
+                                            <span className="text-xs font-normal text-[#A0AEC0]">(Opsional - Untuk Pencantuman Gelar/Posisi)</span>
+                                        </Label>
+                                        <div className="relative">
+                                            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0AEC0]" />
+                                            <Input
+                                                name="company_name"
+                                                value={formData.company_name}
+                                                onChange={handleInputChange}
+                                                placeholder="Cth: PT. Maju Bersama / Direktur Keuangan"
+                                                className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50 pl-10"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <Label className="text-[#FDFBF7]">Jabatan PIC</Label>
                                         <Input
-                                            name="company_name"
-                                            value={formData.company_name}
+                                            name="pic_position"
+                                            value={formData.pic_position}
                                             onChange={handleInputChange}
-                                            placeholder="Cth: PT. Maju Bersama / Direktur Keuangan"
-                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50 pl-10"
+                                            placeholder="Cth: Manager CSR / Humas"
+                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
                                         />
                                     </div>
-                                </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">

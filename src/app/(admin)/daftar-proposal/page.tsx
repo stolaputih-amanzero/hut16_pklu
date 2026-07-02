@@ -39,6 +39,8 @@ export default function DaftarProposalPage() {
         name: '',
         display_name: '',
         company_name: '',
+        pic_name: '',
+        pic_position: '',
         phone: '',
         email: '',
         congregation: '',
@@ -98,6 +100,8 @@ export default function DaftarProposalPage() {
             name: proposal.name,
             display_name: proposal.display_name || proposal.name,
             company_name: proposal.company_name || '',
+            pic_name: proposal.pic_name || '',
+            pic_position: proposal.pic_position || '',
             phone: proposal.phone,
             email: proposal.email || '',
             congregation: proposal.congregation || '',
@@ -129,6 +133,8 @@ export default function DaftarProposalPage() {
             name: '',
             display_name: '',
             company_name: '',
+            pic_name: '',
+            pic_position: '',
             phone: '',
             email: '',
             congregation: '',
@@ -152,20 +158,6 @@ export default function DaftarProposalPage() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
-    }
-
-    const generateCommitmentPDF = async (id: string, language: string) => {
-        try {
-            const response = await fetch('/api/generate-commitment', {
-                method: 'POST',
-                body: JSON.stringify({ id, lang: language })
-            })
-            const result = await response.json()
-            if (result.error) throw new Error(result.error)
-            return result.url
-        } catch (error) {
-            console.error('Gagal menghasilkan surat komitmen:', error)
-        }
     }
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -266,28 +258,92 @@ export default function DaftarProposalPage() {
         }
     }
 
-    const generateProposalPDF = async (id: string, lang: string) => {
-        const response = await fetch('/api/generate-proposal', {
-            method: 'POST',
-            body: JSON.stringify({ id, lang })
-        })
-        const result = await response.json()
-        if (result.error) throw new Error(result.error)
-        return result.url
+    const handleDownloadProposal = async () => {
+        if (!selectedProposal) return
+        try {
+            toast.loading('Menyiapkan file unduhan...', { id: 'download-proposal' })
+            const response = await fetch('/api/generate-proposal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: selectedProposal.id, lang: formData.lang })
+            })
+            if (!response.ok) {
+                const errJson = await response.json().catch(() => ({}))
+                throw new Error(errJson.error || 'Gagal mengunduh proposal')
+            }
+            const blob = await response.blob()
+            const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = blobUrl
+            a.download = `Proposal_${selectedProposal.type}_${selectedProposal.number.replace(/\//g, '_')}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(blobUrl)
+            toast.success('Berhasil mengunduh proposal', { id: 'download-proposal' })
+        } catch (error: any) {
+            toast.error('Gagal mengunduh proposal: ' + error.message, { id: 'download-proposal' })
+        }
     }
 
-    const generateTokenPDF = async (id: string, lang: string) => {
-        const response = await fetch('/api/generate-token', {
-            method: 'POST',
-            body: JSON.stringify({ id, lang })
-        })
-        const result = await response.json()
-        if (result.error) throw new Error(result.error)
-        return result.url
+    const handleDownloadToken = async () => {
+        if (!selectedProposal) return
+        try {
+            toast.loading('Menyiapkan file unduhan...', { id: 'download-token' })
+            const response = await fetch('/api/generate-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: selectedProposal.id, lang: formData.lang })
+            })
+            if (!response.ok) {
+                const errJson = await response.json().catch(() => ({}))
+                throw new Error(errJson.error || 'Gagal mengunduh tanda penghargaan')
+            }
+            const blob = await response.blob()
+            const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = blobUrl
+            a.download = `TandaPenghargaan_${selectedProposal.type}_${selectedProposal.number.replace(/\//g, '_')}_${formData.lang}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(blobUrl)
+            toast.success('Berhasil mengunduh tanda penghargaan', { id: 'download-token' })
+        } catch (error: any) {
+            toast.error('Gagal mengunduh tanda penghargaan: ' + error.message, { id: 'download-token' })
+        }
+    }
+
+    const handleDownloadCommitment = async () => {
+        if (!selectedProposal) return
+        try {
+            toast.loading('Menyiapkan file unduhan...', { id: 'download-commitment' })
+            const response = await fetch('/api/generate-commitment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: selectedProposal.id, lang: formData.lang })
+            })
+            if (!response.ok) {
+                const errJson = await response.json().catch(() => ({}))
+                throw new Error(errJson.error || 'Gagal mengunduh surat komitmen')
+            }
+            const blob = await response.blob()
+            const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = blobUrl
+            a.download = `Commitment_${selectedProposal.type}_${selectedProposal.number.replace(/\//g, '_')}_${formData.lang}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(blobUrl)
+            toast.success('Berhasil mengunduh surat komitmen', { id: 'download-commitment' })
+        } catch (error: any) {
+            toast.error('Gagal mengunduh surat komitmen: ' + error.message, { id: 'download-commitment' })
+        }
     }
 
     const sendProposalViaWA = () => {
-        if (!selectedProposal || !selectedProposal.proposal_pdf_url) return
+        if (!selectedProposal) return
         
         const waLink = buildWhatsAppLink(
             formData.phone,
@@ -297,7 +353,7 @@ export default function DaftarProposalPage() {
                 number: formData.number,
                 name: formData.name,
                 type: formData.type,
-                pdfUrl: selectedProposal.proposal_pdf_url
+                pdfUrl: null
             }
         )
         window.open(waLink, '_blank', 'noopener,noreferrer')
@@ -305,7 +361,7 @@ export default function DaftarProposalPage() {
     }
 
     const sendCommitmentViaWA = () => {
-        if (!selectedProposal || !selectedProposal.commitment_pdf_url) return
+        if (!selectedProposal) return
         
         const waLink = buildWhatsAppLink(
             formData.phone,
@@ -313,7 +369,7 @@ export default function DaftarProposalPage() {
             formData.lang as 'id' | 'en',
             {
                 name: formData.name,
-                commitment_url: selectedProposal.commitment_pdf_url
+                commitment_url: null
             }
         )
         window.open(waLink, '_blank', 'noopener,noreferrer')
@@ -321,7 +377,7 @@ export default function DaftarProposalPage() {
     }
 
     const sendTokenViaWA = () => {
-        if (!selectedProposal || !selectedProposal.token_pdf_url) return
+        if (!selectedProposal) return
         
         const waLink = buildWhatsAppLink(
             formData.phone,
@@ -329,7 +385,7 @@ export default function DaftarProposalPage() {
             formData.lang as 'id' | 'en',
             {
                 display_name: formData.display_name || formData.name,
-                token_url: selectedProposal.token_pdf_url
+                token_url: null
             }
         )
         window.open(waLink, '_blank', 'noopener,noreferrer')
@@ -351,11 +407,13 @@ export default function DaftarProposalPage() {
                     .from('proposals')
                     .update({
                         name: formData.name,
-                        display_name: formData.display_name || formData.name,
+                        display_name: formData.type === 'donatur' ? (formData.display_name || formData.name) : null,
                         company_name: formData.company_name || null,
+                        pic_name: formData.type === 'sponsorship' ? (formData.pic_name || null) : null,
+                        pic_position: formData.type === 'sponsorship' ? (formData.pic_position || null) : null,
                         phone: formData.phone,
                         email: formData.email || null,
-                        congregation: formData.congregation,
+                        congregation: formData.type === 'donatur' ? (formData.congregation || null) : null,
                         contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
                         contribution_form: formData.contribution_form || null,
                         specific_support: formData.specific_support || null,
@@ -374,16 +432,9 @@ export default function DaftarProposalPage() {
 
                 if (updateError) throw updateError
 
-                // Regenerate PDF
-                await generateProposalPDF(formData.id, formData.lang)
-                if (formData.contribution_form) {
-                    await generateCommitmentPDF(formData.id, formData.lang)
-                }
-                if (formData.payment_status === 'confirmed') {
-                    await generateTokenPDF(formData.id, formData.lang)
-                }
 
-                toast.success('Proposal berhasil diperbarui dan PDF dibuat ulang!')
+
+                toast.success('Proposal berhasil diperbarui!')
             } else {
                 // Create
                 const number = await getNextNumber(formData.type as 'donatur' | 'sponsorship', 2026)
@@ -394,11 +445,13 @@ export default function DaftarProposalPage() {
                         type: formData.type,
                         number: number,
                         name: formData.name,
-                        display_name: formData.display_name || formData.name,
+                        display_name: formData.type === 'donatur' ? (formData.display_name || formData.name) : null,
                         company_name: formData.company_name || null,
+                        pic_name: formData.type === 'sponsorship' ? (formData.pic_name || null) : null,
+                        pic_position: formData.type === 'sponsorship' ? (formData.pic_position || null) : null,
                         phone: formData.phone,
                         email: formData.email || null,
-                        congregation: formData.congregation,
+                        congregation: formData.type === 'donatur' ? (formData.congregation || null) : null,
                         contribution_value: formData.contribution_value ? Number(formData.contribution_value) : null,
                         contribution_form: formData.contribution_form || null,
                         specific_support: formData.specific_support || null,
@@ -418,11 +471,7 @@ export default function DaftarProposalPage() {
 
                 if (insertError) throw insertError
 
-                // Generate PDF
-                await generateProposalPDF(newProp.id, formData.lang)
-                if (formData.contribution_form) {
-                    await generateCommitmentPDF(newProp.id, formData.lang)
-                }
+
                 toast.success(`Proposal ${number} berhasil dibuat!`)
             }
 
@@ -478,8 +527,7 @@ export default function DaftarProposalPage() {
 
             if (error) throw error
 
-            await generateTokenPDF(selectedProposal.id, formData.lang)
-            toast.success('Pembayaran terverifikasi & token dibuat!')
+            toast.success('Pembayaran berhasil diverifikasi!')
             setIsOpen(false)
             fetchProposals()
         } catch (error: any) {
@@ -745,36 +793,34 @@ export default function DaftarProposalPage() {
                             </div>
 
                             {/* Document Actions Row */}
-                            {formData.id && (selectedProposal?.proposal_pdf_url || selectedProposal?.commitment_pdf_url || selectedProposal?.token_pdf_url) && (
+                            {formData.id && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#D4AF37]/10">
-                                    {selectedProposal?.proposal_pdf_url && (
-                                        <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-[#D4AF37]/20">
-                                            <div className="flex items-center gap-2 text-xs font-semibold text-[#D4AF37]">
-                                                <FileText className="h-4 w-4" />
-                                                Proposal
-                                            </div>
-                                            <div className="flex gap-1">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => window.open(selectedProposal.proposal_pdf_url, '_blank')}
-                                                    className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
-                                                >
-                                                    Unduh
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={sendProposalViaWA}
-                                                    className="border-[#D4AF37]/50 text-[#022c22] bg-[#D4AF37] hover:bg-[#D4AF37]/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
-                                                >
-                                                    <MessageCircle className="h-3 w-3 mr-1" /> WA
-                                                </Button>
-                                            </div>
+                                    <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-[#D4AF37]/20">
+                                        <div className="flex items-center gap-2 text-xs font-semibold text-[#D4AF37]">
+                                            <FileText className="h-4 w-4" />
+                                            Proposal
                                         </div>
-                                    )}
+                                        <div className="flex gap-1">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleDownloadProposal}
+                                                className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
+                                            >
+                                                Unduh
+                                            </Button>
+                                            <Button
+                                                variant="default"
+                                                size="sm"
+                                                onClick={sendProposalViaWA}
+                                                className="border-[#D4AF37]/50 text-[#022c22] bg-[#D4AF37] hover:bg-[#D4AF37]/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
+                                            >
+                                                <MessageCircle className="h-3 w-3 mr-1" /> WA
+                                            </Button>
+                                        </div>
+                                    </div>
 
-                                    {selectedProposal?.commitment_pdf_url && (
+                                    {(formData.contribution_form || (formData.contribution_value && Number(formData.contribution_value) > 0)) && (
                                         <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-blue-500/20">
                                             <div className="flex items-center gap-2 text-xs font-semibold text-blue-400">
                                                 <FileText className="h-4 w-4" />
@@ -784,13 +830,13 @@ export default function DaftarProposalPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => window.open(selectedProposal.commitment_pdf_url, '_blank')}
+                                                    onClick={handleDownloadCommitment}
                                                     className="border-blue-400/50 text-blue-400 hover:bg-blue-400 hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
                                                 >
                                                     Unduh
                                                 </Button>
                                                 <Button
-                                                    variant="outline"
+                                                    variant="default"
                                                     size="sm"
                                                     onClick={sendCommitmentViaWA}
                                                     className="border-blue-400/50 text-[#022c22] bg-blue-400 hover:bg-blue-400/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
@@ -801,7 +847,7 @@ export default function DaftarProposalPage() {
                                         </div>
                                     )}
                                     
-                                    {selectedProposal?.token_pdf_url && (
+                                    {formData.payment_status === 'confirmed' && (
                                         <div className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-emerald-500/20">
                                             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
                                                 <FileText className="h-4 w-4" />
@@ -811,13 +857,13 @@ export default function DaftarProposalPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => window.open(selectedProposal.token_pdf_url, '_blank')}
+                                                    onClick={handleDownloadToken}
                                                     className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500 hover:text-[#022c22] h-7 px-2 text-xs rounded-l-full rounded-r-none"
                                                 >
                                                     Unduh
                                                 </Button>
                                                 <Button
-                                                    variant="outline"
+                                                    variant="default"
                                                     size="sm"
                                                     onClick={sendTokenViaWA}
                                                     className="border-emerald-500/50 text-[#022c22] bg-emerald-500 hover:bg-emerald-500/80 h-7 px-2 text-xs rounded-r-full rounded-l-none"
@@ -966,16 +1012,19 @@ export default function DaftarProposalPage() {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <Label className="text-xs text-[#D4AF37]">Nama Lengkap / Instansi</Label>
+                                        <Label className="text-xs text-[#D4AF37]">
+                                            {formData.type === 'donatur' ? 'Nama Lengkap Donatur' : 'Nama Sponsor / Perusahaan / Lembaga'}
+                                        </Label>
                                         <Input
                                             name="name"
                                             value={formData.name}
                                             onChange={handleInputChange}
                                             disabled={!isEditMode}
+                                            placeholder={formData.type === 'donatur' ? 'Cth: Bpk Budi Santoso' : 'Cth: PT Bank Mandiri'}
                                             className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
                                         />
                                     </div>
-                                    {formData.type === 'donatur' && (
+                                    {formData.type === 'donatur' ? (
                                         <>
                                             <div>
                                                 <Label className="text-xs text-[#D4AF37]">Nama untuk Buku Acara</Label>
@@ -994,7 +1043,32 @@ export default function DaftarProposalPage() {
                                                     value={formData.company_name}
                                                     onChange={handleInputChange}
                                                     disabled={!isEditMode}
-                                                    placeholder="Contoh: Keluarga Rondonuwu, PT Aman Berkat"
+                                                    placeholder="Contoh: Keluarga Bpk. Santoso, PT Aman Berkat"
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div>
+                                                <Label className="text-xs text-[#D4AF37]">Nama Penanggung Jawab (PIC)</Label>
+                                                <Input
+                                                    name="pic_name"
+                                                    value={formData.pic_name || ''}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditMode}
+                                                    placeholder="Cth: Ibu Rina Wijaya"
+                                                    className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <Label className="text-xs text-[#D4AF37]">Jabatan PIC</Label>
+                                                <Input
+                                                    name="pic_position"
+                                                    value={formData.pic_position || ''}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditMode}
+                                                    placeholder="Cth: Manager CSR / Humas"
                                                     className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
                                                 />
                                             </div>
@@ -1021,17 +1095,19 @@ export default function DaftarProposalPage() {
                                             className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
                                         />
                                     </div>
-                                    <div className="md:col-span-2">
-                                        <Label className="text-xs text-[#D4AF37]">Asal Jemaat / Wilayah</Label>
-                                        <Input
-                                            name="congregation"
-                                            value={formData.congregation}
-                                            onChange={handleInputChange}
-                                            disabled={!isEditMode}
-                                            placeholder="GPIB Jemaat / Wilayah (Opsional)"
-                                            className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
-                                        />
-                                    </div>
+                                    {formData.type === 'donatur' && (
+                                        <div className="md:col-span-2">
+                                            <Label className="text-xs text-[#D4AF37]">Asal Jemaat / Wilayah</Label>
+                                            <Input
+                                                name="congregation"
+                                                value={formData.congregation}
+                                                onChange={handleInputChange}
+                                                disabled={!isEditMode}
+                                                placeholder="GPIB Jemaat / Wilayah (Opsional)"
+                                                className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

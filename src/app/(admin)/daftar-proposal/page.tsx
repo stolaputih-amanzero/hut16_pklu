@@ -554,6 +554,13 @@ export default function DaftarProposalPage() {
         }
     }
 
+    const activeRequests = proposals.filter(p => 
+        p.specific_support === 'request' && 
+        p.payment_status === 'pending' && 
+        !p.contribution_value && 
+        !p.contribution_form
+    )
+
     const filteredProposals = proposals.filter(p => {
         const matchesSearch = p.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
             p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -561,7 +568,11 @@ export default function DaftarProposalPage() {
 
         if (!matchesSearch) return false
 
-        if (statusFilter === 'all') return true
+        // If displaying all, exclude unresolved active requests from the main history list (they are shown in their own section at the top)
+        if (statusFilter === 'all') {
+            const isPendingRequest = p.specific_support === 'request' && p.payment_status === 'pending' && !p.contribution_value && !p.contribution_form
+            return !isPendingRequest
+        }
 
         const isLunas = p.payment_status === 'confirmed'
         const isBatal = p.payment_status === 'cancelled'
@@ -614,6 +625,114 @@ export default function DaftarProposalPage() {
                     </Link>
                 </div>
             </div>
+
+            {statusFilter === 'all' && activeRequests.length > 0 && (
+                <Card className="border border-red-500/40 bg-red-500/5 shadow-[0_0_25px_rgba(239,68,68,0.15)] overflow-hidden">
+                    <CardHeader className="pb-3 flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle className="text-red-400 font-playfair tracking-wide flex items-center gap-2 text-lg font-bold">
+                                <span className="relative flex h-2.5 w-2.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                </span>
+                                Permintaan Dukungan Baru ({activeRequests.length})
+                            </CardTitle>
+                            <CardDescription className="text-white/60 text-xs mt-1">
+                                Calon donatur/sponsor baru mendaftar secara mandiri lewat Beranda. Segera hubungi untuk konfirmasi.
+                            </CardDescription>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">
+                            Butuh Follow Up
+                        </span>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-red-400 uppercase bg-red-500/10 border-y border-red-500/20">
+                                    <tr>
+                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">No. Proposal</th>
+                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">Tanggal</th>
+                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">Nama Calon Donatur / Sponsor</th>
+                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">Tipe</th>
+                                        <th className="px-4 py-3.5 font-montserrat tracking-wider text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-red-500/10 bg-black/20">
+                                    {activeRequests.map((p) => (
+                                        <tr 
+                                            key={p.id}
+                                            className="hover:bg-red-500/5 transition-colors"
+                                        >
+                                            <td className="px-4 py-3 font-mono text-white/90 font-medium whitespace-nowrap">
+                                                {p.number}
+                                            </td>
+                                            <td className="px-4 py-3 text-white/60 whitespace-nowrap text-xs">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="h-3.5 w-3.5" />
+                                                    {formatDate(p.proposal_date || p.created_at)}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="font-semibold text-white">{p.name}</div>
+                                                <div className="text-xs text-red-400/80 font-mono mt-0.5">{p.phone}</div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                                    {p.type === 'donatur' ? 'Donatur' : 'Sponsorship'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-right whitespace-nowrap">
+                                                <Button 
+                                                    size="sm"
+                                                    onClick={() => handleOpenView(p)}
+                                                    className="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-4 py-1.5 rounded-full transition-all h-8 cursor-pointer shadow-md"
+                                                >
+                                                    Follow Up
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="block md:hidden space-y-3">
+                            {activeRequests.map((p) => (
+                                <div 
+                                    key={p.id}
+                                    className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl space-y-3 shadow-md"
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-mono text-xs font-bold text-white/80">{p.number}</span>
+                                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                            {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-white text-sm">{p.name}</div>
+                                        <div className="text-xs text-red-400/80 font-mono mt-0.5">{p.phone}</div>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2 border-t border-red-500/10">
+                                        <span className="text-white/50 text-[10px] flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            {formatDate(p.proposal_date || p.created_at)}
+                                        </span>
+                                        <Button 
+                                            size="sm"
+                                            onClick={() => handleOpenView(p)}
+                                            className="bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] px-3.5 py-1 h-7 rounded-full transition-all cursor-pointer shadow-md"
+                                        >
+                                            Follow Up
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">
                 <CardHeader>

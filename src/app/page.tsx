@@ -66,7 +66,8 @@ export default function Home() {
             phone: modalForm.phone,
             payment_status: 'pending',
             committee_id: committeeId,
-            proposal_date: new Date().toISOString().split('T')[0]
+            proposal_date: new Date().toISOString().split('T')[0],
+            specific_support: 'request'
           })
 
         if (!error) {

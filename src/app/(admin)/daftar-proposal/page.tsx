@@ -565,9 +565,11 @@ export default function DaftarProposalPage() {
 
         const isLunas = p.payment_status === 'confirmed'
         const isBatal = p.payment_status === 'cancelled'
-        const isKomitmen = p.payment_status === 'pending' && (p.contribution_value > 0 || p.contribution_form)
-        const isTerkirim = p.payment_status === 'pending' && !p.contribution_value && !p.contribution_form
+        const isRequest = p.specific_support === 'request'
+        const isKomitmen = p.payment_status === 'pending' && !isRequest && (p.contribution_value > 0 || p.contribution_form)
+        const isTerkirim = p.payment_status === 'pending' && !isRequest && !p.contribution_value && !p.contribution_form
 
+        if (statusFilter === 'request') return isRequest
         if (statusFilter === 'terkirim') return isTerkirim
         if (statusFilter === 'komitmen') return isKomitmen
         if (statusFilter === 'lunas') return isLunas
@@ -633,6 +635,7 @@ export default function DaftarProposalPage() {
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
                                     <SelectItem value="all">Semua Status</SelectItem>
+                                    <SelectItem value="request">Request (Calon Donatur/Sponsor)</SelectItem>
                                     <SelectItem value="terkirim">Terkirim (Belum Follow Up)</SelectItem>
                                     <SelectItem value="komitmen">Komitmen Dicatat</SelectItem>
                                     <SelectItem value="lunas">Lunas</SelectItem>
@@ -713,6 +716,10 @@ export default function DaftarProposalPage() {
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                                             Batal
                                                         </span>
+                                                    ) : p.specific_support === 'request' ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                            Request
+                                                        </span>
                                                     ) : (p.contribution_value > 0 || p.contribution_form) ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
                                                             Komitmen Dicatat
@@ -770,6 +777,10 @@ export default function DaftarProposalPage() {
                                                  ) : p.payment_status === 'cancelled' ? (
                                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                                          Batal
+                                                     </span>
+                                                 ) : p.specific_support === 'request' ? (
+                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                         Request
                                                      </span>
                                                  ) : (p.contribution_value > 0 || p.contribution_form) ? (
                                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">

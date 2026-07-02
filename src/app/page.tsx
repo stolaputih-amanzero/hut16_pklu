@@ -246,14 +246,14 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-5xl mb-24"
+          className="w-full max-w-4xl mb-16"
         >
-          <div className="text-center mb-12">
-            <h2 className={`text-4xl md:text-5xl text-[#D4AF37] ${playfair.className}`}>Maksud & Tujuan</h2>
-            <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <div className="text-center mb-8">
+            <h2 className={`text-3xl md:text-4xl text-[#D4AF37] ${playfair.className}`}>Maksud & Tujuan</h2>
+            <div className="w-16 h-0.5 bg-[#D4AF37]/50 mx-auto mt-4 rounded-full" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               "Mendukung terselenggaranya ibadah syukur dan perayaan HUT ke-16 Pelkat PKLU GPIB.",
               "Mempererat kebersamaan Pelkat PKLU GPIB dari berbagai jemaat di Indonesia.",
@@ -262,11 +262,11 @@ export default function Home() {
               "Mengapresiasi karya, talenta, pengalaman, dan kesaksian kaum lansia.",
               "Menguatkan semangat lansia teladan dalam iman, karya, dan pelayanan."
             ].map((tujuan, index) => (
-              <div key={index} className="bg-[#022c22]/40 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-6 hover:bg-[#D4AF37]/10 transition-colors group shadow-lg">
-                <div className="w-10 h-10 rounded-full bg-[#022c22] border border-[#D4AF37]/30 flex items-center justify-center mb-4 text-[#D4AF37] font-semibold">
+              <div key={index} className="flex gap-4 items-center bg-[#022c22]/40 backdrop-blur-sm border border-[#D4AF37]/25 rounded-xl p-4 hover:bg-[#D4AF37]/10 transition-all duration-300 group shadow-lg">
+                <div className="w-8 h-8 rounded-full bg-[#022c22] border border-[#D4AF37]/35 flex items-center justify-center text-[#D4AF37] text-xs font-bold flex-shrink-0 group-hover:border-[#D4AF37] transition-all">
                   {index + 1}
                 </div>
-                <p className="text-[#FDFBF7]/90 leading-relaxed font-light group-hover:text-[#FDFBF7] transition-colors">
+                <p className="text-[#FDFBF7]/90 text-sm leading-relaxed font-light group-hover:text-[#FDFBF7] transition-colors">
                   {tujuan}
                 </p>
               </div>

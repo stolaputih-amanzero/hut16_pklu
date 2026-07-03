@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
         // 4. Compute Trend Data (Cumulative or per month)
         // Group confirmed proposals by month
         const confirmedProposals = (allProposals || []).filter(p => p.payment_status === 'confirmed').reverse() // ascending order
-        const trendMap = {}
+        const trendMap: Record<string, number> = {}
         confirmedProposals.forEach(p => {
             const date = new Date(p.created_at || new Date())
             const monthYear = date.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' })

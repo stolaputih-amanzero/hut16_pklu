@@ -340,7 +340,7 @@ export default function Home() {
         >
           <div className="text-center mb-10">
             <h2 className={`text-4xl text-[#D4AF37] ${playfair.className}`}>Tuan Rumah Kegiatan</h2>
-            <p className="text-sm text-[#FDFBF7]/70 mt-2 font-light">Badan Pelaksana Musyawarah Pelayanan (Mupel) GPIB Bekasi</p>
+            <p className="text-sm text-[#FDFBF7]/70 mt-2 font-light">Musyawarah Pelayanan (Mupel) GPIB Bekasi</p>
             <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
           </div>
 

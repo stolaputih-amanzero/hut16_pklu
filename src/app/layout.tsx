@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "HUT ke-16 Pelkat PKLU GPIB",
   description: "Teruskan Baktimu! Lansia Teladan dalam Iman, Karya, dan Pelayanan.",
+  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/icon_apps.png", sizes: "192x192", type: "image/png" },

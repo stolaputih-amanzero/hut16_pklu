@@ -1,4 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join('src', 'app', 'api', 'generate-lpj', 'route.ts');
+
+const newContent = `import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import React from 'react'
 import fs from 'fs'
@@ -103,36 +108,13 @@ export async function GET(req: NextRequest) {
             .reduce((sum, p) => sum + ((p.payment_status === 'confirmed' ? Number(p.contribution_value) : 0) || 0), 0)
         const totalDana = totalDanaDonatur + totalDanaSponsor
 
-        // 4. Compute Trend Data (Cumulative or per month)
-        // Group confirmed proposals by month
-        const confirmedProposals = (allProposals || []).filter(p => p.payment_status === 'confirmed').reverse() // ascending order
-        const trendMap = {}
-        confirmedProposals.forEach(p => {
-            const date = new Date(p.created_at || new Date())
-            const monthYear = date.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' })
-            if (!trendMap[monthYear]) trendMap[monthYear] = 0
-            trendMap[monthYear] += (Number(p.contribution_value) || 0)
-        })
-        
-        const trendLabels = Object.keys(trendMap)
-        const trendValues = Object.values(trendMap)
-        
-        // Optional: Make it cumulative
-        // let currentSum = 0;
-        // const cumulativeValues = trendValues.map(v => { currentSum += v; return currentSum; })
-
-        const trendData = {
-            labels: trendLabels.length > 0 ? trendLabels : ['-'],
-            data: trendValues.length > 0 ? trendValues.map(v => Number((v / 1000000).toFixed(1))) : [0]
-        }
-
         const getBase64Logo = () => {
             try {
                 const fullPath = path.join(process.cwd(), 'public', 'logo_hut16_pklu.png')
                 const imageBuffer = fs.readFileSync(fullPath)
-                return `data:image/png;base64,${imageBuffer.toString('base64')}`
+                return \`data:image/png;base64,\${imageBuffer.toString('base64')}\`
             } catch (e) {
-                return `https://pklu.amanloka.com/logo_hut16_pklu.png`
+                return \`https://pklu.amanloka.com/logo_hut16_pklu.png\`
             }
         }
 
@@ -148,8 +130,7 @@ export async function GET(req: NextRequest) {
                 totalDana,
                 logoUrl,
                 origin: req.nextUrl.origin,
-                stats,
-                trendData
+                stats
             }) as any
         )
         
@@ -165,3 +146,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: err.message }, { status: 500 })
     }
 }
+`;
+
+fs.writeFileSync(filePath, newContent);
+console.log("Updated route.ts successfully.");

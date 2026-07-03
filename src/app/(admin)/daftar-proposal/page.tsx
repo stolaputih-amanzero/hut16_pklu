@@ -110,7 +110,11 @@ export default function DaftarProposalPage() {
     const handleDownloadLpj = async () => {
         const loadingToast = toast.loading('Sedang menyiapkan Laporan LPJ...')
         try {
-            const res = await fetch('/api/generate-lpj')
+            const queryParams = new URLSearchParams()
+            if (statusFilter !== 'all') queryParams.append('status', statusFilter)
+            if (searchQuery) queryParams.append('q', searchQuery)
+            
+            const res = await fetch(`/api/generate-lpj?${queryParams.toString()}`)
             if (!res.ok) throw new Error('Gagal mengunduh file')
             
             const blob = await res.blob()

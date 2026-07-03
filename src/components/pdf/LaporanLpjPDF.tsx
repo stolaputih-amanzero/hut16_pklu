@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Image, Link } from '@react-pdf/renderer'
 import { formatRupiah } from '@/lib/utils'
 
 const styles = StyleSheet.create({
@@ -51,13 +51,14 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontFamily: 'Helvetica-Bold',
-        fontSize: 10,
+        fontSize: 14,
         color: '#022c22',
-        borderBottom: '1pt solid #D4AF37',
-        paddingBottom: 4,
-        marginBottom: 8,
+        borderBottom: '2pt solid #D4AF37',
+        paddingBottom: 6,
+        marginBottom: 15,
         textTransform: 'uppercase',
         marginTop: 15,
+        textAlign: 'center',
     },
     summaryContainer: {
         flexDirection: 'row',
@@ -65,11 +66,14 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     summaryBox: {
-        border: '1pt solid #e5e7eb',
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: '#f9fafb',
-        width: '49%',
+        border: '1.5pt solid #e5e7eb',
+        borderRadius: 8,
+        padding: 25,
+        backgroundColor: '#f8fafc',
+        width: '48%',
+        height: 300,
+        justifyContent: 'space-between',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
     },
     summaryRow: {
         flexDirection: 'row',
@@ -77,13 +81,15 @@ const styles = StyleSheet.create({
     },
     summaryLabel: {
         width: '60%',
-        fontSize: 9,
+        fontSize: 11,
         color: '#4b5563',
+        marginBottom: 8,
     },
     summaryValue: {
         width: '40%',
-        fontSize: 9,
+        fontSize: 11,
         fontFamily: 'Helvetica-Bold',
+        marginBottom: 8,
     },
     summaryTotalRow: {
         flexDirection: 'row',
@@ -93,13 +99,13 @@ const styles = StyleSheet.create({
     },
     summaryTotalLabel: {
         width: '60%',
-        fontSize: 10,
+        fontSize: 12,
         fontFamily: 'Helvetica-Bold',
         color: '#022c22',
     },
     summaryTotalValue: {
         width: '40%',
-        fontSize: 10,
+        fontSize: 12,
         fontFamily: 'Helvetica-Bold',
         color: '#047857',
     },
@@ -200,35 +206,114 @@ const styles = StyleSheet.create({
 })
 
 interface Props {
-    proposals: any[]
+    donaturProposals: any[]
+    sponsorProposals: any[]
+    requestProposals: any[]
     totalDanaDonatur: number
     totalDanaSponsor: number
     totalDana: number
     logoUrl?: string
     origin?: string
+    trendData?: { labels: string[], data: number[] }
     stats?: {
-        donaturKeluar: number
-        donaturIsi: number
-        sponsorKeluar: number
-        sponsorIsi: number
+        donatur: {
+            diterbitkan: number
+            komitmen: number
+            lunas: number
+            requestTotal: number
+            requestFollowedUp: number
+        }
+        sponsor: {
+            diterbitkan: number
+            komitmen: number
+            lunas: number
+            requestTotal: number
+            requestFollowedUp: number
+        }
     }
 }
 
+
+const renderTable = (title: string, data: any[], showTotalDana: boolean, totalAmount: number = 0, origin: string = '') => (
+    <View style={{ marginBottom: 20 }} wrap={false}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.table}>
+            <View style={styles.tableHeaderRow}>
+                <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
+                <View style={styles.tableColNum}><Text style={styles.tableCellHeader}>No. Proposal</Text></View>
+                <View style={styles.tableColType}><Text style={styles.tableCellHeader}>Tipe</Text></View>
+                <View style={styles.tableColName}><Text style={styles.tableCellHeader}>Nama / Institusi</Text></View>
+                <View style={styles.tableColValue}><Text style={styles.tableCellHeader}>Nilai (Rp)</Text></View>
+                <View style={styles.tableColForm}><Text style={styles.tableCellHeader}>Bentuk Lainnya</Text></View>
+                <View style={styles.tableColSupport}><Text style={styles.tableCellHeader}>Dukungan Spesifik</Text></View>
+            </View>
+
+            {data.length === 0 ? (
+                <Text style={styles.emptyState}>Belum ada data untuk kategori ini.</Text>
+            ) : (
+                data.map((p: any, index: number) => (
+                    <View style={styles.tableRow} key={p.id || index}>
+                        <View style={styles.tableColNo}><Text style={styles.tableCell}>{index + 1}</Text></View>
+                        <View style={styles.tableColNum}>
+                            <Link src={`${origin}/daftar-proposal?q=${encodeURIComponent(p.number)}`} style={{ textDecoration: 'none' }}>
+                                <Text style={[styles.tableCellBold, { color: '#047857' }]}>{p.number}</Text>
+                            </Link>
+                        </View>
+                        <View style={styles.tableColType}><Text style={styles.tableCell}>{p.type === 'sponsorship' ? 'Sponsor' : 'Donatur'}</Text></View>
+                        <View style={styles.tableColName}>
+                            <Link src={`${origin}/daftar-proposal?q=${encodeURIComponent(p.name)}`} style={{ textDecoration: 'none' }}>
+                                <Text style={[styles.tableCellBold, { color: '#047857' }]}>{p.name}</Text>
+                            </Link>
+                            {p.company_name && <Text style={[styles.tableCell, { marginTop: 0 }]}>{p.company_name}</Text>}
+                        </View>
+                        <View style={styles.tableColValue}>
+                            <Text style={styles.tableCellRight}>
+                                {p.contribution_value ? p.contribution_value.toLocaleString('id-ID') : '-'}
+                            </Text>
+                        </View>
+                        <View style={styles.tableColForm}>
+                            <Text style={styles.tableCell}>
+                                {p.contribution_form && p.contribution_form !== 'dana' ? p.contribution_form : '-'}
+                            </Text>
+                        </View>
+                        <View style={styles.tableColSupport}>
+                            <Text style={styles.tableCell}>{p.specific_support || '-'}</Text>
+                        </View>
+                    </View>
+                ))
+            )}
+
+            {showTotalDana && data.length > 0 && (
+                <View style={styles.tableFooterRow}>
+                    <View style={styles.tableFooterLabelCol}>
+                        <Text style={styles.tableFooterLabel}>TOTAL KESELURUHAN DANA:</Text>
+                    </View>
+                    <View style={styles.tableFooterValueCol}>
+                        <Text style={styles.tableFooterValue}>{totalAmount.toLocaleString('id-ID')}</Text>
+                    </View>
+                    <View style={styles.tableFooterEmptyCol}></View>
+                </View>
+            )}
+        </View>
+    </View>
+)
+
 export function LaporanLpjPDF({ 
-    proposals, 
+    donaturProposals,
+    sponsorProposals,
+    requestProposals,
     totalDanaDonatur, 
     totalDanaSponsor, 
     totalDana, 
     logoUrl = "/logo_hut16_pklu.png", 
     origin = "https://pklu.amanloka.com",
+    trendData = { labels: [], data: [] },
     stats = {
-        donaturKeluar: 0,
-        donaturIsi: 0,
-        sponsorKeluar: 0,
-        sponsorIsi: 0
+        donatur: { diterbitkan: 0, komitmen: 0, lunas: 0, requestTotal: 0, requestFollowedUp: 0 },
+        sponsor: { diterbitkan: 0, komitmen: 0, lunas: 0, requestTotal: 0, requestFollowedUp: 0 }
     }
 }: Props) {
-    const qrImageUrl = `https://quickchart.io/qr?size=100&text=${encodeURIComponent(origin + '/laporan-lpj')}`
+    const qrImageUrl = `https://quickchart.io/qr?size=150&text=${encodeURIComponent('https://pklu.amanloka.com')}`
     const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
     return (
@@ -249,8 +334,9 @@ export function LaporanLpjPDF({
                 <Text style={styles.sectionTitle}>Ringkasan Laporan</Text>
                 <View style={styles.summaryContainer}>
                     {/* Funds Summary Box */}
+                    
                     <View style={styles.summaryBox}>
-                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 9 }]}>(A) Realisasi Penerimaan Dana</Text>
+                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 13 }]}>(A) Realisasi Penerimaan Dana</Text>
                         <View style={styles.summaryRow}>
                             <Text style={styles.summaryLabel}>Total Dana Donatur</Text>
                             <Text style={styles.summaryValue}>: {formatRupiah(totalDanaDonatur)}</Text>
@@ -263,86 +349,61 @@ export function LaporanLpjPDF({
                             <Text style={styles.summaryTotalLabel}>Total Keseluruhan Dana</Text>
                             <Text style={styles.summaryTotalValue}>: {formatRupiah(totalDana)}</Text>
                         </View>
-                    </View>
-
-                    {/* Proposal Stats Summary Box */}
-                    <View style={styles.summaryBox}>
-                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 9 }]}>(B) Status Distribusi Proposal</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Proposal Donatur (Keluar / Lunas)</Text>
-                            <Text style={styles.summaryValue}>: {stats.donaturKeluar} / {stats.donaturIsi}</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Proposal Sponsor (Keluar / Lunas)</Text>
-                            <Text style={styles.summaryValue}>: {stats.sponsorKeluar} / {stats.sponsorIsi}</Text>
+                        <View style={[styles.summaryRow, { marginTop: 4 }]}>
+                            <Text style={styles.summaryLabel}>Target Penerimaan</Text>
+                            <Text style={styles.summaryValue}>: Rp 537.785.000</Text>
                         </View>
                         <View style={styles.summaryTotalRow}>
-                            <Text style={styles.summaryTotalLabel}>Total Proposal (Keluar / Lunas)</Text>
-                            <Text style={styles.summaryTotalValue}>: {stats.donaturKeluar + stats.sponsorKeluar} / {stats.donaturIsi + stats.sponsorIsi}</Text>
+                            <Text style={styles.summaryTotalLabel}>Persentase Capaian</Text>
+                            <Text style={styles.summaryTotalValue}>: {((totalDana / 537785000) * 100).toFixed(1)}%</Text>
+                        </View>
+                        
+                        {/* QuickChart Image for Progress */}
+                        <Image 
+                            src={`https://quickchart.io/chart?w=350&h=80&c=${encodeURIComponent(`{type:'progressBar',data:{datasets:[{data:[${Math.min(100, Math.round((totalDana/537785000)*100))}],backgroundColor:'#047857'}]}}`)}`} 
+                            style={{ width: '100%', height: 50, marginTop: 10, objectFit: 'contain' }}
+                        />
+
+
+                    </View>
+
+                    <View style={styles.summaryBox}>
+                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 13 }]}>(B) Status Distribusi Proposal</Text>
+                        
+                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Total Proposal Keseluruhan:</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>- Donatur / Sponsor / Request</Text>
+                            <Text style={styles.summaryValue}>: {donaturProposals.length} / {sponsorProposals.length} / {requestProposals.length}</Text>
+                        </View>
+
+                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Rincian Donatur:</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>- Diterbitkan / Komitmen / Lunas</Text>
+                            <Text style={styles.summaryValue}>: {stats.donatur.diterbitkan} / {stats.donatur.komitmen} / {stats.donatur.lunas}</Text>
+                        </View>
+                        
+                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Rincian Sponsorship:</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>- Diterbitkan / Komitmen / Lunas</Text>
+                            <Text style={styles.summaryValue}>: {stats.sponsor.diterbitkan} / {stats.sponsor.komitmen} / {stats.sponsor.lunas}</Text>
+                        </View>
+
+                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Rincian Request (Follow Up / Total):</Text>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>- Keseluruhan Request</Text>
+                            <Text style={styles.summaryValue}>: {stats.donatur.requestFollowedUp + stats.sponsor.requestFollowedUp} / {stats.donatur.requestTotal + stats.sponsor.requestTotal}</Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Details */}
-                <Text style={styles.sectionTitle}>Rincian Penerimaan Terkonfirmasi</Text>
-                <View style={styles.table}>
-                    <View style={styles.tableHeaderRow}>
-                        <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
-                        <View style={styles.tableColNum}><Text style={styles.tableCellHeader}>No. Proposal</Text></View>
-                        <View style={styles.tableColType}><Text style={styles.tableCellHeader}>Tipe</Text></View>
-                        <View style={styles.tableColName}><Text style={styles.tableCellHeader}>Nama / Institusi</Text></View>
-                        <View style={styles.tableColValue}><Text style={styles.tableCellHeader}>Nilai (Rp)</Text></View>
-                        <View style={styles.tableColForm}><Text style={styles.tableCellHeader}>Bentuk Lainnya</Text></View>
-                        <View style={styles.tableColSupport}><Text style={styles.tableCellHeader}>Dukungan Spesifik</Text></View>
-                    </View>
-
-                    {proposals.length === 0 ? (
-                        <Text style={styles.emptyState}>Belum ada perolehan yang terkonfirmasi lunas.</Text>
-                    ) : (
-                        proposals.map((p, index) => (
-                            <View style={styles.tableRow} key={p.id}>
-                                <View style={styles.tableColNo}>
-                                    <Text style={styles.tableCell}>{index + 1}</Text>
-                                </View>
-                                <View style={styles.tableColNum}>
-                                    <Text style={styles.tableCellBold}>{p.number}</Text>
-                                </View>
-                                <View style={styles.tableColType}>
-                                    <Text style={styles.tableCell}>{p.type === 'sponsorship' ? 'Sponsor' : 'Donatur'}</Text>
-                                </View>
-                                <View style={styles.tableColName}>
-                                    <Text style={styles.tableCellBold}>{p.name}</Text>
-                                    {p.company_name && <Text style={[styles.tableCell, { marginTop: 0 }]}>{p.company_name}</Text>}
-                                </View>
-                                <View style={styles.tableColValue}>
-                                    <Text style={styles.tableCellRight}>
-                                        {p.contribution_value ? p.contribution_value.toLocaleString('id-ID') : '-'}
-                                    </Text>
-                                </View>
-                                <View style={styles.tableColForm}>
-                                    <Text style={styles.tableCell}>
-                                        {p.contribution_form && p.contribution_form !== 'dana' ? p.contribution_form : '-'}
-                                    </Text>
-                                </View>
-                                <View style={styles.tableColSupport}>
-                                    <Text style={styles.tableCell}>{p.specific_support || '-'}</Text>
-                                </View>
-                            </View>
-                        ))
-                    )}
-
-                    {proposals.length > 0 && (
-                        <View style={styles.tableFooterRow}>
-                            <View style={styles.tableFooterLabelCol}>
-                                <Text style={styles.tableFooterLabel}>TOTAL KESELURUHAN DANA:</Text>
-                            </View>
-                            <View style={styles.tableFooterValueCol}>
-                                <Text style={styles.tableFooterValue}>{totalDana.toLocaleString('id-ID')}</Text>
-                            </View>
-                            <View style={styles.tableFooterEmptyCol}></View>
-                        </View>
-                    )}
+                
+                {/* Page Break for Details Section */}
+                <View break>
+                    {renderTable('Daftar Proposal Donatur', donaturProposals, true, totalDanaDonatur, origin)}
+                    {renderTable('Daftar Proposal Sponsorship', sponsorProposals, true, totalDanaSponsor, origin)}
+                    {renderTable('Daftar Proposal Request / Calon Dukungan', requestProposals, false, 0, origin)}
                 </View>
+
 
                 {/* Footer Signatures */}
                 <View style={styles.footer} wrap={false}>

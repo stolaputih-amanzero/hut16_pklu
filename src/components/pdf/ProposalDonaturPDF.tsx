@@ -420,7 +420,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
             return isId ? '12 Oktober 2026' : 'October 12, 2026'
         }
     }
-    
+
     const verifyUrl = `${VERIFY_BASE_URL}${data.number || '0000-0000'}`
     const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=140&margin=1&dark=022c22`
 
@@ -493,7 +493,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     <Text style={styles.coverThemeSub}>
                         {isId ? 'Bertumbuh Dalam Keselamatan (1 Petrus 2: 2)\nLansia Teladan dalam Iman, Karya, dan Pelayanan' : 'Growing in Salvation (1 Peter 2:2)\nElderly Role Models in Faith, Work, and Service'}
                     </Text>
-                    
+
                     <View style={[styles.coverDetails, { marginBottom: 15 }]}>
                         <Text style={styles.coverDetailText}>{isId ? 'Senin, 12 Oktober 2026' : 'Monday, October 12, 2026'}</Text>
                         <Text style={styles.coverDetailText}>Bekasi Convention Center</Text>
@@ -501,13 +501,13 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                         <Text style={styles.coverDetailText}>Kota Bekasi, Jawa Barat</Text>
                     </View>
 
-                    <View style={{ 
-                        border: '1pt solid #D4AF37', 
-                        padding: '12 24', 
-                        marginTop: 10, 
-                        marginBottom: 15, 
-                        alignItems: 'center', 
-                        borderRadius: 4, 
+                    <View style={{
+                        border: '1pt solid #D4AF37',
+                        padding: '12 24',
+                        marginTop: 10,
+                        marginBottom: 15,
+                        alignItems: 'center',
+                        borderRadius: 4,
                         backgroundColor: 'rgba(212, 175, 55, 0.04)',
                         minWidth: 260
                     }}>
@@ -539,7 +539,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                             </Text>
                         )}
                         <Text style={[styles.coverDetailText, { color: '#A0AEC0', fontSize: 7, textAlign: 'center', letterSpacing: 0.5 }]}>
-                            {isId 
+                            {isId
                                 ? formatDateLong(data.proposal_date || data.created_at, true)
                                 : formatDateLong(data.proposal_date || data.created_at, false)}
                         </Text>
@@ -550,11 +550,11 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
             <Page size="A4" style={styles.page} wrap>
                 <Header />
                 <Footer />
-                
+
                 {/* I. PENDAHULUAN */}
                 <View style={{ marginBottom: 20 }}>
                     <Text style={styles.sectionTitle}>{isId ? 'I. Pendahuluan' : 'I. Introduction'}</Text>
-                    
+
                     <View style={styles.quoteContainer}>
                         <Text style={styles.quoteText}>
                             {isId ? '“Hiasan orang muda ialah kekuatannya, dan keindahan orang tua ialah uban.”' : '“The glory of young men is their strength, gray hair the splendor of the old.”'}
@@ -597,7 +597,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <View break style={{ marginBottom: 15, marginTop: 0 }}>
                     <Text style={styles.sectionTitle}>{isId ? 'II. Maksud dan Tujuan' : 'II. Purpose and Objectives'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Proposal ini disusun sebagai permohonan dukungan dana dari pribadi, keluarga, dan sahabat pelayanan untuk mendukung terselenggaranya Perayaan dan Ibadah HUT ke-16 Pelkat PKLU GPIB.' : 'This proposal is prepared as a request for financial support to organize the 16th Anniversary Celebration of PKLU GPIB.'}</Text>
-                    
+
                     <View style={styles.listItem}>
                         <Text style={styles.listBullet}>1.</Text>
                         <Text style={styles.listText}>{isId ? 'Mendukung terselenggaranya ibadah syukur dan perayaan HUT ke-16 Pelkat PKLU GPIB.' : 'Supporting the thanksgiving worship and 16th PKLU GPIB Anniversary celebration.'}</Text>
@@ -627,7 +627,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 {/* III. RINGKASAN & WAKTU KEGIATAN GROUPED WITH WRAP=FALSE */}
                 <View wrap={false} style={{ marginTop: 10 }}>
                     <Text style={styles.sectionTitle}>{isId ? 'III. Ringkasan Kegiatan' : 'III. Event Summary'}</Text>
-                    
+
                     <View style={styles.editorialTable}>
                         <View style={styles.edTableRow}>
                             <Text style={styles.edTableCellLabel}>{isId ? 'NAMA KEGIATAN' : 'EVENT NAME'}</Text>
@@ -661,7 +661,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
 
                     <Text style={[styles.sectionTitle, { fontSize: 12, marginTop: 10, marginBottom: 10 }]}>{isId ? 'Waktu / Periode Kegiatan' : 'Event Schedule'}</Text>
-                    
+
                     <View style={styles.editorialTable}>
                         <View style={styles.edTableHeader}>
                             <Text style={[styles.edTableHeadText, { width: '25%' }]}>{isId ? 'WAKTU/PERIODE' : 'TIME/PERIOD'}</Text>
@@ -705,9 +705,9 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <View break wrap={false}>
                     <Text style={styles.sectionTitle}>{isId ? 'IV. Anggaran Kegiatan' : 'IV. Budget Plan'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Adapun anggaran yang dibutuhkan dalam pelaksanaan kegiatan Perayaan HUT Pelkat PKLU yang ke-16 adalah sebagai berikut:' : 'The budget required for the implementation of the 16th PKLU Anniversary is as follows:'}</Text>
-                    
+
                     <Text style={[styles.sectionTitle, { fontSize: 11, textAlign: 'center', marginTop: 10, marginBottom: 5 }]}>{isId ? 'RENCANA ANGGARAN PENERIMAAN DAN PENGELUARAN\nPANITIA HUT KE 16 PELKAT PKLU GPIB 2026' : 'BUDGET PLAN FOR REVENUE AND EXPENDITURE\n16TH PKLU GPIB ANNIVERSARY COMMITTEE 2026'}</Text>
-                    
+
                     <Text style={[styles.sectionTitle, { fontSize: 10, marginBottom: 5, color: '#D4AF37' }]}>{isId ? 'PENERIMAAN' : 'REVENUE'}</Text>
                     <View style={styles.editorialTable}>
                         <View style={styles.edTableHeader}>
@@ -814,7 +814,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <View wrap={false}>
                     <Text style={styles.sectionTitle}>{isId ? 'V. Bentuk Dukungan Donatur' : 'V. Donor Support Forms'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Panitia membuka kesempatan dukungan dari pribadi, keluarga, persekutuan kecil, dan sahabat pelayanan dalam bentuk dana, hadiah lomba, konsumsi, souvenir, perlengkapan acara, dukungan bagi peserta lansia, atau bentuk dukungan lain sesuai kerinduan dan kemampuan donatur.' : 'The Committee opens support opportunities from individuals, families, and service friends in various forms according to their desire and capability.'}</Text>
-                    
+
                     <View style={styles.editorialTable}>
                         <View style={styles.edTableHeader}>
                             <Text style={[styles.edTableHeadText, { width: '25%' }]}>{isId ? 'KATEGORI' : 'CATEGORY'}</Text>
@@ -858,7 +858,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <View wrap={false}>
                     <Text style={styles.sectionTitle}>{isId ? 'VI. Ide Apresiasi yang Hangat untuk Donatur' : 'VI. Warm Appreciation Ideas'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Karena dukungan ini bersifat personal dan kekeluargaan, bentuk apresiasi tidak diarahkan sebagai iklan komersial, melainkan sebagai ucapan syukur, penghargaan, dan tanda kasih dari Panitia.' : 'Because this support is personal, appreciation is not directed as commercial advertising, but as gratitude from the Committee.'}</Text>
-                    
+
                     <View style={styles.editorialTable}>
                         <View style={styles.edTableRow}>
                             <Text style={[styles.edTableCellLabel, { width: '30%' }]}>{isId ? 'Buku Acara Elektronik' : 'E-Booklet'}</Text>
@@ -933,7 +933,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     <View style={styles.listItem}><Text style={styles.listBullet}>4.</Text><Text style={styles.listText}>{isId ? 'Menghormati donatur yang ingin memberikan dukungan secara anonim.' : 'Respecting anonymous donors.'}</Text></View>
                     <View style={styles.listItem}><Text style={styles.listBullet}>5.</Text><Text style={styles.listText}>{isId ? 'Menjaga suasana syukur, kasih, dan kekeluargaan.' : 'Maintaining a family atmosphere.'}</Text></View>
                     <View style={styles.listItem}><Text style={styles.listBullet}>6.</Text><Text style={styles.listText}>{isId ? 'Laporan penerimaan dan penggunaan dana dikelola oleh Panitia sesuai kebutuhan internal kepanitiaan.' : 'Fund reports are managed internally by the Committee.'}</Text></View>
-                    
+
                     <View style={{
                         border: '0.5pt solid #022c22',
                         borderRadius: 4,
@@ -957,14 +957,14 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                     <View style={[styles.quoteContainer, { backgroundColor: '#FDFBF7', borderLeft: '4pt solid #022c22' }]}>
                         <Text style={[styles.bodyText, { fontStyle: 'italic', marginBottom: 15 }]}>{isId ? 'Dengan penuh syukur, Panitia HUT ke-16 Pelkat PKLU GPIB mengucapkan terima kasih kepada:' : 'With full gratitude, the 16th Anniversary Committee thanks:'}</Text>
-                        
+
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                             <View style={{ width: '48%', border: '0.5pt solid rgba(2, 44, 34, 0.15)', padding: 8, borderRadius: 4, backgroundColor: 'rgba(2, 44, 34, 0.01)', marginBottom: 8 }}>
                                 <Text style={{ fontFamily: 'Helvetica', fontSize: 8.0, fontWeight: 'bold', color: '#D4AF37', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 4 }}>Sahabat Kasih</Text>
                                 <Text style={[styles.bodyText, { fontSize: 8.0, marginBottom: 2 }]}>1. Keluarga........................................</Text>
                                 <Text style={[styles.bodyText, { fontSize: 8.0, marginBottom: 0 }]}>2. Bapak/Ibu.......................................</Text>
                             </View>
-                            
+
                             <View style={{ width: '48%', border: '0.5pt solid rgba(2, 44, 34, 0.15)', padding: 8, borderRadius: 4, backgroundColor: 'rgba(2, 44, 34, 0.01)', marginBottom: 8 }}>
                                 <Text style={{ fontFamily: 'Helvetica', fontSize: 8.0, fontWeight: 'bold', color: '#D4AF37', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 4 }}>Sahabat Berkat</Text>
                                 <Text style={[styles.bodyText, { fontSize: 8.0, marginBottom: 2 }]}>1. Keluarga........................................</Text>
@@ -982,14 +982,14 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                                 <Text style={[styles.bodyText, { fontSize: 8.0, marginBottom: 0, lineHeight: 1.2 }]}>Keluarga yang Mengasihi Pelayanan Lansia</Text>
                             </View>
                         </View>
-                        
+
                         <Text style={[styles.bodyText, { fontStyle: 'italic', marginTop: 15, marginBottom: 0 }]}>{isId ? 'Kiranya Tuhan memberkati setiap dukungan, doa, dan kasih yang telah diberikan bagi pelayanan Pelkat PKLU GPIB.' : 'May God bless every support, prayer, and love given.'}</Text>
                     </View>
                 </View>
 
                 <View wrap={false} style={{ marginTop: 20 }}>
                     <Text style={styles.sectionTitle}>{isId ? 'X. Contoh Ucapan Singkat Donatur' : 'X. Short Message Examples'}</Text>
-                    
+
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                         <View style={{ width: '48%', borderLeft: '3pt solid #D4AF37', backgroundColor: '#FDFBF7', padding: 8, borderRadius: 2, marginBottom: 8 }}>
                             <Text style={{ fontFamily: 'Times-Roman', fontSize: 8.5, fontStyle: 'italic', color: '#4A5568', lineHeight: 1.35 }}>
@@ -1044,7 +1044,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                             <View style={styles.vipCard}>
                                 <Text style={styles.vipTitle}>{isId ? 'REKAMAN DUKUNGAN DONATUR' : 'DONOR SUPPORT RECORD'}</Text>
-                                
+
                                 <View style={styles.vipRow}>
                                     <Text style={styles.vipLabel}>{isId ? 'Nomor Registrasi' : 'Registration Number'}</Text>
                                     <Text style={[styles.vipValue, { fontFamily: 'Helvetica', fontSize: 9 }]}>{data.number}</Text>
@@ -1155,7 +1155,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                 <View wrap={false} style={{ marginTop: 0 }}>
                     <Text style={styles.sectionTitle}>{isId ? 'XIII. Informasi Transfer' : 'XIII. Transfer Information'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Dukungan dana dapat disampaikan melalui rekening Panitia berikut:' : 'Financial support can be sent via the following Committee account:'}</Text>
-                    
+
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, marginBottom: 12 }}>
                         {/* Bank Box */}
                         <View style={{ width: '54%', backgroundColor: '#022c22', padding: 10, borderLeft: '3pt solid #D4AF37', borderRadius: 2 }}>
@@ -1165,7 +1165,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                             <Text style={{ fontFamily: 'Helvetica', fontSize: 8, color: '#A0AEC0', marginBottom: 1 }}>{isId ? 'Atas Nama:' : 'Account Name:'}</Text>
                             <Text style={{ fontFamily: 'Times-Roman', fontSize: 9.5, color: '#FDFBF7' }}>PANITIA MUPEL GPIB BEKASI</Text>
                         </View>
-                        
+
                         {/* Contact Box */}
                         <View style={{ width: '43%', border: '0.5pt solid rgba(2, 44, 34, 0.15)', backgroundColor: '#FFFFFF', padding: 10, borderRadius: 2, justifyContent: 'center' }}>
                             <Text style={{ fontFamily: 'Helvetica', fontSize: 7.5, fontWeight: 'bold', color: '#022c22', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>
@@ -1186,10 +1186,10 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     <Text style={styles.sectionTitle}>{isId ? 'XIV. Penutup' : 'XIV. Closing'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Demikian proposal dukungan donatur ini disampaikan sebagai undangan pelayanan bagi pribadi, keluarga, dan sahabat-sahabat Pelkat PKLU GPIB yang rindu mengambil bagian dalam Perayaan dan Ibadah Memperingati HUT ke-16 Pelkat PKLU GPIB.' : 'Thus this donor support proposal is presented as an invitation to serve for individuals, families, and friends of Pelkat PKLU GPIB.'}</Text>
                     <Text style={styles.bodyText}>{isId ? 'Setiap dukungan, baik besar maupun kecil, merupakan wujud kasih dan kepedulian yang sangat berarti bagi pelayanan kaum lanjut usia. Kiranya melalui kegiatan ini, Pelkat PKLU GPIB semakin dikuatkan untuk terus menjadi lansia teladan dalam iman, karya, dan pelayanan.' : 'Every support is a meaningful manifestation of care for the elderly service. May through this activity, PKLU GPIB be strengthened to continue being role models.'}</Text>
-                    
+
                     <Text style={[styles.sectionTitle, { fontSize: 12, textAlign: 'center', marginTop: 15, marginBottom: 5 }]}>{isId ? 'Terima Kasih' : 'Thank You'}</Text>
                     <Text style={[styles.bodyText, { textAlign: 'center', marginBottom: 15 }]}>{isId ? 'Atas doa, dukungan, dan kasih yang diberikan, Panitia menyampaikan terima kasih.\n\nTeruskan Baktimu!\nLansia Teladan dalam Iman, Karya, dan Pelayanan' : 'For your prayers, support, and love, the Committee expresses gratitude.\n\nContinue Your Service!\nElderly Role Models in Faith, Work, and Service'}</Text>
-                    
+
                     <Text style={[styles.bodyText, { textAlign: 'center', marginBottom: 20 }]}>
                         {isId ? 'Teriring Salam dan Doa,' : 'With Greetings and Prayers,'}
                         {'\n'}
@@ -1204,9 +1204,9 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                         </View>
 
                         <View style={{ alignItems: 'center', justifyContent: 'center', width: 90, marginTop: -25 }}>
-                            <Image 
-                                src={`https://quickchart.io/qr?size=100&text=${encodeURIComponent(`https://pklu.amanloka.com/verify/${data.id}`)}`} 
-                                style={{ width: 40, height: 40, marginBottom: 4 }} 
+                            <Image
+                                src={`https://quickchart.io/qr?size=100&text=${encodeURIComponent(`https://pklu.amanloka.com/verify/${data.id}`)}`}
+                                style={{ width: 40, height: 40, marginBottom: 4 }}
                             />
                             <Text style={{ fontSize: 5.5, color: '#022c22', textAlign: 'center', fontWeight: 'bold', letterSpacing: 0.5 }}>
                                 {isId ? 'DOKUMEN VALID' : 'VALID DOCUMENT'}

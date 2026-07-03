@@ -340,7 +340,7 @@ export default function Home() {
         >
           <div className="text-center mb-10">
             <h2 className={`text-4xl text-[#D4AF37] ${playfair.className}`}>Tuan Rumah Kegiatan</h2>
-            <p className="text-sm text-[#FDFBF7]/70 mt-2 font-light">Badan Pelaksana Musyawarah Pelayanan (Mupel) GPIB Jemaat-Jemaat Bekasi</p>
+            <p className="text-sm text-[#FDFBF7]/70 mt-2 font-light">Badan Pelaksana Musyawarah Pelayanan (Mupel) GPIB Bekasi</p>
             <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
           </div>
 
@@ -353,7 +353,7 @@ export default function Home() {
                <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
                  <div className="space-y-4">
                    <p className="text-[#FDFBF7]/80 text-base md:text-lg leading-relaxed font-light text-justify">
-                     <strong>Musyawarah Pelayanan (Mupel) GPIB Jemaat-Jemaat Bekasi</strong> merupakan persekutuan pelayanan, kesaksian, dan wadah misioner lintas jemaat di bawah naungan Gereja Protestan di Indonesia bagian Barat (GPIB) untuk wilayah Bekasi Kota dan Kabupaten.
+                      <strong>Musyawarah Pelayanan (Mupel) GPIB Bekasi</strong> merupakan persekutuan pelayanan, kesaksian, dan wadah misioner lintas jemaat di bawah naungan Gereja Protestan di Indonesia bagian Barat (GPIB) untuk wilayah Bekasi Kota dan Kabupaten.
                    </p>
                    <p className="text-[#FDFBF7]/80 text-base md:text-lg leading-relaxed font-light text-justify">
                      Sebagai tuan rumah perayaan dan ibadah syukur HUT ke-16 Pelkat PKLU GPIB tingkat nasional tahun 2026, Mupel Bekasi mengoordinasikan seluruh persiapan demi kelancaran dan kenyamanan para lansia teladan dari penjuru Nusantara.

@@ -198,6 +198,20 @@ export default function LaporanLpjPublicPage() {
                         )}
                     </div>
 
+                    {/* Signatures Panel */}
+                    <div className="flex flex-row justify-between items-center bg-black/25 backdrop-blur-md rounded-2xl border border-white/5 p-6 shadow-xl">
+                        <div className="text-center w-1/2 border-r border-white/10">
+                            <p className="text-xs text-white/60 mb-8 uppercase tracking-widest">Mengetahui,</p>
+                            <p className="text-sm font-bold text-[#FDFBF7]">Vrilly Rondonuwu</p>
+                            <p className="text-xs text-[#D4AF37] mt-1">Ketua Panitia</p>
+                        </div>
+                        <div className="text-center w-1/2">
+                            <p className="text-xs text-white/60 mb-8 uppercase tracking-widest">Menyetujui,</p>
+                            <p className="text-sm font-bold text-[#FDFBF7]">Paul Simanjuntak</p>
+                            <p className="text-xs text-[#D4AF37] mt-1">Bendahara</p>
+                        </div>
+                    </div>
+
                     {/* Actions Panel */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-black/15 rounded-2xl border border-white/5 p-5">
                         <div className="flex items-center gap-2.5 text-xs text-white/60">

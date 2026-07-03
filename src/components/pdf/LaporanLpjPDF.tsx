@@ -313,7 +313,7 @@ export function LaporanLpjPDF({
         sponsor: { diterbitkan: 0, komitmen: 0, lunas: 0, requestTotal: 0, requestFollowedUp: 0 }
     }
 }: Props) {
-    const qrImageUrl = `https://quickchart.io/qr?size=150&text=${encodeURIComponent('https://pklu.amanloka.com')}`
+    const qrImageUrl = `https://quickchart.io/qr?size=150&text=${encodeURIComponent(origin + '/laporan-lpj')}`
     const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
     return (

@@ -1073,16 +1073,7 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                                 </View>
                             </View>
 
-                            <View style={styles.sealSection}>
-                                <View style={styles.sealBox}>
-                                    <Image src={qrImageUrl} style={styles.qrCodeSeal} />
-                                    <Text style={styles.sealText}>{isId ? 'PINDAI UNTUK\nVERIFIKASI' : 'SCAN TO\nVERIFY'}</Text>
-                                </View>
-                                <View style={styles.sealBox}>
-                                    <Image src={logoUrl} style={styles.qrCodeSeal} />
-                                    <Text style={styles.sealText}>{isId ? 'TERUSKAN\nBAKTIMU' : 'CONTINUE\nYOUR SERVICE'}</Text>
-                                </View>
-                            </View>
+
                         </>
                     ) : (
                         <View style={{ marginTop: 5 }}>

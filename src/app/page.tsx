@@ -600,7 +600,7 @@ export default function Home() {
                       <div className="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-[#022c22] border-2 border-[#D4AF37] group-hover:bg-[#D4AF37] transition-all duration-300 shadow-[0_0_5px_rgba(212,175,55,0.4)]" />
                       
                       {/* time on left */}
-                      <div className="md:absolute md:-left-44 md:top-1 md:w-32 md:text-right font-semibold text-[#D4AF37] text-sm md:text-base">
+                      <div className="hidden md:block md:absolute md:-left-44 md:top-1 md:w-32 md:text-right font-semibold text-[#D4AF37] text-sm md:text-base">
                         <div>{item.time}</div>
                         <div className="text-[10px] text-[#FDFBF7]/50 font-normal mt-0.5">Durasi: {item.duration}</div>
                       </div>
@@ -637,7 +637,7 @@ export default function Home() {
                       <div className="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-[#022c22] border-2 border-[#D4AF37] group-hover:bg-[#D4AF37] transition-all duration-300 shadow-[0_0_5px_rgba(212,175,55,0.4)]" />
                       
                       {/* period on left */}
-                      <div className="md:absolute md:-left-44 md:top-1 md:w-32 md:text-right font-semibold text-[#D4AF37] text-sm md:text-base leading-tight">
+                      <div className="hidden md:block md:absolute md:-left-44 md:top-1 md:w-32 md:text-right font-semibold text-[#D4AF37] text-sm md:text-base leading-tight">
                         <div>{item.period}</div>
                       </div>
                       

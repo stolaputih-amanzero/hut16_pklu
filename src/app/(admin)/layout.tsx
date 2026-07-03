@@ -72,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: 'Beranda', path: '/', icon: Home },
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Buat Proposal', path: '/buat-proposal', icon: FileText },
-        { name: 'Daftar', path: '/daftar-proposal', icon: Archive },
+        { name: 'Admin', path: '/daftar-proposal', icon: Archive },
     ]
 
     return (

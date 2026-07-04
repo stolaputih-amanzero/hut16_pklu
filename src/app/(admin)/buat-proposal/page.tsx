@@ -274,6 +274,7 @@ export default function BuatProposalPage() {
                                 <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
                                 <h2 className="text-2xl font-bold text-[#FDFBF7] mb-2">Proposal Berhasil Dibuat!</h2>
                                 <p className="text-[#D4AF37] font-mono text-lg">{proposalNumber}</p>
+                                <p className="text-[#FDFBF7] font-semibold mt-1.5 text-sm tracking-wide capitalize">{formData.name}</p>
                             </div>
                             <CardContent className="p-6">
                                 <div className="bg-[#022c22] rounded-lg p-4 border border-[#D4AF37]/20 mb-6 flex flex-col md:flex-row gap-6">

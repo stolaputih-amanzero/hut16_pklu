@@ -265,6 +265,9 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
+                                    <Text style={{ fontFamily: 'Helvetica-Oblique', fontSize: 6.5, color: '#475569', marginTop: 2 }}>
+                                        {isId ? 'Tanda tangan dicatat secara digital' : 'Digitally recorded signature'}
+                                    </Text>
                                 </View>
 
                                 {/* QR Code Signature for Verification */}
@@ -285,6 +288,9 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>
+                                    <Text style={{ fontFamily: 'Helvetica-Oblique', fontSize: 6.5, color: '#475569', marginTop: 2 }}>
+                                        {isId ? 'Tanda tangan dicatat secara digital' : 'Digitally recorded signature'}
+                                    </Text>
                                 </View>
                             </View>
                         </View>

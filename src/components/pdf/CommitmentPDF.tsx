@@ -438,6 +438,9 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vrilly Rondonuwu</Text>
+                                    <Text style={{ fontFamily: 'Helvetica-Oblique', fontSize: 6.5, color: '#6B7280', marginTop: 2 }}>
+                                        {isId ? 'Tanda tangan dicatat secara digital' : 'Digitally recorded signature'}
+                                    </Text>
                                 </View>
 
                                 {/* Verification QR Code */}
@@ -457,6 +460,9 @@ export function CommitmentPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png", gp
                                     </Text>
                                     <View style={styles.signatureLine} />
                                     <Text style={styles.signatureName}>Vevi Mayo</Text>
+                                    <Text style={{ fontFamily: 'Helvetica-Oblique', fontSize: 6.5, color: '#6B7280', marginTop: 2 }}>
+                                        {isId ? 'Tanda tangan dicatat secara digital' : 'Digitally recorded signature'}
+                                    </Text>
                                 </View>
                             </View>
 

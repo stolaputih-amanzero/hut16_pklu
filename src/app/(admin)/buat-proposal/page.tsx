@@ -18,7 +18,8 @@ import {
     Download,
     FileSpreadsheet,
     HelpCircle,
-    X
+    X,
+    Info
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getNextNumber } from '@/lib/numbering'
@@ -309,6 +310,31 @@ export default function BuatProposalPage() {
                                         <Send className="mr-2 h-5 w-5" />
                                         Kirim via WhatsApp
                                     </Button>
+                                </div>
+                                
+                                <div className="mt-6 p-4 bg-black/25 rounded-lg border border-[#D4AF37]/15 text-left space-y-2 max-w-xl mx-auto">
+                                    <h4 className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5">
+                                        <Info className="w-3.5 h-3.5" />
+                                        Alur Pengiriman Dokumen
+                                    </h4>
+                                    <div className="space-y-1.5 text-[11px] text-[#A0AEC0] leading-relaxed">
+                                        <div className="flex gap-2">
+                                            <span className="text-[#D4AF37] font-semibold">1.</span>
+                                            <p>Unduh berkas proposal dengan mengeklik tombol <strong className="text-[#FDFBF7]">Download PDF</strong>.</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-[#D4AF37] font-semibold">2.</span>
+                                            <p>Setelah berhasil terunduh, klik tombol <strong className="text-[#FDFBF7]">Kirim via WhatsApp</strong> untuk otomatis membuka WhatsApp beserta isi pesan pengantar.</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-[#D4AF37] font-semibold">3.</span>
+                                            <p>Pada chat WhatsApp yang terbuka, klik ikon lampiran <strong className="text-[#FDFBF7]">(clip kertas / tambah +)</strong>, pilih <strong className="text-[#FDFBF7]">Dokumen</strong>, lalu lampirkan file PDF proposal yang baru Anda unduh.</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-[#D4AF37] font-semibold">4.</span>
+                                            <p>Kirim pesan dan lampiran proposal tersebut secara bersamaan.</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div className="mt-8 text-center">

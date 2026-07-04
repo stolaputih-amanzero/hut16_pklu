@@ -746,12 +746,12 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
                 </View>
 
-                {/* VII. PAKET SPONSORSHIP - ASTOUNDING MASTERPIECE PAGE */}
+                {/* VI. PAKET SPONSORSHIP - ASTOUNDING MASTERPIECE PAGE */}
                 <View wrap={false} break style={{ marginBottom: 20 }}>
-                    <Text style={[styles.sectionTitle, { fontSize: 20, textAlign: 'center', color: '#022c22', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 15 }]}>
-                        {isId ? 'VII. Paket Sponsorship' : 'VII. Sponsorship Packages'}
+                    <Text style={[styles.sectionTitle, { fontSize: 20, textAlign: 'left', color: '#022c22', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 15 }]}>
+                        {isId ? 'VI. Paket Sponsorship' : 'VI. Sponsorship Packages'}
                     </Text>
-                    <Text style={[styles.bodyText, { textAlign: 'center', color: '#4A5568', fontStyle: 'italic', marginBottom: 20 }]}>
+                    <Text style={[styles.bodyText, { textAlign: 'left', color: '#4A5568', fontStyle: 'italic', marginBottom: 20 }]}>
                         {isId 
                             ? 'Kami mengundang Bapak/Ibu untuk menjalin kemitraan eksklusif dalam perayaan HUT ke-16 Pelkat PKLU GPIB melalui pilihan paket sponsorship berikut:'
                             : 'We invite you to establish an exclusive partnership through our premium sponsorship packages:'}
@@ -832,10 +832,10 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
                 </View>
 
-                {/* VIII. FORMAT RENCANA ANGGARAN BIAYA - SCALED UP TO FILL 1 PAGE */}
+                {/* VII. FORMAT RENCANA ANGGARAN BIAYA - SCALED UP TO FILL 1 PAGE */}
                 <View break wrap={false} style={{ marginBottom: 20 }}>
                     <Text style={[styles.sectionTitle, { fontSize: 20, textAlign: 'center', color: '#022c22', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 15 }]}>
-                        {isId ? 'VIII. Format Rencana Anggaran Biaya' : 'VIII. Budget Plan Format'}
+                        {isId ? 'VII. Format Rencana Anggaran Biaya' : 'VII. Budget Plan Format'}
                     </Text>
                     <Text style={[styles.bodyText, { textAlign: 'center', color: '#4A5568', fontStyle: 'italic', marginBottom: 20 }]}>
                         {isId
@@ -923,9 +923,9 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
                 </View>
 
-                {/* IX. FORMAT KOMITMEN SPONSORSHIP */}
+                {/* VIII. FORMAT KOMITMEN SPONSORSHIP */}
                 <View break style={{ marginTop: 20 }}>
-                    <Text style={styles.sectionTitle}>{isId ? 'IX. Format Komitmen Sponsorship' : 'IX. Sponsorship Commitment Format'}</Text>
+                    <Text style={styles.sectionTitle}>{isId ? 'VIII. Format Komitmen Sponsorship' : 'VIII. Sponsorship Commitment Format'}</Text>
 
                     {data.contribution_value ? (
                         <>
@@ -1085,9 +1085,9 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     )}
                 </View>
 
-                {/* X. PENUTUP & Signatures - FORCED BREAK */}
+                {/* IX. PENUTUP & Signatures - FORCED BREAK */}
                 <View wrap={false} break>
-                    <Text style={styles.sectionTitle}>{isId ? 'X. Penutup' : 'X. Closing'}</Text>
+                    <Text style={styles.sectionTitle}>{isId ? 'IX. Penutup' : 'IX. Closing'}</Text>
                     <Text style={styles.bodyText}>
                         {isId ? 'Demikian proposal sponsorship ini disusun sebagai dasar permohonan dukungan dan kerja sama dalam rangka Perayaan dan Ibadah Memperingati HUT ke-16 Pelkat PKLU GPIB.' : 'Thus this sponsorship proposal is prepared as a basis for requesting support and cooperation in the context of the Celebration and Worship Commemorating the 16th Anniversary of Pelkat PKLU GPIB.'}
                     </Text>

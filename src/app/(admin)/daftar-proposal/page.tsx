@@ -290,6 +290,11 @@ export default function DaftarProposalPage() {
     const handleRemoveProof = async () => {
         if (!formData.id) return
 
+        if (formData.payment_status === 'confirmed') {
+            toast.error('Bukti pembayaran tidak dapat dihapus saat status Lunas. Silakan ubah status pembayaran terlebih dahulu.')
+            return
+        }
+
         try {
             setUploadingProof(true)
 
@@ -471,6 +476,12 @@ export default function DaftarProposalPage() {
             }
         }
 
+        // Check if confirming payment status as Lunas
+        if (formData.payment_status === 'confirmed' && !formData.payment_proof_url) {
+            toast.error('Status Lunas wajib melampirkan Bukti Pembayaran terlebih dahulu')
+            return
+        }
+
         try {
             setModalSubmitting(true)
 
@@ -588,6 +599,10 @@ export default function DaftarProposalPage() {
 
     const handleConfirmPayment = async () => {
         if (!selectedProposal) return
+        if (!selectedProposal.payment_proof_url && !formData.payment_proof_url) {
+            toast.error('Status Lunas wajib melampirkan Bukti Pembayaran terlebih dahulu')
+            return
+        }
         try {
             setModalSubmitting(true)
             const { error } = await supabase

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, ShieldCheck } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 import { supabase } from '@/lib/supabase/client'
 import { getNextNumber } from '@/lib/numbering'
@@ -818,27 +818,16 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Footer Admin Link */}
+        {/* Footer Credits */}
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-16 mb-8 w-full max-w-5xl border-t border-[#D4AF37]/20 pt-8 flex justify-center"
+          className="mt-16 mb-8 w-full max-w-5xl border-t border-[#D4AF37]/20 pt-8 flex flex-col items-center gap-2 text-center"
         >
-          <Link 
-            href="/dashboard" 
-            className="group relative flex items-center gap-3 px-6 py-2.5 rounded-full overflow-hidden transition-all duration-500 hover:scale-105"
-          >
-            <div className="absolute inset-0 bg-[#022c22] border border-[#D4AF37]/30 rounded-full transition-colors group-hover:border-[#D4AF37]/60" />
-            
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] ease-out" />
-
-            <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/50 group-hover:bg-[#D4AF37] group-hover:shadow-[0_0_10px_#D4AF37] transition-all duration-300 relative z-10" />
-            
-            <span className="text-[10px] md:text-xs text-[#FDFBF7]/50 group-hover:text-[#D4AF37] tracking-[0.3em] uppercase font-semibold transition-colors duration-300 relative z-10">
-              Akses Kepanitiaan
-            </span>
-          </Link>
+          <p className="text-[10px] md:text-xs text-[#FDFBF7]/30 tracking-[0.2em] uppercase">
+            © 2026 Pelkat PKLU GPIB Mupel Bekasi. All Rights Reserved.
+          </p>
         </motion.div>
 
       </div>
@@ -972,6 +961,31 @@ export default function Home() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Floating Committee Access Button */}
+      <motion.div 
+        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="fixed bottom-6 right-6 z-40"
+      >
+        <Link 
+          href="/dashboard" 
+          className="group relative flex items-center gap-2 px-4 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.5),_0_0_20px_rgba(212,175,55,0.15)] border border-[#D4AF37]/30 hover:border-[#D4AF37]/70 bg-[#022c22]/90 backdrop-blur-md cursor-pointer"
+        >
+          {/* Subtle Shimmer Background on Hover */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-r from-transparent via-[#D4AF37]/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] ease-out" />
+          
+          {/* Small glowing dot */}
+          <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/70 group-hover:bg-[#D4AF37] group-hover:shadow-[0_0_8px_#D4AF37] transition-all duration-300" />
+          
+          <ShieldCheck className="w-4 h-4 text-[#D4AF37]/90 group-hover:text-[#D4AF37] transition-colors" />
+          
+          <span className="text-[10px] md:text-xs text-[#FDFBF7]/70 group-hover:text-[#D4AF37] tracking-[0.25em] uppercase font-semibold transition-colors duration-300">
+            Akses Panitia
+          </span>
+        </Link>
+      </motion.div>
     </div>
   )
 }

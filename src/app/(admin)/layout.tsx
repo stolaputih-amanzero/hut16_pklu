@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Navbar (Desktop only navigation links) */}
-            <nav className="bg-[#022c22]/70 backdrop-blur-xl border-b border-[#D4AF37]/20 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.5)] transition-all print:hidden">
+            <nav className="bg-[#022c22]/70 backdrop-blur-xl border-b border-[#D4AF37]/20 px-6 py-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.5)] transition-all print:hidden">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavigation('/')}>
                         <img src="/logo_hut16_pklu.png" alt="Logo" className="h-10 w-10 object-contain drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]" />
@@ -133,7 +133,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </nav>
 
             {/* Content */}
-            <main className="p-4 md:p-6 relative">{children}</main>
+            <main className="p-4 md:p-6 pt-24 md:pt-28 relative">{children}</main>
 
             {/* Mobile Floating Bottom Nav */}
             <div className="fixed bottom-6 left-4 right-4 z-50 md:hidden flex justify-around items-center bg-black/60 backdrop-blur-lg border border-[#D4AF37]/30 rounded-2xl py-3 px-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] print:hidden">

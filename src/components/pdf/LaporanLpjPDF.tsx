@@ -68,12 +68,57 @@ const styles = StyleSheet.create({
     summaryBox: {
         border: '1.5pt solid #e5e7eb',
         borderRadius: 8,
-        padding: 25,
-        backgroundColor: '#f8fafc',
+        padding: 15,
+        backgroundColor: '#ffffff',
         width: '48%',
         height: 300,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    },
+    infoBar: {
+        flexDirection: 'row',
+        backgroundColor: '#f8fafc',
+        border: '0.5pt solid #cbd5e1',
+        borderRadius: 6,
+        height: 48,
+        overflow: 'hidden',
+        marginBottom: 6,
+    },
+    infoBarAccent: {
+        width: 4,
+        height: '100%',
+    },
+    infoBarContent: {
+        flex: 1,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        justifyContent: 'space-between',
+    },
+    infoBarTitle: {
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 8.5,
+        color: '#022c22',
+        marginBottom: 1,
+    },
+    infoBarGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        flex: 1,
+    },
+    infoBarCol: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingRight: 6,
+    },
+    infoBarLabel: {
+        fontSize: 7,
+        color: '#64748b',
+    },
+    infoBarVal: {
+        fontFamily: 'Helvetica-Bold',
+        fontSize: 8,
+        color: '#1e293b',
     },
     summaryRow: {
         flexDirection: 'row',
@@ -336,62 +381,147 @@ export function LaporanLpjPDF({
                     {/* Funds Summary Box */}
                     
                     <View style={styles.summaryBox}>
-                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 13 }]}>(A) Realisasi Penerimaan Dana</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Total Dana Donatur</Text>
-                            <Text style={styles.summaryValue}>: {formatRupiah(totalDanaDonatur)}</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Total Dana Sponsorship</Text>
-                            <Text style={styles.summaryValue}>: {formatRupiah(totalDanaSponsor)}</Text>
-                        </View>
-                        <View style={styles.summaryTotalRow}>
-                            <Text style={styles.summaryTotalLabel}>Total Keseluruhan Dana</Text>
-                            <Text style={styles.summaryTotalValue}>: {formatRupiah(totalDana)}</Text>
-                        </View>
-                        <View style={[styles.summaryRow, { marginTop: 4 }]}>
-                            <Text style={styles.summaryLabel}>Target Penerimaan</Text>
-                            <Text style={styles.summaryValue}>: Rp 537.785.000</Text>
-                        </View>
-                        <View style={styles.summaryTotalRow}>
-                            <Text style={styles.summaryTotalLabel}>Persentase Capaian</Text>
-                            <Text style={styles.summaryTotalValue}>: {((totalDana / 537785000) * 100).toFixed(1)}%</Text>
-                        </View>
+                        <Text style={[styles.summaryTotalLabel, { marginBottom: 8, fontSize: 12 }]}>(A) Realisasi Penerimaan Dana</Text>
                         
-                        {/* QuickChart Image for Progress */}
-                        <Image 
-                            src={`https://quickchart.io/chart?w=350&h=80&c=${encodeURIComponent(`{type:'progressBar',data:{datasets:[{data:[${Math.min(100, Math.round((totalDana/537785000)*100))}],backgroundColor:'#047857'}]}}`)}`} 
-                            style={{ width: '100%', height: 50, marginTop: 10, objectFit: 'contain' }}
-                        />
+                        {/* Bar 1: Penerimaan Dana */}
+                        <View style={styles.infoBar}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#022c22' }]} />
+                            <View style={styles.infoBarContent}>
+                                <Text style={styles.infoBarTitle}>Rincian Penerimaan</Text>
+                                <View style={styles.infoBarGrid}>
+                                    <View style={[styles.infoBarCol, { width: '50%' }]}>
+                                        <Text style={styles.infoBarLabel}>Donatur</Text>
+                                        <Text style={styles.infoBarVal}>{formatRupiah(totalDanaDonatur)}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '50%' }]}>
+                                        <Text style={styles.infoBarLabel}>Sponsorship</Text>
+                                        <Text style={styles.infoBarVal}>{formatRupiah(totalDanaSponsor)}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
 
+                        {/* Bar 2: Total & Target */}
+                        <View style={styles.infoBar}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#D4AF37' }]} />
+                            <View style={styles.infoBarContent}>
+                                <Text style={styles.infoBarTitle}>Akumulasi vs Target</Text>
+                                <View style={styles.infoBarGrid}>
+                                    <View style={[styles.infoBarCol, { width: '50%' }]}>
+                                        <Text style={styles.infoBarLabel}>Total Realisasi</Text>
+                                        <Text style={[styles.infoBarVal, { color: '#047857' }]}>{formatRupiah(totalDana)}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '50%' }]}>
+                                        <Text style={styles.infoBarLabel}>Target Penerimaan</Text>
+                                        <Text style={styles.infoBarVal}>Rp 537.785.000</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
 
+                        {/* Bar 3: Progress Capaian */}
+                        <View style={[styles.infoBar, { height: 75, marginBottom: 0 }]}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#047857' }]} />
+                            <View style={styles.infoBarContent}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Text style={styles.infoBarTitle}>Capaian Target</Text>
+                                    <Text style={[styles.infoBarVal, { color: '#047857', fontSize: 10 }]}>
+                                        {((totalDana / 537785000) * 100).toFixed(1)}%
+                                    </Text>
+                                </View>
+                                <Image 
+                                    src={`https://quickchart.io/chart?w=350&h=45&c=${encodeURIComponent(`{type:'progressBar',data:{datasets:[{data:[${Math.min(100, Math.round((totalDana/537785000)*100))}],backgroundColor:'#047857'}]}}`)}`} 
+                                    style={{ width: '100%', height: 25, marginTop: 4, objectFit: 'contain' }}
+                                />
+                            </View>
+                        </View>
                     </View>
 
                     <View style={styles.summaryBox}>
-                        <Text style={[styles.summaryTotalLabel, { marginBottom: 6, fontSize: 13 }]}>(B) Status Distribusi Proposal</Text>
+                        <Text style={[styles.summaryTotalLabel, { marginBottom: 8, fontSize: 12 }]}>(B) Status Distribusi Proposal</Text>
                         
-                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Total Proposal Keseluruhan:</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>- Donatur / Sponsor / Request</Text>
-                            <Text style={styles.summaryValue}>: {donaturProposals.length} / {sponsorProposals.length} / {requestProposals.length}</Text>
+                        {/* Bar 1: Total Proposal */}
+                        <View style={styles.infoBar}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#022c22' }]} />
+                            <View style={styles.infoBarContent}>
+                                <Text style={styles.infoBarTitle}>Proposal Keseluruhan</Text>
+                                <View style={styles.infoBarGrid}>
+                                    <View style={[styles.infoBarCol, { width: '33%' }]}>
+                                        <Text style={styles.infoBarLabel}>Donatur</Text>
+                                        <Text style={styles.infoBarVal}>{donaturProposals.length}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '33%' }]}>
+                                        <Text style={styles.infoBarLabel}>Sponsor</Text>
+                                        <Text style={styles.infoBarVal}>{sponsorProposals.length}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '34%' }]}>
+                                        <Text style={styles.infoBarLabel}>Request</Text>
+                                        <Text style={styles.infoBarVal}>{requestProposals.length}</Text>
+                                    </View>
+                                </View>
+                            </View>
                         </View>
 
-                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Rincian Donatur:</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>- Diterbitkan / Komitmen / Lunas</Text>
-                            <Text style={styles.summaryValue}>: {stats.donatur.diterbitkan} / {stats.donatur.komitmen} / {stats.donatur.lunas}</Text>
-                        </View>
-                        
-                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Rincian Sponsorship:</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>- Diterbitkan / Komitmen / Lunas</Text>
-                            <Text style={styles.summaryValue}>: {stats.sponsor.diterbitkan} / {stats.sponsor.komitmen} / {stats.sponsor.lunas}</Text>
+                        {/* Bar 2: Rincian Donatur */}
+                        <View style={styles.infoBar}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#D4AF37' }]} />
+                            <View style={styles.infoBarContent}>
+                                <Text style={styles.infoBarTitle}>Rincian Donatur</Text>
+                                <View style={styles.infoBarGrid}>
+                                    <View style={[styles.infoBarCol, { width: '33%' }]}>
+                                        <Text style={styles.infoBarLabel}>Terbit</Text>
+                                        <Text style={styles.infoBarVal}>{stats.donatur.diterbitkan}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '33%' }]}>
+                                        <Text style={styles.infoBarLabel}>Komitmen</Text>
+                                        <Text style={styles.infoBarVal}>{stats.donatur.komitmen}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '34%' }]}>
+                                        <Text style={styles.infoBarLabel}>Lunas</Text>
+                                        <Text style={[styles.infoBarVal, { color: '#047857' }]}>{stats.donatur.lunas}</Text>
+                                    </View>
+                                </View>
+                            </View>
                         </View>
 
-                        <Text style={[styles.summaryTotalLabel, { fontSize: 11, marginTop: 4 }]}>Rincian Request (Follow Up / Total):</Text>
-                        <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>- Keseluruhan Request</Text>
-                            <Text style={styles.summaryValue}>: {stats.donatur.requestFollowedUp + stats.sponsor.requestFollowedUp} / {stats.donatur.requestTotal + stats.sponsor.requestTotal}</Text>
+                        {/* Bar 3: Rincian Sponsorship */}
+                        <View style={styles.infoBar}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#047857' }]} />
+                            <View style={styles.infoBarContent}>
+                                <Text style={styles.infoBarTitle}>Rincian Sponsorship</Text>
+                                <View style={styles.infoBarGrid}>
+                                    <View style={[styles.infoBarCol, { width: '33%' }]}>
+                                        <Text style={styles.infoBarLabel}>Terbit</Text>
+                                        <Text style={styles.infoBarVal}>{stats.sponsor.diterbitkan}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '33%' }]}>
+                                        <Text style={styles.infoBarLabel}>Komitmen</Text>
+                                        <Text style={styles.infoBarVal}>{stats.sponsor.komitmen}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '34%' }]}>
+                                        <Text style={styles.infoBarLabel}>Lunas</Text>
+                                        <Text style={[styles.infoBarVal, { color: '#047857' }]}>{stats.sponsor.lunas}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+
+                        {/* Bar 4: Rincian Request */}
+                        <View style={[styles.infoBar, { marginBottom: 0 }]}>
+                            <View style={[styles.infoBarAccent, { backgroundColor: '#b91c1c' }]} />
+                            <View style={styles.infoBarContent}>
+                                <Text style={styles.infoBarTitle}>Rincian Request</Text>
+                                <View style={styles.infoBarGrid}>
+                                    <View style={[styles.infoBarCol, { width: '50%' }]}>
+                                        <Text style={styles.infoBarLabel}>Telah Follow Up</Text>
+                                        <Text style={styles.infoBarVal}>{stats.donatur.requestFollowedUp + stats.sponsor.requestFollowedUp}</Text>
+                                    </View>
+                                    <View style={[styles.infoBarCol, { width: '50%' }]}>
+                                        <Text style={styles.infoBarLabel}>Total Request</Text>
+                                        <Text style={styles.infoBarVal}>{stats.donatur.requestTotal + stats.sponsor.requestTotal}</Text>
+                                    </View>
+                                </View>
+                            </View>
                         </View>
                     </View>
                 </View>

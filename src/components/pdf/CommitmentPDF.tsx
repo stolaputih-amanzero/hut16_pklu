@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         fontSize: 7.5,
         color: '#D4AF37',
         textAlign: 'center',
-        marginTop: 10,
+        marginTop: 28,
         letterSpacing: 2,
         textTransform: 'uppercase',
     },

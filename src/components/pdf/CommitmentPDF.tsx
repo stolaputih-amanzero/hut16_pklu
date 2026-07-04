@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     },
     titleSection: {
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 24,
     },
     docTitle: {
         fontFamily: 'Times-Roman',
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     },
     salutation: {
         fontSize: 10,
-        marginBottom: 6,
+        marginBottom: 12,
         lineHeight: 1.5,
     },
     bodyParagraph: {

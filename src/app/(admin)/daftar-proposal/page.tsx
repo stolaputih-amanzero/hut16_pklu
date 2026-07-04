@@ -677,7 +677,7 @@ export default function DaftarProposalPage() {
                         Seluruh riwayat proposal dukungan yang telah diterbitkan
                     </p>
                 </div>
-                <div className="flex gap-3 mt-4 md:mt-0">
+                <div className="flex justify-between items-center w-full md:w-auto gap-3 mt-4 md:mt-0">
                     <Button 
                         variant="outline"
                         onClick={handleDownloadLpj}
@@ -747,6 +747,34 @@ export default function DaftarProposalPage() {
                                     <SelectItem value="batal">Batal</SelectItem>
                                 </SelectContent>
                             </Select>
+
+                            {/* Sort Select (Only visible on Mobile View) */}
+                            <div className="md:hidden w-full sm:w-auto">
+                                <Select 
+                                    value={sortField + '_' + sortDirection} 
+                                    onValueChange={(val: string) => {
+                                        const [field, dir] = val.split('_') as [any, any]
+                                        setSortField(field)
+                                        setSortDirection(dir)
+                                    }}
+                                >
+                                    <SelectTrigger className="w-full h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
+                                        <SelectValue placeholder="Urutkan" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                        <SelectItem value="date_desc">Urutan: Terbaru</SelectItem>
+                                        <SelectItem value="date_asc">Urutan: Terlama</SelectItem>
+                                        <SelectItem value="name_asc">Nama: A - Z</SelectItem>
+                                        <SelectItem value="name_desc">Nama: Z - A</SelectItem>
+                                        <SelectItem value="number_asc">No. Proposal: A - Z</SelectItem>
+                                        <SelectItem value="number_desc">No. Proposal: Z - A</SelectItem>
+                                        <SelectItem value="type_asc">Jenis: A - Z</SelectItem>
+                                        <SelectItem value="type_desc">Jenis: Z - A</SelectItem>
+                                        <SelectItem value="status_desc">Status: Tinggi - Rendah</SelectItem>
+                                        <SelectItem value="status_asc">Status: Rendah - Tinggi</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
 
 

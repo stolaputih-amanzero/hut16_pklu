@@ -23,12 +23,26 @@ Salam sejahtera dalam kasih Kristus,
  
 Dengan penuh hormat dan sukacita, kami dari Panitia HUT ke-16 Pelkat PKLU GPIB bermaksud menyampaikan permohonan dukungan dan partisipasi Bapak/Ibu untuk kegiatan peringatan:
  
-✦ *HUT KE-16 PELKAT PKLU GPIB*
-▪ *Hari/Tanggal:* Senin, 12 Oktober 2026
-▪ *Tempat:* Bekasi Convention Center, Hotel Santika Mega Mall
-▪ *Tema:* *"Teruskan Baktimu!"* (Lansia Teladan dalam Iman, Karya, dan Pelayanan)
+*=============================*
+*✦  HUT KE-16 PELKAT PKLU GPIB  ✦*
+*=============================*
  
-▪ *Proposal Dukungan Terlampir* (Nomor Registrasi: ${d.number})
+*▪ Hari & Tanggal:*
+Senin, 12 Oktober 2026
+ 
+*▪ Tempat:*
+Bekasi Convention Center
+Hotel Santika Mega Mall
+ 
+*▪ Tema:*
+*"Teruskan Baktimu!"*
+(Lansia Teladan dalam Iman, Karya, dan Pelayanan)
+ 
+*-----------------------------*
+*▪ Dokumen Lampiran:*
+Proposal Dukungan Terlampir
+(Nomor Registrasi: ${d.number})
+*=============================*
  
 Setiap dukungan kasih yang Bapak/Ibu berikan sangat berarti bagi pelayanan kaum lanjut usia di lingkungan GPIB. Kiranya Tuhan Yesus Kristus senantiasa memberkati Bapak/Ibu beserta keluarga.
  
@@ -92,12 +106,26 @@ Warm greetings in the love of Christ,
  
 With great respect and joy, we from the 16th Anniversary Committee of Pelkat PKLU GPIB would like to humbly invite your support and participation in our upcoming celebration:
  
-✦ *16th ANNIVERSARY OF PKLU GPIB*
-▪ *Date:* Monday, October 12, 2026
-▪ *Location:* Bekasi Convention Center, Hotel Santika Mega Mall
-▪ *Theme:* *"Continue Your Service!"* (Elderly Role Models in Faith, Work, and Service)
+*=============================*
+*✦  16th ANNIVERSARY OF PKLU GPIB  ✦*
+*=============================*
  
-▪ *Support Proposal Attached* (Registration No: ${d.number})
+*▪ Date:*
+Monday, October 12, 2026
+ 
+*▪ Location:*
+Bekasi Convention Center
+Hotel Santika Mega Mall
+ 
+*▪ Theme:*
+*"Continue Your Service!"*
+(Elderly Role Models in Faith, Work, and Service)
+ 
+*-----------------------------*
+*▪ Attachment Document:*
+Support Proposal Attached
+(Registration No: ${d.number})
+*=============================*
  
 Every act of kindness and support you provide will be a profound blessing to the ministry of our elderly members within the GPIB community. May the Lord Jesus Christ continuously bless you and your family.
  

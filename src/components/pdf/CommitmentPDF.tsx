@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
         marginVertical: 4,
         paddingHorizontal: 20,
         paddingVertical: 8,
-        backgroundColor: '#FAFAFA',
         borderRadius: 4,
         border: '0.5pt solid #E5E7EB',
     },
@@ -131,7 +130,6 @@ const styles = StyleSheet.create({
         color: '#022c22',
     },
     bankCard: {
-        backgroundColor: '#F8FBF9',
         borderLeft: '3pt solid #022c22',
         padding: 8,
         marginTop: 4,

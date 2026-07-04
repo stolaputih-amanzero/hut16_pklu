@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users, MessageCircle, Printer } from 'lucide-react'
+import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users, MessageCircle, Printer, Download, ArrowUp, ArrowDown } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getNextNumber } from '@/lib/numbering'
@@ -31,6 +31,18 @@ export default function DaftarProposalPage() {
     const [uploadingProof, setUploadingProof] = useState(false)
 
     const [statusFilter, setStatusFilter] = useState('all')
+    const [typeFilter, setTypeFilter] = useState<'all' | 'donatur' | 'sponsorship'>('all')
+    const [sortField, setSortField] = useState<'number' | 'date' | 'name' | 'type' | 'status'>('date')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
+    const handleSort = (field: 'number' | 'date' | 'name' | 'type' | 'status') => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortField(field)
+            setSortDirection('desc')
+        }
+    }
 
     // Form states
     const [formData, setFormData] = useState({
@@ -581,40 +593,73 @@ export default function DaftarProposalPage() {
         }
     }
 
-    const activeRequests = proposals.filter(p => 
+    const isPendingRequest = (p: any) => 
         p.specific_support === 'request' && 
         p.payment_status === 'pending' && 
         !p.contribution_value && 
         !p.contribution_form
-    )
 
-    const filteredProposals = proposals.filter(p => {
-        const matchesSearch = p.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (p.company_name && p.company_name.toLowerCase().includes(searchQuery.toLowerCase()))
+    const filteredProposals = proposals
+        .filter(p => {
+            const matchesSearch = p.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (p.company_name && p.company_name.toLowerCase().includes(searchQuery.toLowerCase()))
 
-        if (!matchesSearch) return false
+            if (!matchesSearch) return false
 
-        // If displaying all, exclude unresolved active requests from the main history list (they are shown in their own section at the top)
-        if (statusFilter === 'all') {
-            const isPendingRequest = p.specific_support === 'request' && p.payment_status === 'pending' && !p.contribution_value && !p.contribution_form
-            return !isPendingRequest
-        }
+            // Filter by proposal type
+            if (typeFilter !== 'all' && p.type !== typeFilter) {
+                return false
+            }
 
-        const isLunas = p.payment_status === 'confirmed'
-        const isBatal = p.payment_status === 'cancelled'
-        const isRequest = p.specific_support === 'request'
-        const isKomitmen = p.payment_status === 'pending' && !isRequest && (p.contribution_value > 0 || p.contribution_form)
-        const isTerkirim = p.payment_status === 'pending' && !isRequest && !p.contribution_value && !p.contribution_form
+            const isLunas = p.payment_status === 'confirmed'
+            const isBatal = p.payment_status === 'cancelled'
+            const isRequest = p.specific_support === 'request'
+            const isKomitmen = p.payment_status === 'pending' && !isRequest && (p.contribution_value > 0 || p.contribution_form)
+            const isTerkirim = p.payment_status === 'pending' && !isRequest && !p.contribution_value && !p.contribution_form
 
-        if (statusFilter === 'request') return isRequest
-        if (statusFilter === 'terkirim') return isTerkirim
-        if (statusFilter === 'komitmen') return isKomitmen
-        if (statusFilter === 'lunas') return isLunas
-        if (statusFilter === 'batal') return isBatal
+            if (statusFilter === 'request') return isRequest
+            if (statusFilter === 'terkirim') return isTerkirim
+            if (statusFilter === 'komitmen') return isKomitmen
+            if (statusFilter === 'lunas') return isLunas
+            if (statusFilter === 'batal') return isBatal
 
-        return true
-    })
+            return true
+        })
+        .sort((a, b) => {
+            const aReq = isPendingRequest(a) ? 1 : 0
+            const bReq = isPendingRequest(b) ? 1 : 0
+            
+            // Put pending requests at the top
+            if (aReq !== bReq) {
+                return bReq - aReq
+            }
+            
+            // Otherwise apply sorting logic
+            let comparison = 0
+            if (sortField === 'number') {
+                comparison = (a.number || '').localeCompare(b.number || '')
+            } else if (sortField === 'date') {
+                const aTime = new Date(a.proposal_date || a.created_at || 0).getTime()
+                const bTime = new Date(b.proposal_date || b.created_at || 0).getTime()
+                comparison = aTime - bTime
+            } else if (sortField === 'name') {
+                comparison = (a.name || '').localeCompare(b.name || '')
+            } else if (sortField === 'type') {
+                comparison = (a.type || '').localeCompare(b.type || '')
+            } else if (sortField === 'status') {
+                const getStatusWeight = (p: any) => {
+                    if (p.payment_status === 'confirmed') return 4
+                    if (p.payment_status === 'cancelled') return 0
+                    if (p.specific_support === 'request') return 1
+                    if (p.contribution_value > 0 || p.contribution_form) return 3
+                    return 2
+                }
+                comparison = getStatusWeight(a) - getStatusWeight(b)
+            }
+
+            return sortDirection === 'asc' ? comparison : -comparison
+        })
 
     const formatDate = (dateString: string) => {
         const d = new Date(dateString)
@@ -626,7 +671,7 @@ export default function DaftarProposalPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold font-playfair text-[#FDFBF7] tracking-wider uppercase drop-shadow-md">
-                        Admin
+                        Laporan
                     </h1>
                     <p className="text-sm text-[#D4AF37] mt-1 font-montserrat">
                         Seluruh riwayat proposal dukungan yang telah diterbitkan
@@ -638,127 +683,21 @@ export default function DaftarProposalPage() {
                         onClick={handleDownloadLpj}
                         className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2 cursor-pointer"
                     >
-                        <Printer className="h-4 w-4" />
-                        Unduh Laporan LPJ
+                        <Download className="h-4 w-4" />
+                        Laporan
                     </Button>
                     <Link href="/buat-proposal" passHref>
                         <Button 
                             className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"
                         >
                             <Plus className="h-4 w-4" />
-                            Buat Proposal Baru
+                            Proposal
                         </Button>
                     </Link>
                 </div>
             </div>
 
-            {statusFilter === 'all' && activeRequests.length > 0 && (
-                <Card className="border border-red-500/40 bg-red-500/5 shadow-[0_0_25px_rgba(239,68,68,0.15)] overflow-hidden">
-                    <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle className="text-red-400 font-playfair tracking-wide flex items-center gap-2 text-lg font-bold">
-                                <span className="relative flex h-2.5 w-2.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                                </span>
-                                Permintaan Dukungan Baru ({activeRequests.length})
-                            </CardTitle>
-                            <CardDescription className="text-white/60 text-xs mt-1">
-                                Calon donatur/sponsor baru mendaftar secara mandiri lewat Beranda. Segera hubungi untuk konfirmasi.
-                            </CardDescription>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">
-                            Butuh Follow Up
-                        </span>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {/* Desktop Table View */}
-                        <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-red-400 uppercase bg-red-500/10 border-y border-red-500/20">
-                                    <tr>
-                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">No. Proposal</th>
-                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">Tanggal</th>
-                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">Nama Calon Donatur / Sponsor</th>
-                                        <th className="px-4 py-3.5 font-montserrat tracking-wider">Tipe</th>
-                                        <th className="px-4 py-3.5 font-montserrat tracking-wider text-right">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-red-500/10 bg-black/20">
-                                    {activeRequests.map((p) => (
-                                        <tr 
-                                            key={p.id}
-                                            className="hover:bg-red-500/5 transition-colors"
-                                        >
-                                            <td className="px-4 py-3 font-mono text-white/90 font-medium whitespace-nowrap">
-                                                {p.number}
-                                            </td>
-                                            <td className="px-4 py-3 text-white/60 whitespace-nowrap text-xs">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Calendar className="h-3.5 w-3.5" />
-                                                    {formatDate(p.proposal_date || p.created_at)}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="font-semibold text-white">{p.name}</div>
-                                                <div className="text-xs text-red-400/80 font-mono mt-0.5">{p.phone}</div>
-                                            </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
-                                                    {p.type === 'donatur' ? 'Donatur' : 'Sponsorship'}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-right whitespace-nowrap">
-                                                <Button 
-                                                    size="sm"
-                                                    onClick={() => handleOpenView(p)}
-                                                    className="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-4 py-1.5 rounded-full transition-all h-8 cursor-pointer shadow-md"
-                                                >
-                                                    Follow Up
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
 
-                        {/* Mobile Card View */}
-                        <div className="block md:hidden space-y-3">
-                            {activeRequests.map((p) => (
-                                <div 
-                                    key={p.id}
-                                    className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl space-y-3 shadow-md"
-                                >
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-mono text-xs font-bold text-white/80">{p.number}</span>
-                                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
-                                            {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-white text-sm">{p.name}</div>
-                                        <div className="text-xs text-red-400/80 font-mono mt-0.5">{p.phone}</div>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-2 border-t border-red-500/10">
-                                        <span className="text-white/50 text-[10px] flex items-center gap-1">
-                                            <Calendar className="h-3 w-3" />
-                                            {formatDate(p.proposal_date || p.created_at)}
-                                        </span>
-                                        <Button 
-                                            size="sm"
-                                            onClick={() => handleOpenView(p)}
-                                            className="bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] px-3.5 py-1 h-7 rounded-full transition-all cursor-pointer shadow-md"
-                                        >
-                                            Follow Up
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">
                 <CardHeader>
@@ -772,10 +711,31 @@ export default function DaftarProposalPage() {
                                 {filteredProposals.length} proposal ditemukan
                             </CardDescription>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                            {/* Filter Tipe (Radio Buttons Segmented Control) */}
+                            <div className="flex items-center h-8 bg-[#022c22]/50 border border-[#D4AF37]/35 rounded-lg p-0.5 gap-1 w-full sm:w-auto justify-around sm:justify-start">
+                                {[
+                                    { value: 'all', label: 'Semua' },
+                                    { value: 'donatur', label: 'Donatur' },
+                                    { value: 'sponsorship', label: 'Sponsor' },
+                                ].map((type) => (
+                                    <button
+                                        key={type.value}
+                                        onClick={() => setTypeFilter(type.value as any)}
+                                        className={`h-full px-3 rounded-md text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex-1 sm:flex-initial text-center flex items-center justify-center ${
+                                            typeFilter === type.value
+                                                ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_10px_rgba(212,175,55,0.25)]'
+                                                : 'text-[#FDFBF7]/60 hover:text-[#D4AF37]'
+                                        }`}
+                                    >
+                                        {type.label}
+                                    </button>
+                                ))}
+                            </div>
+
                             {/* Filter Status */}
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-full sm:w-44 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
+                                <SelectTrigger className="w-full sm:w-44 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
                                     <SelectValue placeholder="Filter Status" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
@@ -788,13 +748,15 @@ export default function DaftarProposalPage() {
                                 </SelectContent>
                             </Select>
 
-                            <div className="relative w-full sm:w-64">
+
+
+                            <div className="relative w-full sm:w-64 h-8">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
                                 <Input
                                     placeholder="Cari nomor atau nama..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-9 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                                    className="pl-9 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
                                 />
                             </div>
                         </div>
@@ -815,13 +777,93 @@ export default function DaftarProposalPage() {
                             {/* Desktop View Table */}
                             <div className="hidden md:block overflow-x-auto">
                                 <table className="w-full text-sm text-left">
-                                    <thead className="text-xs text-[#D4AF37] uppercase bg-[#022c22]/60 border-y border-[#D4AF37]/20">
+                                    <thead className="text-xs text-[#D4AF37] uppercase bg-[#022c22]/60 border-y border-[#D4AF37]/20 select-none">
                                         <tr>
-                                            <th className="px-4 py-4 font-montserrat tracking-wider">No. Proposal</th>
-                                            <th className="px-4 py-4 font-montserrat tracking-wider">Tanggal</th>
-                                            <th className="px-4 py-4 font-montserrat tracking-wider">Nama Donatur / Sponsor</th>
-                                            <th className="px-4 py-4 font-montserrat tracking-wider">Jenis</th>
-                                            <th className="px-4 py-4 font-montserrat tracking-wider">Status</th>
+                                            <th 
+                                                onClick={() => handleSort('number')}
+                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                            >
+                                                <div className="flex items-center gap-1">
+                                                    <span>No. Proposal</span>
+                                                    {sortField === 'number' ? (
+                                                        sortDirection === 'asc' ? (
+                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        ) : (
+                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        )
+                                                    ) : (
+                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                    )}
+                                                </div>
+                                            </th>
+                                            <th 
+                                                onClick={() => handleSort('date')}
+                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                            >
+                                                <div className="flex items-center gap-1">
+                                                    <span>Tanggal</span>
+                                                    {sortField === 'date' ? (
+                                                        sortDirection === 'asc' ? (
+                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        ) : (
+                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        )
+                                                    ) : (
+                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                    )}
+                                                </div>
+                                            </th>
+                                            <th 
+                                                onClick={() => handleSort('name')}
+                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                            >
+                                                <div className="flex items-center gap-1">
+                                                    <span>Nama Donatur / Sponsor</span>
+                                                    {sortField === 'name' ? (
+                                                        sortDirection === 'asc' ? (
+                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        ) : (
+                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        )
+                                                    ) : (
+                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                    )}
+                                                </div>
+                                            </th>
+                                            <th 
+                                                onClick={() => handleSort('type')}
+                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                            >
+                                                <div className="flex items-center gap-1">
+                                                    <span>Jenis</span>
+                                                    {sortField === 'type' ? (
+                                                        sortDirection === 'asc' ? (
+                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        ) : (
+                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        )
+                                                    ) : (
+                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                    )}
+                                                </div>
+                                            </th>
+                                            <th 
+                                                onClick={() => handleSort('status')}
+                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                            >
+                                                <div className="flex items-center gap-1">
+                                                    <span>Status</span>
+                                                    {sortField === 'status' ? (
+                                                        sortDirection === 'asc' ? (
+                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        ) : (
+                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                        )
+                                                    ) : (
+                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                    )}
+                                                </div>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[#D4AF37]/10">
@@ -832,7 +874,11 @@ export default function DaftarProposalPage() {
                                                 transition={{ duration: 0.25, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
                                                 key={p.id} 
                                                 onClick={() => handleOpenView(p)}
-                                                className="hover:bg-[#022c22]/40 transition-colors cursor-pointer"
+                                                className={`transition-colors cursor-pointer border-l-2 ${
+                                                    isPendingRequest(p) 
+                                                        ? 'bg-red-500/5 hover:bg-red-500/10 border-l-red-500/30' 
+                                                        : 'hover:bg-[#022c22]/40 border-l-transparent'
+                                                }`}
                                             >
                                                 <td className="px-4 py-4 font-mono text-[#FDFBF7]/90 font-medium whitespace-nowrap">
                                                     {p.number}
@@ -860,6 +906,10 @@ export default function DaftarProposalPage() {
                                                     ) : p.payment_status === 'cancelled' ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                                             Batal
+                                                        </span>
+                                                    ) : isPendingRequest(p) ? (
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/25 animate-pulse">
+                                                            Butuh Follow Up
                                                         </span>
                                                     ) : p.specific_support === 'request' ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -890,7 +940,11 @@ export default function DaftarProposalPage() {
                                          transition={{ duration: 0.3, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
                                          key={p.id}
                                          onClick={() => handleOpenView(p)}
-                                         className="p-4 bg-[#022c22]/40 border border-[#D4AF37]/20 rounded-xl hover:bg-[#022c22]/60 active:bg-[#022c22]/70 transition-colors cursor-pointer space-y-3"
+                                         className={`p-4 rounded-xl transition-colors cursor-pointer space-y-3 border ${
+                                             isPendingRequest(p) 
+                                                 ? 'bg-red-500/5 border-red-500/25 hover:bg-red-500/10' 
+                                                 : 'bg-[#022c22]/40 border-[#D4AF37]/20 hover:bg-[#022c22]/60 active:bg-[#022c22]/70'
+                                         }`}
                                      >
                                          <div className="flex justify-between items-center">
                                              <span className="font-mono text-sm font-semibold text-[#FDFBF7]">
@@ -922,6 +976,10 @@ export default function DaftarProposalPage() {
                                                  ) : p.payment_status === 'cancelled' ? (
                                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
                                                          Batal
+                                                     </span>
+                                                 ) : isPendingRequest(p) ? (
+                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/25 animate-pulse">
+                                                         Butuh Follow Up
                                                      </span>
                                                  ) : p.specific_support === 'request' ? (
                                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { LogOut, LayoutDashboard, FileText, Users, User, Home, Archive } from 'lucide-react'
+import { LogOut, LayoutDashboard, FileText, Users, User, Home, Archive, Plus } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -71,8 +71,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { name: 'Beranda', path: '/', icon: Home },
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { name: 'Buat Proposal', path: '/buat-proposal', icon: FileText },
-        { name: 'Admin', path: '/daftar-proposal', icon: Archive },
+        { name: 'Proposal', path: '/buat-proposal', icon: Plus },
+        { name: 'Laporan', path: '/daftar-proposal', icon: Archive },
     ]
 
     return (

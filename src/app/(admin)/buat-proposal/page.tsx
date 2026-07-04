@@ -15,7 +15,10 @@ import {
     ArrowRight,
     Building2,
     CheckCircle,
-    Download
+    Download,
+    FileSpreadsheet,
+    HelpCircle,
+    X
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getNextNumber } from '@/lib/numbering'
@@ -50,6 +53,7 @@ export default function BuatProposalPage() {
     const [proposalNumber, setProposalNumber] = useState('')
     const [proposalPdfUrl, setProposalPdfUrl] = useState('')
     const [isSuccess, setIsSuccess] = useState(false)
+    const [isGuideOpen, setIsGuideOpen] = useState(false)
 
     useEffect(() => {
         const fetchCommittees = async () => {
@@ -228,16 +232,32 @@ export default function BuatProposalPage() {
                     </h1>
                     <p className="text-[#A0AEC0] mt-2">Pusat pembuatan dokumen Proposal Donatur dan Sponsorship</p>
                 </div>
-                
-                <Button 
-                    variant="outline" 
-                    className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] group transition-all"
-                    onClick={() => router.push('/daftar-proposal')}
-                >
-                    <ArchiveIcon className="w-4 h-4 mr-2" />
-                    Lihat Daftar Proposal
-                    <ArrowRight className="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
-                </Button>
+                <div className="flex flex-col gap-2 w-full md:w-auto items-end">
+                    <button
+                        type="button"
+                        className="w-full md:w-56 h-10 rounded-md border border-[#D4AF37]/50 text-[#D4AF37] bg-[#D4AF37]/5 hover:bg-[#D4AF37] hover:text-[#022c22] font-bold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer text-sm shadow-[0_0_10px_rgba(212,175,55,0.05)] hover:shadow-[0_0_15px_rgba(212,175,55,0.25)]"
+                        style={{
+                            animation: 'soft-blink 2s infinite ease-in-out',
+                        }}
+                        onClick={() => setIsGuideOpen(true)}
+                    >
+                        <HelpCircle className="w-4 h-4 transition-colors" />
+                        Panduan Pembuatan
+
+                        <style>{`
+                            @keyframes soft-blink {
+                                0%, 100% {
+                                    border-color: rgba(212, 175, 55, 0.4);
+                                    box-shadow: 0 0 10px rgba(212, 175, 55, 0.05);
+                                }
+                                50% {
+                                    border-color: rgba(212, 175, 55, 1);
+                                    box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+                                }
+                            }
+                        `}</style>
+                    </button>
+                </div>
             </div>
 
             <AnimatePresence mode="wait">
@@ -311,89 +331,93 @@ export default function BuatProposalPage() {
                         <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative z-20 overflow-visible">
                             <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
                                 <CardTitle className="text-[#D4AF37] flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
+                                    <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-sm">
                                         1
                                     </div>
                                     Pengaturan Global
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {/* Type Selection */}
-                                <div className="space-y-3">
-                                    <Label className="text-[#FDFBF7]">Tipe Proposal</Label>
-                                    <div className="grid grid-cols-2 gap-3">
+                            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Tipe Proposal (Baris Pertama) */}
+                                <div className="space-y-2 md:col-span-3">
+                                    <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Tipe Proposal</Label>
+                                    <div className="flex bg-[#011a14] p-1 rounded-lg border border-[#D4AF37]/20 h-11 w-full">
                                         <button
+                                            type="button"
                                             onClick={() => setProposalType('donatur')}
-                                            className={`p-4 rounded-xl border transition-all flex flex-col items-center justify-center gap-2 ${
+                                            className={`flex-1 text-sm rounded-md transition-all font-semibold flex items-center justify-center gap-1.5 cursor-pointer ${
                                                 proposalType === 'donatur' 
-                                                ? 'bg-[#D4AF37] border-[#D4AF37] text-[#022c22] shadow-[0_0_15px_rgba(212,175,55,0.3)]' 
-                                                : 'bg-transparent border-[#D4AF37]/30 text-[#A0AEC0] hover:border-[#D4AF37]/70 hover:text-[#FDFBF7]'
+                                                ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_8px_rgba(212,175,55,0.25)]' 
+                                                : 'text-[#A0AEC0] hover:text-[#D4AF37]'
                                             }`}
                                         >
-                                            <Heart className="w-6 h-6" />
-                                            <span className="font-semibold text-sm">Donatur Pribadi</span>
+                                            <Heart className="w-4 h-4" />
+                                            Donatur
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={() => setProposalType('sponsorship')}
-                                            className={`p-4 rounded-xl border transition-all flex flex-col items-center justify-center gap-2 ${
+                                            className={`flex-1 text-sm rounded-md transition-all font-semibold flex items-center justify-center gap-1.5 cursor-pointer ${
                                                 proposalType === 'sponsorship' 
-                                                ? 'bg-[#D4AF37] border-[#D4AF37] text-[#022c22] shadow-[0_0_15px_rgba(212,175,55,0.3)]' 
-                                                : 'bg-transparent border-[#D4AF37]/30 text-[#A0AEC0] hover:border-[#D4AF37]/70 hover:text-[#FDFBF7]'
+                                                ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_8px_rgba(212,175,55,0.25)]' 
+                                                : 'text-[#A0AEC0] hover:text-[#D4AF37]'
                                             }`}
                                         >
-                                            <Users className="w-6 h-6" />
-                                            <span className="font-semibold text-sm">Sponsorship Institusi</span>
+                                            <Users className="w-4 h-4" />
+                                            Sponsorship
                                         </button>
                                     </div>
                                 </div>
-                                
-                                <div className="space-y-6">
-                                    {/* Language Selection */}
-                                    <div className="space-y-3">
-                                        <Label className="text-[#FDFBF7]">Bahasa Proposal</Label>
-                                        <div className="flex bg-[#011a14] p-1 rounded-lg border border-[#D4AF37]/20">
-                                            <button
-                                                onClick={() => setFormData({ ...formData, language: 'id' })}
-                                                className={`flex-1 py-2 text-sm rounded-md transition-all ${
-                                                    formData.language === 'id' ? 'bg-[#D4AF37] text-[#022c22] font-semibold' : 'text-[#A0AEC0] hover:text-[#FDFBF7]'
-                                                }`}
-                                            >
-                                                Indonesia (ID)
-                                            </button>
-                                            <button
-                                                onClick={() => setFormData({ ...formData, language: 'en' })}
-                                                className={`flex-1 py-2 text-sm rounded-md transition-all ${
-                                                    formData.language === 'en' ? 'bg-[#D4AF37] text-[#022c22] font-semibold' : 'text-[#A0AEC0] hover:text-[#FDFBF7]'
-                                                }`}
-                                            >
-                                                English (EN)
-                                            </button>
-                                        </div>
-                                    </div>
 
-                                    {/* PIC Selection */}
-                                    <div className="space-y-3">
-                                        <Label className="text-[#FDFBF7]">Panitia Penanggung Jawab (PIC) <span className="text-red-400">*</span></Label>
-                                        <SearchableSelect
-                                            options={committees.map(c => ({ value: c.id, label: c.name }))}
-                                            value={formData.committee_id}
-                                            onChange={(val) => setFormData(prev => ({ ...prev, committee_id: val }))}
-                                            placeholder="Pilih nama panitia..."
-                                            disabled={committees.length === 0}
-                                        />
+                                {/* Bahasa Proposal */}
+                                <div className="space-y-2 md:col-span-1">
+                                    <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Bahasa</Label>
+                                    <div className="flex bg-[#011a14] p-1 rounded-lg border border-[#D4AF37]/20 h-11">
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, language: 'id' })}
+                                            className={`flex-1 text-sm rounded-md transition-all font-semibold cursor-pointer ${
+                                                formData.language === 'id' ? 'bg-[#D4AF37] text-[#022c22]' : 'text-[#A0AEC0] hover:text-[#FDFBF7]'
+                                            }`}
+                                        >
+                                            ID
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, language: 'en' })}
+                                            className={`flex-1 text-sm rounded-md transition-all font-semibold cursor-pointer ${
+                                                formData.language === 'en' ? 'bg-[#D4AF37] text-[#022c22]' : 'text-[#A0AEC0] hover:text-[#FDFBF7]'
+                                            }`}
+                                        >
+                                            EN
+                                        </button>
                                     </div>
+                                </div>
 
-                                    {/* Proposal Date */}
-                                    <div className="space-y-2">
-                                        <Label className="text-[#FDFBF7]">Tanggal Proposal</Label>
-                                        <Input
-                                            type="date"
-                                            name="proposal_date"
-                                            value={formData.proposal_date}
-                                            onChange={handleInputChange}
-                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] [color-scheme:dark]"
-                                        />
-                                    </div>
+                                {/* PIC Selection */}
+                                <div className="space-y-2 md:col-span-1">
+                                    <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">
+                                        PIC Panitia <span className="text-red-400">*</span>
+                                    </Label>
+                                    <SearchableSelect
+                                        options={committees.map(c => ({ value: c.id, label: c.name }))}
+                                        value={formData.committee_id}
+                                        onChange={(val) => setFormData(prev => ({ ...prev, committee_id: val }))}
+                                        placeholder="Pilih nama..."
+                                        disabled={committees.length === 0}
+                                    />
+                                </div>
+
+                                {/* Proposal Date */}
+                                <div className="space-y-2 md:col-span-1">
+                                    <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Tanggal</Label>
+                                    <Input
+                                        type="date"
+                                        name="proposal_date"
+                                        value={formData.proposal_date}
+                                        onChange={handleInputChange}
+                                        className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] [color-scheme:dark] h-11 text-sm"
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
@@ -547,27 +571,147 @@ export default function BuatProposalPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+            <ProposalGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
         </div>
     )
 }
 
-function ArchiveIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="20" height="5" x="2" y="4" rx="1" />
-      <path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" />
-      <path d="M10 13h4" />
-    </svg>
-  )
+function ProposalGuideModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0"
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        initial={{ scale: 0.95, y: 20, opacity: 0 }}
+                        animate={{ scale: 1, y: 0, opacity: 1 }}
+                        exit={{ scale: 0.95, y: 20, opacity: 0 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                        className="bg-[#022c22] border border-[#D4AF37]/35 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative z-10"
+                    >
+                        {/* Accent Glow */}
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-[#D4AF37] to-emerald-500" />
+                        
+                        {/* Modal Header */}
+                        <div className="p-5 border-b border-[#D4AF37]/20 flex items-center justify-between bg-black/25">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 flex items-center justify-center">
+                                    <HelpCircle className="w-4 h-4 text-[#D4AF37]" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-[#FDFBF7] text-base font-playfair tracking-wide">
+                                        Panduan Pembuatan Proposal
+                                    </h3>
+                                    <p className="text-[10px] text-[#D4AF37]/80">Alur kerja sistem proposal HUT ke-16 PKLU</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-1 rounded-lg text-[#A0AEC0] hover:text-[#FDFBF7] hover:bg-white/5 transition-all cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-6 space-y-6 max-h-[65vh] overflow-y-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Donatur Card */}
+                                <div className="bg-black/20 border border-[#D4AF37]/15 rounded-xl p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-[#D4AF37]">
+                                        <Heart className="w-4 h-4 text-[#D4AF37]" />
+                                        <span className="font-bold text-xs uppercase tracking-wider">1. Tipe Donatur</span>
+                                    </div>
+                                    <p className="text-[11px] text-[#A0AEC0] leading-relaxed">
+                                        Ditujukan untuk perorangan, jemaat, keluarga, atau donatur pribadi. Format proposal lebih kasual, fokus pada dukungan sukarela dan kebersamaan pelayanan.
+                                    </p>
+                                    <ul className="text-[10px] text-[#A0AEC0]/85 list-disc list-inside space-y-1">
+                                        <li>Nama donatur tercantum di Buku Acara</li>
+                                        <li>Informasi asal jemaat GPIB (opsional)</li>
+                                    </ul>
+                                </div>
+
+                                {/* Sponsorship Card */}
+                                <div className="bg-black/20 border border-[#D4AF37]/15 rounded-xl p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-[#D4AF37]">
+                                        <Users className="w-4 h-4 text-[#D4AF37]" />
+                                        <span className="font-bold text-xs uppercase tracking-wider">2. Tipe Sponsorship</span>
+                                    </div>
+                                    <p className="text-[11px] text-[#A0AEC0] leading-relaxed">
+                                        Ditujukan untuk instansi komersial, perusahaan, atau organisasi. Mengedepankan kerja sama promosi timbal balik dan kontrak bernilai komitmen tertentu.
+                                    </p>
+                                    <ul className="text-[10px] text-[#A0AEC0]/85 list-disc list-inside space-y-1">
+                                        <li>Wajib mencantumkan Nama PIC instansi</li>
+                                        <li>Wajib mengisi Jabatan PIC instansi</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {/* Flow Steps */}
+                            <div className="space-y-4">
+                                <h4 className="font-semibold text-xs text-[#FDFBF7] uppercase tracking-widest border-b border-[#D4AF37]/15 pb-1">
+                                    Langkah Pembuatan & Pengiriman:
+                                </h4>
+                                
+                                <div className="space-y-3 text-xs">
+                                    <div className="flex gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            A
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-semibold text-[#FDFBF7]">Atur Pengaturan Global</p>
+                                            <p className="text-[11px] text-[#A0AEC0]">
+                                                Pilih jenis proposal, atur bahasa (ID/EN), pilih Panitia yang bertanggung jawab sebagai kontak rujukan, serta atur tanggal proposal.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            B
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-semibold text-[#FDFBF7]">Input Data Target & WhatsApp</p>
+                                            <p className="text-[11px] text-[#A0AEC0]">
+                                                Masukkan identitas calon pendukung dengan benar. Pastikan Nomor WhatsApp aktif (format nomor lokal Indonesia).
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            C
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-semibold text-[#FDFBF7]">Generate PDF & Kirimkan</p>
+                                            <p className="text-[11px] text-[#A0AEC0]">
+                                                Klik tombol generate. Sistem akan mengunci nomor proposal unik dan membuat PDF secara instan. Anda dapat langsung mengunduh PDF atau menekan "Kirim via WhatsApp" untuk mengirim proposal disertai tautan dan pesan pengantar otomatis.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-4 border-t border-[#D4AF37]/15 flex justify-end bg-black/25">
+                            <Button
+                                type="button"
+                                onClick={onClose}
+                                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#022c22] font-semibold text-xs rounded-lg px-4 h-9 cursor-pointer"
+                            >
+                                Saya Mengerti
+                            </Button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+    )
 }

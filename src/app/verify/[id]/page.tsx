@@ -219,7 +219,7 @@ export default function VerificationPage() {
                                     </div>
                                 </div>
 
-                                {proposal.type === 'donatur' && (proposal.contribution_form || proposal.contribution_value) && (
+                                {(proposal.contribution_form || proposal.contribution_value) && (
                                     <>
                                         <div className="border-t border-white/5 pt-3.5 mt-3.5 space-y-3.5">
                                             {proposal.contribution_form && (
@@ -233,7 +233,7 @@ export default function VerificationPage() {
                                                     </div>
                                                 </div>
                                             )}
-
+ 
                                             {proposal.contribution_value && Number(proposal.contribution_value) > 0 && (
                                                 <>
                                                     <div className="flex gap-3">
@@ -246,18 +246,24 @@ export default function VerificationPage() {
                                                         </div>
                                                     </div>
                                                     
-                                                    <div className="flex gap-3">
-                                                        <User className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                                                        <div>
-                                                            <p className="text-white/40 text-[10px] uppercase tracking-wide">Kategori Apresiasi Donatur</p>
-                                                            <p className="text-sm font-semibold text-[#FDFBF7] capitalize">
-                                                                {proposal.donatur_category?.replace('_', ' ')}
-                                                            </p>
+                                                    {(proposal.donatur_category || proposal.sponsor_package) && (
+                                                        <div className="flex gap-3">
+                                                            <User className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                                                            <div>
+                                                                <p className="text-white/40 text-[10px] uppercase tracking-wide">
+                                                                    {proposal.type === 'donatur' ? 'Kategori Apresiasi Donatur' : 'Paket Sponsorship'}
+                                                                </p>
+                                                                <p className="text-sm font-semibold text-[#FDFBF7] capitalize">
+                                                                    {proposal.type === 'donatur' 
+                                                                        ? proposal.donatur_category?.replace('_', ' ') 
+                                                                        : proposal.sponsor_package?.replace('_', ' ')}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                 </>
                                             )}
-
+ 
                                             {proposal.specific_support && (
                                                 <div className="flex gap-3">
                                                     <FileText className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />
@@ -269,7 +275,7 @@ export default function VerificationPage() {
                                                     </div>
                                                 </div>
                                             )}
-
+ 
                                             {proposal.message && (
                                                 <div className="flex gap-3">
                                                     <FileText className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />

@@ -590,7 +590,7 @@ export default function BuatProposalPage() {
                                 ) : (
                                     <>
                                         <FileText className="w-5 h-5 mr-3" />
-                                        Generate Proposal {proposalType === 'donatur' ? 'Donatur' : 'Sponsorship'}
+                                        Generate Proposal
                                     </>
                                 )}
                             </Button>

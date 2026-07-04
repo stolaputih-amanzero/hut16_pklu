@@ -454,6 +454,23 @@ export default function DaftarProposalPage() {
             return
         }
 
+        // Date constraints validation
+        if (formData.confirmed_date && formData.proposal_date && formData.confirmed_date < formData.proposal_date) {
+            toast.error('Tanggal Konfirmasi tidak boleh sebelum Tanggal Dibuat')
+            return
+        }
+
+        if (formData.paid_date) {
+            if (formData.proposal_date && formData.paid_date < formData.proposal_date) {
+                toast.error('Tanggal Lunas tidak boleh sebelum Tanggal Dibuat')
+                return
+            }
+            if (formData.confirmed_date && formData.paid_date < formData.confirmed_date) {
+                toast.error('Tanggal Lunas tidak boleh sebelum Tanggal Konfirmasi')
+                return
+            }
+        }
+
         try {
             setModalSubmitting(true)
 

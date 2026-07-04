@@ -10,8 +10,8 @@ const styles = StyleSheet.create({
     },
     backgroundLogo: {
         position: 'absolute',
-        top: 148,
-        left: 296,
+        top: 134.5,
+        left: 258,
         width: 250,
         height: 250,
         opacity: 0.03, // Very subtle watermark
@@ -119,16 +119,16 @@ const styles = StyleSheet.create({
     },
     qrContainer: {
         alignItems: 'center',
-        width: 100,
-        padding: 6,
+        width: 85,
+        padding: 5,
         border: '1pt solid #e2e8f0',
         backgroundColor: '#ffffff',
-        borderRadius: 8,
+        borderRadius: 6,
         marginBottom: 0
     },
     qrCode: {
-        width: 70,
-        height: 70,
+        width: 55,
+        height: 55,
         marginBottom: 4
     },
     qrText: {
@@ -180,6 +180,24 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
     const baseUrl = origin || 'https://pklu.amanloka.com'
     const verifyUrl = `${baseUrl}/verify/${data.id || '0000-0000'}`
     const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(verifyUrl)}&size=200&margin=1&dark=022c22`
+
+    const formatDateLong = (dateStr: string, isId: boolean) => {
+        try {
+            const d = new Date(dateStr)
+            if (isNaN(d.getTime())) {
+                return isId ? '12 Oktober 2026' : 'October 12, 2026'
+            }
+            const options: Intl.DateTimeFormatOptions = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                timeZone: 'Asia/Jakarta'
+            }
+            return d.toLocaleDateString(isId ? 'id-ID' : 'en-US', options)
+        } catch {
+            return isId ? '12 Oktober 2026' : 'October 12, 2026'
+        }
+    }
 
     return (
         <Document>
@@ -234,12 +252,14 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
 
                         {/* Footer Signatures */}
                         <View style={styles.footerContainer}>
+                            <View style={{ alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ fontFamily: 'Times-Roman', fontSize: 11, color: '#475569' }}>
+                                    {isId ? 'Bekasi' : 'Bekasi'}, {formatDateLong(data.paid_date || data.confirmed_date || data.confirmed_at || data.created_at, isId)}
+                                </Text>
+                            </View>
                             <View style={styles.footer}>
                                 {/* Left Signature */}
                                 <View style={styles.signatureBlock}>
-                                    <Text style={styles.dateText}>
-                                        {isId ? 'Bekasi, 12 Oktober 2026' : 'Bekasi, October 12, 2026'}
-                                    </Text>
                                     <Text style={styles.signatureTitle}>
                                         {isId ? 'Ketua Panitia' : 'Committee Chairperson'}
                                     </Text>
@@ -260,7 +280,6 @@ export function TandaPenghargaanPDF({ data, lang, logoUrl, origin }: Props) {
 
                                 {/* Right Signature */}
                                 <View style={styles.signatureBlock}>
-                                    <Text style={styles.dateText}> </Text>
                                     <Text style={styles.signatureTitle}>
                                         {isId ? 'Sekretaris' : 'Secretary'}
                                     </Text>

@@ -1131,7 +1131,7 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
 
                     <View style={{ alignItems: 'center', marginTop: 15 }}>
                         <View style={[styles.signCenterBox, { marginTop: 0 }]}>
-                            <Text style={[styles.signTitle, { marginBottom: 25, color: '#022c22' }]}>{isId ? 'Mengetahui,\nBadan Pelaksana MUPEL Jemaat – Jemaat Bekasi' : 'Acknowledged by,\nExecutive Board of GPIB MUPEL - Bekasi Jemaat'}</Text>
+                            <Text style={[styles.signTitle, { marginBottom: 25, color: '#022c22' }]}>{isId ? 'Mengetahui,\nBadan Pelaksana MUPEL Bekasi' : 'Acknowledged by,\nExecutive Board of GPIB MUPEL - Bekasi'}</Text>
                             <Text style={styles.signName}>Pdt. Daniel J C Lumentut, S.Th., M.M</Text>
                             <View style={[styles.signLine, { width: 180, marginTop: 4, marginBottom: 4 }]} />
                             <Text style={styles.signRole}>{isId ? 'Ketua B.P Mupel Bekasi' : 'Chairperson of BP Mupel Bekasi'}</Text>

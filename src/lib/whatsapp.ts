@@ -21,81 +21,66 @@ const TEMPLATES: Record<Lang, Record<WATemplateType, (d: any) => string>> = {
  
 Salam sejahtera dalam kasih Kristus,
  
-Dengan penuh hormat dan sukacita, kami dari Panitia HUT ke-16 Pelkat PKLU GPIB bermaksud menyampaikan permohonan dukungan dan partisipasi Bapak/Ibu untuk kegiatan peringatan:
+Panitia HUT ke-16 Pelayanan Kategorial Persekutuan Kaum Lanjut Usia (Pelkat PKLU) GPIB mengharapkan kesediaan Bapak/Ibu untuk berpartisipasi dalam perayaan syukur:
  
-*=============================*
-*✦  HUT KE-16 PELKAT PKLU GPIB  ✦*
-*=============================*
+*HUT Ke-16 Pelkat PKLU GPIB*
+• Hari, Tanggal: Senin, 12 Oktober 2026
+• Lokasi: Bekasi Convention Center, Hotel Santika Mega Mall
+• Tema Utama: "Teruskan Baktimu!" (Lansia Teladan dalam Iman, Karya, dan Pelayanan)
  
-*▪ Hari & Tanggal:*
-Senin, 12 Oktober 2026
+*Dokumen Terlampir:*
+Proposal Dukungan (Reg. No: ${d.number})
  
-*▪ Tempat:*
-Bekasi Convention Center
-Hotel Santika Mega Mall
- 
-*▪ Tema:*
-*"Teruskan Baktimu!"*
-(Lansia Teladan dalam Iman, Karya, dan Pelayanan)
- 
-*-----------------------------*
-*▪ Dokumen Lampiran:*
-Proposal Dukungan Terlampir
-(Nomor Registrasi: ${d.number})
-*=============================*
- 
-Setiap dukungan kasih yang Bapak/Ibu berikan sangat berarti bagi pelayanan kaum lanjut usia di lingkungan GPIB. Kiranya Tuhan Yesus Kristus senantiasa memberkati Bapak/Ibu beserta keluarga.
+Dukungan kasih yang Bapak/Ibu berikan adalah wujud nyata pelayanan bersama demi kaum lanjut usia. Kiranya kasih karunia Tuhan Yesus Kristus senantiasa menyertai Bapak/Ibu beserta keluarga.
  
 Hormat kami,
-*Panitia HUT ke-16 PKLU GPIB*`,
+*Panitia Pelaksana HUT 16 PKLU GPIB*`,
  
         token: (d) =>
             `*Yth. Bapak/Ibu ${d.display_name}*
  
 Salam sejahtera dalam kasih Kristus,
  
-Kami menghaturkan limpah terima kasih atas dukungan kasih yang telah Bapak/Ibu berikan untuk perayaan HUT ke-16 Pelkat PKLU GPIB. 
+Panitia Pelaksana HUT ke-16 Pelkat PKLU GPIB menyampaikan terima kasih yang tulus atas partisipasi dan dukungan kasih yang telah Bapak/Ibu berikan.
  
-Sebagai bentuk apresiasi dan penghargaan kami, bersama pesan ini kami lampirkan *Tanda Penghargaan* resmi dari panitia.
+Sebagai wujud apresiasi mendalam kami, berikut dilampirkan dokumen penghargaan resmi dari Panitia:
  
-▪ *Tanda Penghargaan Terlampir*
+• *Tanda Penghargaan Resmi* (Terlampir)
  
-Kiranya Tuhan Yesus Kristus senantiasa memberkati setiap kebaikan dan pelayanan Bapak/Ibu.
+Kiranya Tuhan Yesus Kristus senantiasa memberkati pelayanan dan kebaikan Bapak/Ibu beserta keluarga.
  
 Hormat kami,
-*Panitia HUT ke-16 PKLU GPIB*
-"Teruskan Baktimu!"`,
+*Panitia Pelaksana HUT 16 PKLU GPIB*`,
  
         confirmation: (d) =>
             `*Yth. Bapak/Ibu ${d.name}*
  
 Salam sejahtera,
  
-Kami ingin mengonfirmasi dengan penuh syukur bahwa dukungan kasih dari Bapak/Ibu sebesar *${formatRupiah(d.value)}* telah kami terima dengan baik.
+Kami mengonfirmasi bahwa dukungan kasih dari Bapak/Ibu sebesar *${formatRupiah(d.value)}* telah kami terima dengan baik.
  
-Dokumen Tanda Penghargaan resmi sedang dalam proses penerbitan dan akan segera kami kirimkan kepada Bapak/Ibu.
+Dokumen Tanda Penghargaan resmi saat ini sedang dalam proses penerbitan oleh Panitia dan akan segera kami sampaikan kepada Bapak/Ibu.
  
-Terima kasih yang sebesar-besarnya atas kepedulian dan kemurahan hati Bapak/Ibu untuk mensukseskan perayaan HUT ke-16 Pelkat PKLU GPIB (12 Oktober 2026).
+Apresiasi setinggi-tingginya kami haturkan atas kepedulian Bapak/Ibu dalam menyukseskan Perayaan HUT ke-16 Pelkat PKLU GPIB.
  
 Hormat kami,
-*Panitia HUT ke-16 PKLU GPIB*`,
+*Panitia Pelaksana HUT 16 PKLU GPIB*`,
  
         commitment: (d) =>
             `*Yth. Bapak/Ibu ${d.name}*
  
 Salam sejahtera dalam kasih Kristus,
  
-Kami mengucapkan terima kasih yang sebesar-besarnya atas komitmen dukungan yang telah Bapak/Ibu berikan untuk perayaan HUT ke-16 Pelkat PKLU GPIB.
+Panitia Pelaksana HUT ke-16 Pelkat PKLU GPIB menyampaikan apresiasi mendalam atas pernyataan komitmen dukungan yang telah Bapak/Ibu berikan.
  
-Berikut kami lampirkan *Surat Konfirmasi Komitmen & Ucapan Terima Kasih* resmi yang mencatat partisipasi Bapak/Ibu.
+Berikut kami lampirkan dokumen konfirmasi resmi atas partisipasi Bapak/Ibu:
  
-▪ *Surat Konfirmasi Komitmen Terlampir*
+• *Surat Konfirmasi Komitmen & Ucapan Terima Kasih* (Terlampir)
  
-Kiranya Tuhan Yesus Kristus senantiasa memberkati setiap kebaikan dan pelayanan Bapak/Ibu.
+Kiranya Tuhan Yesus Kristus memberkati kebaikan serta pelayanan Bapak/Ibu beserta keluarga.
  
 Hormat kami,
-*Panitia HUT ke-16 PKLU GPIB*
-"Teruskan Baktimu!"`,
+*Panitia Pelaksana HUT 16 PKLU GPIB*`,
      },
  
      en: {
@@ -104,30 +89,17 @@ Hormat kami,
  
 Warm greetings in the love of Christ,
  
-With great respect and joy, we from the 16th Anniversary Committee of Pelkat PKLU GPIB would like to humbly invite your support and participation in our upcoming celebration:
+The Organizing Committee of the 16th Anniversary of the Categorical Fellowship of the Elderly (Pelkat PKLU) GPIB humbly requests your support and participation in our upcoming celebration:
  
-*=============================*
-*✦  16th ANNIVERSARY OF PKLU GPIB  ✦*
-*=============================*
+*16th Anniversary of Pelkat PKLU GPIB*
+• Date: Monday, October 12, 2026
+• Venue: Bekasi Convention Center, Hotel Santika Mega Mall
+• Theme: "Continue Your Service!" (Elderly Role Models in Faith, Work, and Service)
  
-*▪ Date:*
-Monday, October 12, 2026
+*Attached Document:*
+Support Proposal (Reg. No: ${d.number})
  
-*▪ Location:*
-Bekasi Convention Center
-Hotel Santika Mega Mall
- 
-*▪ Theme:*
-*"Continue Your Service!"*
-(Elderly Role Models in Faith, Work, and Service)
- 
-*-----------------------------*
-*▪ Attachment Document:*
-Support Proposal Attached
-(Registration No: ${d.number})
-*=============================*
- 
-Every act of kindness and support you provide will be a profound blessing to the ministry of our elderly members within the GPIB community. May the Lord Jesus Christ continuously bless you and your family.
+Your support is a profound blessing to our senior members' ministry. May the grace of our Lord Jesus Christ be with you and your family.
  
 Sincerely,
 *The 16th PKLU GPIB Anniversary Committee*`,
@@ -137,28 +109,27 @@ Sincerely,
  
 Warm greetings in the love of Christ,
  
-We would like to express our deepest gratitude for your generous support towards the 16th Anniversary of Pelkat PKLU GPIB.
+The Organizing Committee of the 16th Anniversary of Pelkat PKLU GPIB expresses our deepest gratitude for your generous support.
  
-In recognition of your invaluable contribution, we are honored to present you with this official *Token of Appreciation*.
+In recognition of your contribution, we are pleased to attach your official token of appreciation:
  
-▪ *Token of Appreciation Attached*
+• *Token of Appreciation* (Attached)
  
-May the Lord Jesus Christ bless every kindness you have shown.
+May the Lord Jesus Christ continuously bless you, your family, and your ministries.
  
 Sincerely,
-*The 16th PKLU GPIB Anniversary Committee*
-"Continue Your Service!"`,
+*The 16th PKLU GPIB Anniversary Committee*`,
  
         confirmation: (d) =>
             `*Dear Mr./Ms. ${d.name},*
  
 Warm greetings,
  
-We write to gratefully confirm that your generous support of *${formatRupiah(d.value)}* has been successfully received.
+We are pleased to confirm that your generous contribution of *${formatRupiah(d.value)}* has been successfully received.
  
-Your official Token of Appreciation is currently being processed and will be sent to you shortly.
+Your official Token of Appreciation is being processed and will be delivered to you shortly.
  
-Thank you very much for your outstanding care and generosity in ensuring the success of the 16th PKLU GPIB Anniversary (October 12, 2026).
+Thank you for your outstanding generosity in supporting the 16th Anniversary of Pelkat PKLU GPIB.
  
 Sincerely,
 *The 16th PKLU GPIB Anniversary Committee*`,
@@ -168,17 +139,16 @@ Sincerely,
  
 Warm greetings in the love of Christ,
  
-We express our deepest gratitude for the commitment of support you have provided for the 16th Anniversary of Pelkat PKLU GPIB.
+The Organizing Committee of the 16th Anniversary of Pelkat PKLU GPIB expresses our sincere appreciation for your commitment of support.
  
-We have attached your official *Commitment Confirmation & Thank You Letter* below.
+Please find the official confirmation of your participation attached below:
  
-▪ *Commitment Confirmation Attached*
+• *Commitment Confirmation & Thank You Letter* (Attached)
  
-May the Lord Jesus Christ continuously bless you and your family.
+May the Lord Jesus Christ bless your kindness and ministries.
  
 Sincerely,
-*The 16th PKLU GPIB Anniversary Committee*
-"Continue Your Service!"`,
+*The 16th PKLU GPIB Anniversary Committee*`,
      },
  }
 

@@ -5,7 +5,7 @@ import { GuestbookList } from "@/components/GuestbookList";
 import { MessageSquareQuote, HeartHandshake, ShieldCheck, HelpCircle, FileText, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
-  title: "Buku Tamu Digital & Ucapan Selamat - HUT ke-16 PKLU GPIB",
+  title: "Buku Tamu Digital - HUT ke-16 PKLU GPIB",
   description: "Tuliskan ucapan selamat dan doa untuk HUT ke-16 Pelayanan Kategorial Lanjut Usia (PKLU) GPIB 2026.",
 };
 
@@ -27,7 +27,7 @@ export default async function GuestbookPage() {
             <HeartHandshake className="w-8 h-8 text-[#D4AF37]" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-[#D4AF37] sm:text-4xl">
-            Buku Tamu Digital &amp; Ucapan Selamat
+            Buku Tamu Digital
           </h1>
           <p className="text-gray-300 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
             Tuliskan ucapan selamat dan doa sukacita untuk HUT ke-16 PKLU GPIB.

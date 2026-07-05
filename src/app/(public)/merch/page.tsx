@@ -3,7 +3,7 @@ import { MerchOrderForm } from "@/components/MerchOrderForm";
 import { ShoppingBag } from "lucide-react";
 
 export const metadata = {
-  title: "Pemesanan Merchandise Tambahan - HUT ke-16 PKLU GPIB",
+  title: "Merchandise - HUT ke-16 PKLU GPIB",
   description: "Pesan souvenir dan merchandise cenderamata edisi khusus HUT ke-16 Pelayanan Kategorial Lanjut Usia (PKLU) GPIB 2026.",
 };
 
@@ -24,7 +24,7 @@ export default async function MerchOrderPage() {
             <ShoppingBag className="w-8 h-8 text-[#D4AF37]" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-[#D4AF37] sm:text-4xl">
-            Merchandise &amp; Souvenir Edisi HUT 16
+            Merchandise
           </h1>
           <p className="text-gray-300 max-w-lg mx-auto text-xs md:text-sm leading-relaxed">
             Dapatkan koleksi souvenir cenderamata edisi terbatas HUT ke-16 PKLU GPIB 2026.

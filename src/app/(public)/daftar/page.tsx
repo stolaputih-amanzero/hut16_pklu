@@ -2,6 +2,11 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { RegistrationForm } from "@/components/registration-form";
 import { Calendar, Clock, MapPin, Phone } from "lucide-react";
 
+export const metadata = {
+  title: "Pendaftaran - HUT ke-16 PKLU GPIB",
+  description: "Isi formulir pendaftaran peserta atau pendamping HUT ke-16 PKLU GPIB.",
+};
+
 export const revalidate = 3600; // Cache for 1 hour since churches rarely change
 
 export default async function RegistrationPage() {
@@ -12,7 +17,6 @@ export default async function RegistrationPage() {
     .order("name", { ascending: true });
 
   if (error) {
-    console.error("Error fetching churches:", error);
     return (
       <div className="flex h-screen items-center justify-center">
         <p className="text-red-500">Gagal memuat data jemaat. Silakan muat ulang halaman.</p>
@@ -25,7 +29,7 @@ export default async function RegistrationPage() {
       <div className="mx-auto max-w-3xl space-y-8 rounded-2xl bg-black/40 p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold tracking-tighter text-[#D4AF37] sm:text-4xl md:text-5xl">
-            Registrasi HUT ke-16 PKLU
+            Pendaftaran
           </h1>
           <p className="text-muted-foreground md:text-lg">
             Isi formulir di bawah ini untuk mendaftar sebagai peserta atau pendamping.

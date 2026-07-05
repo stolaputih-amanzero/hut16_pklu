@@ -1155,7 +1155,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="fixed bottom-6 right-6 z-40"
+        className="fixed bottom-20 right-6 md:bottom-6 z-40"
       >
         <Link 
           href="/dashboard" 

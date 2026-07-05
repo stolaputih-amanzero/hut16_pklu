@@ -16,15 +16,25 @@ export default function PublicLayout({
       {/* Shared Public Footer */}
       <footer className="border-t border-[#D4AF37]/20 bg-black/80 pt-8 pb-28 md:pb-8 px-4 text-center text-xs text-gray-400 space-y-2">
         <div className="container mx-auto max-w-4xl space-y-2">
-          <p className="text-gray-300 font-semibold">
-            PANITIA PELAKSANA TEMU &amp; HUT KE-16 PELKAT PKLU GPIB TAHUN 2026
-          </p>
-          <p className="text-[11px] text-gray-400">
-            Musyawarah Pelayanan (Mupel) GPIB Bekasi • Host Venue: Bekasi Convention Center
-          </p>
           <p className="text-[10px] text-[#D4AF37]">
             &copy; 2026 Pelkat PKLU GPIB. All Rights Reserved.
           </p>
+          <div className="flex items-center justify-center gap-1.5 text-[10px] text-gray-500 pt-1">
+            <span>Powered by</span>
+            <a 
+              href="https://amanloka.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-1 hover:text-[#D4AF37] transition-all duration-300 group"
+            >
+              <img 
+                src="/aman.png" 
+                alt="AMAN Ecosystem" 
+                className="h-3 w-auto object-contain opacity-60 group-hover:opacity-100 transition-opacity" 
+              />
+              <span className="font-medium tracking-wide">AMAN Ecosystem</span>
+            </a>
+          </div>
         </div>
       </footer>
     </div>

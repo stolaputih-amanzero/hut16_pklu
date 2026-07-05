@@ -35,10 +35,10 @@ const DEADLINE_BAJU = new Date("2026-07-31T23:59:59+07:00");
 const IS_PAST_DEADLINE = new Date() > DEADLINE_BAJU;
 
 const formSchema = z.object({
-  registration_mode: z.enum(["Mandiri", "Rombongan"], { required_error: "Pilih mode pendaftaran" }),
+  registration_mode: z.enum(["Mandiri", "Rombongan"], { message: "Pilih mode pendaftaran" }),
   
   // Kolom Bersama
-  category: z.enum(["Umum", "Tuan Rumah"], { required_error: "Pilih kategori" }),
+  category: z.enum(["Umum", "Tuan Rumah"], { message: "Pilih kategori" }),
   mupel: z.string().min(1, "Pilih Mupel"),
   church_name: z.string().min(1, "Pilih Jemaat"),
   whatsapp_number: z.string().min(5, "Nomor WhatsApp tidak valid"),
@@ -136,7 +136,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
   const [pendingData, setPendingData] = useState<FormValues | null>(null);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       registration_mode: "Mandiri",
       category: undefined,
@@ -620,7 +620,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
                   {["S", "M", "L", "XL", "XXL", "XXXL"].map((s) => (
                     <div key={s} className="space-y-1 text-center">
                       <Label className="text-xs font-semibold">{s}</Label>
-                      <Input type="number" min="0" className="text-center bg-black/50 px-1" {...register(`shirt_sizes.${s as any}`)} />
+                      <Input type="number" min="0" className="text-center bg-black/50 px-1" {...register(`shirt_sizes.${s}` as any)} />
                     </div>
                   ))}
                 </div>

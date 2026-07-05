@@ -7,7 +7,7 @@ export const metadata = {
   openGraph: {
     title: "Twibbon Generator & Social Media Kit - HUT ke-16 PKLU GPIB 2026",
     description: "Mari meriahkan HUT ke-16 PKLU GPIB! Pasang foto Anda di Twibbon resmi dan dapatkan caption kampanyenya.",
-    url: "https://hut16-pklu.gpib.or.id/twibbon",
+    url: "https://pklu.amanloka.com/twibbon",
     siteName: "HUT ke-16 PKLU GPIB 2026",
     images: [
       {

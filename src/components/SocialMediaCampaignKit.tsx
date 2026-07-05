@@ -43,7 +43,7 @@ Tema: _Bertumbuh dalam Keselamatan_
 Tagline: _Teruskan Baktimu_
 
 Daftar sekarang melalui website resmi:
-https://hut16-pklu.gpib.or.id/daftar
+https://pklu.amanloka.com/daftar
 
 #HUTPKLU16 #GPIB #PKLUGPIB #KaumLanjutUsia`,
 };

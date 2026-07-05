@@ -285,7 +285,7 @@ export default function AdminMerchPage() {
                     <div className="p-4 space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="font-bold text-white text-sm leading-snug">{item.name}</h3>
-                        <span className="font-mono font-extrabold text-[#D4AF37] text-xs shrink-0">
+                        <span className="font-mono font-extrabold text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-2 py-0.5 rounded text-xs shrink-0">
                           Rp {item.price.toLocaleString("id-ID")}
                         </span>
                       </div>
@@ -444,16 +444,37 @@ export default function AdminMerchPage() {
                           )}
                         </td>
                         <td className="p-3 font-semibold text-[#D4AF37] whitespace-nowrap">{o.item_type}</td>
-                        <td className="p-3 font-mono">
+                        <td className="p-3">
                           {o.size ? (
-                            <span className="bg-white/10 px-2 py-0.5 rounded text-white font-bold">
-                              {o.size}
-                            </span>
+                            (() => {
+                              const sizeVal = o.size.includes(":") ? o.size.split(":").pop()?.trim() || "" : o.size;
+                              const sizeUpper = sizeVal.toUpperCase();
+                              const isSmallMed = ["S", "M", "XS"].some(s => sizeUpper.includes(s)) && !sizeUpper.includes("XL") && !sizeUpper.includes("XXL");
+                              const isLarge = sizeUpper === "L" || (sizeUpper.includes("L") && !sizeUpper.includes("X"));
+                              const displayColor = isSmallMed 
+                                ? "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                                : isLarge
+                                ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40"
+                                : "bg-red-500/20 text-red-300 border-red-500/40";
+                              return (
+                                <span className={`inline-block px-2.5 py-0.5 rounded font-mono font-black text-xs border ${displayColor}`}>
+                                  {sizeVal}
+                                </span>
+                              );
+                            })()
                           ) : (
-                            <span className="text-gray-500">-</span>
+                            <span className="text-gray-500 font-mono">-</span>
                           )}
                         </td>
-                        <td className="p-3 font-bold text-center font-mono">{o.quantity} Pcs</td>
+                        <td className="p-3 text-center">
+                          <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full font-bold font-mono text-xs border ${
+                            o.quantity > 1
+                              ? "bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                              : "bg-white/5 text-gray-300 border-white/10"
+                          }`}>
+                            {o.quantity} Pcs
+                          </span>
+                        </td>
                         <td className="p-3 text-gray-300 italic max-w-xs truncate">{o.notes || "-"}</td>
                         <td className="p-3 text-right">
                           <Button
@@ -580,6 +601,9 @@ export default function AdminMerchPage() {
                     className="bg-black/50 border-white/20 text-white font-mono"
                     required
                   />
+                  <p className="text-[10px] text-[#D4AF37] font-bold mt-1">
+                    Format: Rp {Number(price || 0).toLocaleString("id-ID")}
+                  </p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -595,6 +619,9 @@ export default function AdminMerchPage() {
                     className="bg-black/50 border-white/20 text-white font-mono"
                     required
                   />
+                  <p className="text-[10px] text-emerald-400 font-bold mt-1">
+                    Format: {Number(stock || 0).toLocaleString("id-ID")} Pcs
+                  </p>
                 </div>
               </div>
 

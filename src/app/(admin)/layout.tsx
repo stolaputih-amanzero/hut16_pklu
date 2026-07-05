@@ -154,7 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Content */}
             <main className="p-4 md:p-6 pt-24 md:pt-28 md:pl-72 relative">
                 {/* Mobile Breadcrumb Navigation (replacing bottom nav) */}
-                <div className="md:hidden mb-6 flex items-center justify-between bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 rounded-xl px-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.3)] select-none print:hidden">
+                <div className="relative z-40 md:hidden mb-6 flex items-center justify-between bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 rounded-xl px-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.3)] select-none print:hidden">
                     <div className="flex items-center gap-1.5 text-xs text-[#FDFBF7]/60 font-medium overflow-hidden">
                         <Home className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
                         <button 

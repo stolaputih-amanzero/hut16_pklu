@@ -86,7 +86,7 @@ export function SocialMediaCampaignKit() {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-4 sm:p-6 backdrop-blur-md text-[#FDFBF7]">
+    <div className="space-y-6 rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7]">
       <div className="text-center space-y-1">
         <h2 className="text-xl font-bold text-[#D4AF37]">Social Media Campaign Kit</h2>
         <p className="text-xs text-gray-300">Pilih platform media sosial dan salin caption resmi untuk postingan Anda.</p>

@@ -180,7 +180,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-4 sm:p-6 backdrop-blur-md text-[#FDFBF7]">
+    <div className="space-y-6 rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7]">
       <div className="text-center space-y-1">
         <h2 className="text-xl font-bold text-[#D4AF37]">Twibbon Frame Generator</h2>
         <p className="text-xs text-gray-300">Geser dan atur ukuran foto Anda agar pas di dalam frame.</p>
@@ -192,7 +192,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className={`relative mx-auto w-full max-w-[360px] aspect-square rounded-xl overflow-hidden border-2 border-[#D4AF37]/40 bg-black/60 shadow-xl flex items-center justify-center touch-none select-none ${
+        className={`relative mx-auto w-full max-w-[360px] aspect-square rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-black/50 shadow-xl flex items-center justify-center touch-none select-none ${
           imageSrc ? "cursor-grab active:cursor-grabbing" : ""
         }`}
       >

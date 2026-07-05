@@ -25,7 +25,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
   // Load Frame Overlay Image
   useEffect(() => {
     const frame = new Image();
-    frame.src = "/twibbon-frame.svg";
+    frame.src = "/twibbon.png";
     frame.onload = () => {
       frameImgRef.current = frame;
       setFrameLoaded(true);
@@ -250,7 +250,6 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
           <input
             type="file"
             accept="image/*"
-            capture="user"
             onChange={handleImageUpload}
             className="hidden"
             aria-label="Upload atau ambil foto untuk Twibbon"
@@ -277,8 +276,8 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
       <div className="pt-4 border-t border-white/10 text-center text-xs text-gray-400 space-y-1">
         <p>Kendala menggabungkan foto otomatis di browser Anda?</p>
         <a 
-          href="/twibbon-frame.png" 
-          download="twibbon-frame-hut16-pklu.png" 
+          href="/twibbon.png" 
+          download="twibbon-hut16-pklu.png" 
           className="text-[#D4AF37] hover:underline font-semibold inline-block"
           aria-label="Unduh mentahan frame PNG transparan"
         >

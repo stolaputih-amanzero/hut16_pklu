@@ -11,7 +11,7 @@ export const metadata = {
     siteName: "HUT ke-16 PKLU GPIB 2026",
     images: [
       {
-        url: "/twibbon-frame.png",
+        url: "/twibbon.png",
         width: 1080,
         height: 1080,
         alt: "Frame Resmi Twibbon HUT ke-16 PKLU GPIB 2026",
@@ -24,7 +24,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Twibbon Generator - HUT ke-16 PKLU GPIB 2026",
     description: "Pasang foto Anda di Twibbon Resmi HUT ke-16 PKLU GPIB 2026.",
-    images: ["/twibbon-frame.png"],
+    images: ["/twibbon.png"],
   },
 };
 

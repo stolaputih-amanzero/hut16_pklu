@@ -8,16 +8,11 @@ import {
   Sparkles, 
   ShoppingBag, 
   HeartHandshake, 
-  Search, 
-  Menu, 
-  X,
   ShieldCheck
 } from "lucide-react";
-import { useState } from "react";
 
 export function PublicHeader() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { name: "Beranda", href: "/", icon: Home },
@@ -76,14 +71,6 @@ export function PublicHeader() {
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-1.5 z-50">
-            {/* Mobile Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-300 hover:text-white rounded-lg"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6 text-[#D4AF37]" /> : <Menu className="w-6 h-6 text-[#D4AF37]" />}
-            </button>
-
             {/* Akses/Login Panitia (most right) */}
             <Link
               href="/dashboard"
@@ -94,31 +81,6 @@ export function PublicHeader() {
             </Link>
           </div>
         </div>
-
-        {/* Mobile Dropdown Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-[#022c22]/95 p-4 space-y-2 animate-in slide-in-from-top-2">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? "bg-[#D4AF37] text-black"
-                      : "text-gray-200 hover:bg-white/10"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {link.name}
-                </Link>
-              );
-            })}
-          </div>
-        )}
       </header>
 
       {/* Floating Glassmorphism Mobile Bottom Navbar */}

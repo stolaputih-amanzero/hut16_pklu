@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, RotateCcw, ZoomIn, ZoomOut, Move } from "lucide-react";
+import { Upload, Download, RotateCcw, ZoomIn, ZoomOut, Move, Camera } from "lucide-react";
 
 interface AmanauraGeneratorProps {
   onDownloadSuccess?: () => void;
@@ -21,6 +21,8 @@ export function AmanauraGenerator({ onDownloadSuccess }: AmanauraGeneratorProps)
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const userImgRef = useRef<HTMLImageElement | null>(null);
   const frameImgRef = useRef<HTMLImageElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
   // Load Frame Overlay Image
   useEffect(() => {
@@ -246,19 +248,43 @@ export function AmanauraGenerator({ onDownloadSuccess }: AmanauraGeneratorProps)
 
       {/* Action Buttons */}
       <div className="space-y-3">
-        <label className="block w-full">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-            aria-label="Upload atau ambil foto untuk Amanaura"
-          />
-          <div className="flex items-center justify-center gap-2 w-full py-3 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#D4AF37] font-semibold rounded-xl cursor-pointer transition-all">
-            <Upload className="w-5 h-5" />
-            <span>{imageSrc ? "Ganti Foto Anda" : "Pilih / Ambil Foto"}</span>
-          </div>
-        </label>
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden"
+          aria-label="Upload dari galeri"
+        />
+        <input
+          type="file"
+          ref={cameraInputRef}
+          accept="image/*"
+          capture="user"
+          onChange={handleImageUpload}
+          className="hidden"
+          aria-label="Ambil foto dari kamera"
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="flex items-center justify-center gap-2 w-full py-3 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#D4AF37] font-semibold rounded-xl cursor-pointer transition-all text-xs"
+          >
+            <Camera className="w-4 h-4" />
+            <span>Ambil Kamera</span>
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center justify-center gap-2 w-full py-3 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#D4AF37] font-semibold rounded-xl cursor-pointer transition-all text-xs"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Pilih Galeri</span>
+          </button>
+        </div>
 
         <Button
           type="button"

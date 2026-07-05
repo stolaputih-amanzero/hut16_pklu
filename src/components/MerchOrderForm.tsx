@@ -528,7 +528,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
       )}
 
       {/* 2. FORM INPUT CONTAINER */}
-      <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-6 md:p-8 backdrop-blur-md text-[#FDFBF7] shadow-2xl">
+      <div className="space-y-6 text-[#FDFBF7]">
         {/* 📍 VENUE CLAIM BANNER NOTICE */}
         <div className="rounded-xl border border-[#D4AF37]/50 bg-[#D4AF37]/15 p-4 text-amber-200 text-xs md:text-sm space-y-1.5 shadow-lg">
           <div className="flex items-center gap-2 font-bold text-[#D4AF37] text-sm md:text-base">

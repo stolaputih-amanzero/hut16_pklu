@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { RegistrationForm } from "@/components/registration-form";
-import { Calendar, Clock, MapPin, Phone } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, UserCheck } from "lucide-react";
 
 export const metadata = {
   title: "Pendaftaran - HUT ke-16 PKLU GPIB",
@@ -25,13 +25,16 @@ export default async function RegistrationPage() {
   }
 
   return (
-    <div className="container mx-auto min-h-screen py-10">
-      <div className="mx-auto max-w-3xl space-y-8 rounded-2xl bg-black/40 p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tighter text-[#D4AF37] sm:text-4xl md:text-5xl">
+    <div className="container mx-auto min-h-screen py-10 px-4">
+      <div className="mx-auto max-w-4xl space-y-8 rounded-2xl bg-black/50 p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
+        <div className="text-center space-y-3">
+          <div className="inline-flex p-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-1">
+            <UserCheck className="w-8 h-8 text-[#D4AF37]" />
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#D4AF37] sm:text-4xl">
             Pendaftaran
           </h1>
-          <p className="text-muted-foreground md:text-lg">
+          <p className="text-gray-300 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
             Isi formulir di bawah ini untuk mendaftar sebagai peserta atau pendamping.
           </p>
           <div className="pt-2">

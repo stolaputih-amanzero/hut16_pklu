@@ -323,6 +323,16 @@ export default function Home() {
                           )}
                         </button>
                       ))}
+                      
+                      <div className="h-px bg-[#D4AF37]/10 my-1.5" />
+                      <Link
+                        href="/dashboard"
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-all duration-200 cursor-pointer flex items-center gap-2"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>Akses Panitia</span>
+                      </Link>
                     </div>
                   </motion.div>
                 )}
@@ -1150,12 +1160,12 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Floating Committee Access Button */}
+      {/* Floating Committee Access Button (Desktop only) */}
       <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="fixed bottom-20 right-6 md:bottom-6 z-40"
+        className="hidden md:block fixed md:bottom-6 right-6 z-40"
       >
         <Link 
           href="/dashboard" 

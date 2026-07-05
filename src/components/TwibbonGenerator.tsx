@@ -180,7 +180,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-6 backdrop-blur-md text-[#FDFBF7]">
+    <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-4 sm:p-6 backdrop-blur-md text-[#FDFBF7]">
       <div className="text-center space-y-1">
         <h2 className="text-xl font-bold text-[#D4AF37]">Twibbon Frame Generator</h2>
         <p className="text-xs text-gray-300">Geser dan atur ukuran foto Anda agar pas di dalam frame.</p>

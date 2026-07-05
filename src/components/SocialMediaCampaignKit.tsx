@@ -86,7 +86,7 @@ export function SocialMediaCampaignKit() {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-6 backdrop-blur-md text-[#FDFBF7]">
+    <div className="space-y-6 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-4 sm:p-6 backdrop-blur-md text-[#FDFBF7]">
       <div className="text-center space-y-1">
         <h2 className="text-xl font-bold text-[#D4AF37]">Social Media Campaign Kit</h2>
         <p className="text-xs text-gray-300">Pilih platform media sosial dan salin caption resmi untuk postingan Anda.</p>
@@ -97,7 +97,7 @@ export function SocialMediaCampaignKit() {
         <button
           type="button"
           onClick={() => setActiveTab("IG")}
-          className={`py-2 px-1 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-1.5 sm:py-2 px-1 rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 ${
             activeTab === "IG" ? "bg-[#D4AF37] text-black font-bold shadow" : "text-gray-300 hover:text-white"
           }`}
         >
@@ -106,43 +106,43 @@ export function SocialMediaCampaignKit() {
             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
           </svg>
-          IG
+          <span className="text-[10px] sm:text-xs">IG</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("FB")}
-          className={`py-2 px-1 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-1.5 sm:py-2 px-1 rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 ${
             activeTab === "FB" ? "bg-[#D4AF37] text-black font-bold shadow" : "text-gray-300 hover:text-white"
           }`}
         >
           <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
           </svg>
-          FB
+          <span className="text-[10px] sm:text-xs">FB</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("TikTok")}
-          className={`py-2 px-1 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-1.5 sm:py-2 px-1 rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 ${
             activeTab === "TikTok" ? "bg-[#D4AF37] text-black font-bold shadow" : "text-gray-300 hover:text-white"
           }`}
         >
           <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.96-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.53-1.36 1.45-1.44 2.42-.1.97.25 1.96.93 2.66.75.76 1.86 1.09 2.9.89 1.15-.18 2.19-.94 2.68-1.99.35-.71.49-1.51.48-2.3-.01-4.72-.01-9.44-.01-14.16z"/>
           </svg>
-          TikTok
+          <span className="text-[10px] sm:text-xs">TikTok</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("WA")}
-          className={`py-2 px-1 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-1.5 sm:py-2 px-1 rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 ${
             activeTab === "WA" ? "bg-[#D4AF37] text-black font-bold shadow" : "text-gray-300 hover:text-white"
           }`}
         >
           <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M12.012 2c-5.506 0-9.989 4.478-9.989 9.984 0 1.758.459 3.474 1.33 4.988l-1.413 5.164 5.283-1.386c1.455.793 3.096 1.21 4.787 1.21 5.507 0 9.99-4.478 9.99-9.984s-4.483-9.976-9.988-9.976zm0 18.291c-1.492 0-2.955-.4-4.232-1.157l-.304-.18-3.146.825.839-3.067-.198-.315c-.832-1.325-1.272-2.861-1.272-4.413 0-4.577 3.725-8.297 8.313-8.297 4.587 0 8.313 3.72 8.313 8.297 0 4.578-3.726 8.307-8.313 8.307z"/>
           </svg>
-          WA
+          <span className="text-[10px] sm:text-xs">WA</span>
         </button>
       </div>
 

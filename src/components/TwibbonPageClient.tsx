@@ -19,7 +19,7 @@ export function TwibbonPageClient() {
   return (
     <div className="space-y-8">
       {/* Step-by-Step Guide Card */}
-      <div className="rounded-2xl border border-[#D4AF37]/30 bg-black/60 p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-inner">
+      <div className="rounded-2xl border border-[#D4AF37]/30 bg-black/60 p-4 sm:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-inner">
         <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2 border-b border-white/10 pb-2">
           <HelpCircle className="w-5 h-5 text-[#D4AF37]" />
           Panduan 4 Langkah Mudah Membuat & Membagikan Twibbon:

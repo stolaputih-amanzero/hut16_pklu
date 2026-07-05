@@ -21,7 +21,7 @@ export function PublicHeader() {
   const navLinks = [
     { name: "Beranda", href: "/", icon: Home },
     { name: "Pendaftaran", href: "/daftar", icon: UserCheck },
-    { name: "Twibbon", href: "/twibbon", icon: Sparkles },
+    { name: "Amanaura", href: "/amanaura", icon: Sparkles },
     { name: "Merchandise", href: "/merch", icon: ShoppingBag },
     { name: "Buku Tamu", href: "/ucapan", icon: HeartHandshake },
   ];

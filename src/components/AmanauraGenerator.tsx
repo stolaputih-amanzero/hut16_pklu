@@ -4,11 +4,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Download, RotateCcw, ZoomIn, ZoomOut, Move } from "lucide-react";
 
-interface TwibbonGeneratorProps {
+interface AmanauraGeneratorProps {
   onDownloadSuccess?: () => void;
 }
 
-export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
+export function AmanauraGenerator({ onDownloadSuccess }: AmanauraGeneratorProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [frameLoaded, setFrameLoaded] = useState(false);
   
@@ -25,7 +25,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
   // Load Frame Overlay Image
   useEffect(() => {
     const frame = new Image();
-    frame.src = "/twibbon.png";
+    frame.src = "/amanaura.png";
     frame.onload = () => {
       frameImgRef.current = frame;
       setFrameLoaded(true);
@@ -164,7 +164,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `twibbon-hut16-pklu-${Date.now()}.jpg`;
+        a.download = `amanaura-hut16-pklu-${Date.now()}.jpg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -182,7 +182,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
   return (
     <div className="space-y-6 rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7]">
       <div className="text-center space-y-1">
-        <h2 className="text-xl font-bold text-[#D4AF37]">Twibbon Frame Generator</h2>
+        <h2 className="text-xl font-bold text-[#D4AF37]">Amanaura Frame Generator</h2>
         <p className="text-xs text-gray-300">Geser dan atur ukuran foto Anda agar pas di dalam frame.</p>
       </div>
 
@@ -238,7 +238,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
               onClick={handleReset}
               className="text-xs text-gray-400 hover:text-white"
             >
-              <RotateCcw className="w-3 h-3 mr-1" /> Reset Posisi & Zoom
+              <RotateCcw className="w-3 h-3 mr-1" /> Reset Posisi &amp; Zoom
             </Button>
           </div>
         </div>
@@ -252,7 +252,7 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
             accept="image/*"
             onChange={handleImageUpload}
             className="hidden"
-            aria-label="Upload atau ambil foto untuk Twibbon"
+            aria-label="Upload atau ambil foto untuk Amanaura"
           />
           <div className="flex items-center justify-center gap-2 w-full py-3 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#D4AF37] font-semibold rounded-xl cursor-pointer transition-all">
             <Upload className="w-5 h-5" />
@@ -264,11 +264,11 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
           type="button"
           disabled={!imageSrc}
           onClick={handleDownload}
-          aria-label="Download hasil Twibbon ke perangkat"
+          aria-label="Download hasil Amanaura ke perangkat"
           className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold py-6 text-base rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all disabled:opacity-50"
         >
           <Download className="w-5 h-5 mr-2" />
-          Download Hasil Twibbon (JPG)
+          Download Hasil Amanaura (JPG)
         </Button>
       </div>
 
@@ -276,8 +276,8 @@ export function TwibbonGenerator({ onDownloadSuccess }: TwibbonGeneratorProps) {
       <div className="pt-4 border-t border-white/10 text-center text-xs text-gray-400 space-y-1">
         <p>Kendala menggabungkan foto otomatis di browser Anda?</p>
         <a 
-          href="/twibbon.png" 
-          download="twibbon-hut16-pklu.png" 
+          href="/amanaura.png" 
+          download="amanaura-hut16-pklu.png" 
           className="text-[#D4AF37] hover:underline font-semibold inline-block"
           aria-label="Unduh mentahan frame PNG transparan"
         >

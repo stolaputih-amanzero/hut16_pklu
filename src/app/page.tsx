@@ -421,7 +421,7 @@ export default function Home() {
               Pintu Gerbang Partisipasi Acara
             </h2>
             <p className="text-xs md:text-sm text-gray-300 max-w-lg mx-auto">
-              Akses cepat untuk pendaftaran peserta, pasang twibbon sosmed, pesan merchandise souvenir, dan kirim ucapan doa.
+              Akses cepat untuk pendaftaran peserta, pasang amanaura sosmed, pesan merchandise souvenir, dan kirim ucapan doa.
             </p>
           </div>
 
@@ -447,8 +447,8 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* 2. Twibbon & Kit Sosmed */}
-            <Link href="/twibbon" className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-black/60 p-5 backdrop-blur-xl hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 shadow-xl flex flex-col justify-between space-y-4">
+            {/* 2. Amanaura & Kit Sosmed */}
+            <Link href="/amanaura" className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-black/60 p-5 backdrop-blur-xl hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 shadow-xl flex flex-col justify-between space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="p-3 bg-[#D4AF37]/20 rounded-xl border border-[#D4AF37]/40 text-[#D4AF37] group-hover:scale-110 transition-transform">
@@ -459,12 +459,12 @@ export default function Home() {
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-base group-hover:text-[#D4AF37] transition-colors">Twibbon &amp; Kit Sosmed</h3>
+                  <h3 className="font-bold text-white text-base group-hover:text-[#D4AF37] transition-colors">Amanaura &amp; Kit Sosmed</h3>
                   <p className="text-xs text-gray-300 mt-1 line-clamp-2">Pasang bingkai foto mewah HUT PKLU &amp; copy teks caption media sosial.</p>
                 </div>
               </div>
               <div className="flex items-center text-xs font-bold text-[#D4AF37] pt-2 border-t border-white/10">
-                Buat Foto Twibbon <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+                Buat Foto Amanaura <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
 

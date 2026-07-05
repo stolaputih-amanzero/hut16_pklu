@@ -1,5 +1,5 @@
 import { AmanauraPageClient } from "@/components/AmanauraPageClient";
-import { Camera } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export const metadata = {
   title: "Amanaura - HUT ke-16 PKLU GPIB",
@@ -34,7 +34,7 @@ export default function AmanauraPage() {
       <div className="mx-auto max-w-4xl space-y-8 rounded-2xl bg-black/50 p-4 sm:p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
         <div className="text-center space-y-3">
           <div className="inline-flex p-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-1">
-            <Camera className="w-8 h-8 text-[#D4AF37]" />
+            <Sparkles className="w-8 h-8 text-[#D4AF37]" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-[#D4AF37] sm:text-4xl">
             Amanaura

@@ -14,7 +14,7 @@ export default function PublicLayout({
       <main className="flex-1 pb-20 md:pb-12">{children}</main>
 
       {/* Shared Public Footer */}
-      <footer className="border-t border-[#D4AF37]/20 bg-black/80 py-8 px-4 text-center text-xs text-gray-400 space-y-2">
+      <footer className="border-t border-[#D4AF37]/20 bg-black/80 pt-8 pb-28 md:pb-8 px-4 text-center text-xs text-gray-400 space-y-2">
         <div className="container mx-auto max-w-4xl space-y-2">
           <p className="text-gray-300 font-semibold">
             PANITIA PELAKSANA TEMU &amp; HUT KE-16 PELKAT PKLU GPIB TAHUN 2026

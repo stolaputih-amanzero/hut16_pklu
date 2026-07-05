@@ -975,7 +975,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-16 mb-8 w-full max-w-5xl border-t border-[#D4AF37]/20 pt-8 flex flex-col items-center gap-2 text-center"
+          className="mt-16 mb-28 md:mb-8 w-full max-w-5xl border-t border-[#D4AF37]/20 pt-8 flex flex-col items-center gap-2 text-center"
         >
           <p className="text-[10px] md:text-xs text-[#FDFBF7]/30 tracking-[0.2em] uppercase">
             © 2026 Pelkat PKLU GPIB Mupel Bekasi. All Rights Reserved.

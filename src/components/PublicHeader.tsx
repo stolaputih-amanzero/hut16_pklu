@@ -117,7 +117,7 @@ export function PublicHeader() {
       </header>
 
       {/* Floating Glassmorphism Mobile Bottom Navbar */}
-      <div className="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-[#022c22]/90 backdrop-blur-xl border border-[#D4AF37]/40 rounded-full px-2 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.8),_0_0_15px_rgba(212,175,55,0.2)] flex items-center justify-around">
+      <div className="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-[#022c22]/90 backdrop-blur-xl border border-[#D4AF37]/35 rounded-full px-2 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.6),_0_0_12px_rgba(212,175,55,0.15)] flex items-center justify-around">
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
           const Icon = link.icon;
@@ -125,16 +125,17 @@ export function PublicHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-bold transition-all ${
+              className={`flex flex-col items-center justify-center py-1 px-3.5 rounded-full transition-all duration-300 relative ${
                 isActive
-                  ? "text-[#D4AF37]"
-                  : "text-gray-400 hover:text-white"
+                  ? "text-[#D4AF37] scale-105"
+                  : "text-gray-400 hover:text-white hover:scale-105"
               }`}
             >
-              <div className={`p-1.5 rounded-full ${isActive ? "bg-[#D4AF37]/20 border border-[#D4AF37]/40" : ""}`}>
-                <Icon className={`w-4 h-4 ${isActive ? "text-[#D4AF37]" : ""}`} />
-              </div>
-              <span>{link.name}</span>
+              <Icon className="w-5 h-5 mb-0.5" />
+              <span className="text-[9px] font-medium tracking-tight">{link.name}</span>
+              {isActive && (
+                <span className="absolute bottom-0 w-6 h-[2px] bg-[#D4AF37] rounded-full shadow-[0_0_8px_#D4AF37]" />
+              )}
             </Link>
           );
         })}

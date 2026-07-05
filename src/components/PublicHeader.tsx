@@ -10,7 +10,8 @@ import {
   HeartHandshake, 
   Search, 
   Menu, 
-  X 
+  X,
+  ShieldCheck
 } from "lucide-react";
 import { useState } from "react";
 
@@ -73,13 +74,25 @@ export function PublicHeader() {
           </nav>
 
 
-          {/* Mobile Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-300 hover:text-white rounded-lg"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6 text-[#D4AF37]" /> : <Menu className="w-6 h-6 text-[#D4AF37]" />}
-          </button>
+          {/* Right Action Controls */}
+          <div className="flex items-center gap-1.5 z-50">
+            {/* Mobile Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-300 hover:text-white rounded-lg"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6 text-[#D4AF37]" /> : <Menu className="w-6 h-6 text-[#D4AF37]" />}
+            </button>
+
+            {/* Akses/Login Panitia (most right) */}
+            <Link
+              href="/dashboard"
+              className="p-2 text-[#D4AF37] hover:text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 rounded-full transition-all duration-200 active:scale-95 shadow-[0_0_10px_rgba(212,175,55,0.1)] border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 flex items-center justify-center"
+              title="Akses Panitia"
+            >
+              <ShieldCheck className="w-4.5 h-4.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Mobile Dropdown Menu */}

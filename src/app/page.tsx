@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, ShieldCheck, ChevronRight, ChevronDown, Home as HomeIcon, UserCheck, ShoppingBag, HeartHandshake, Sparkles, Search } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles, Search } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 import { supabase } from '@/lib/supabase/client'
 import { getNextNumber } from '@/lib/numbering'
@@ -58,49 +58,6 @@ import { PublicHeader } from '@/components/PublicHeader'
 export default function Home() {
   const [copied, setCopied] = useState(false)
   const [activeRundown, setActiveRundown] = useState<'puncak' | 'pra'>('pra')
-  const [activeSection, setActiveSection] = useState<string>('Pendahuluan')
-  const [showBreadcrumb, setShowBreadcrumb] = useState<boolean>(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowBreadcrumb(true)
-      } else {
-        setShowBreadcrumb(false)
-        setIsDropdownOpen(false)
-      }
-    }
-    window.addEventListener('scroll', handleScroll)
-
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20% 0px -60% 0px',
-      threshold: 0
-    }
-
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const section = sections.find(s => s.id === entry.target.id)
-          if (section) {
-            setActiveSection(section.label)
-          }
-        }
-      })
-    }
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions)
-    sections.forEach(section => {
-      const el = document.getElementById(section.id)
-      if (el) observer.observe(el)
-    })
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      observer.disconnect()
-    }
-  }, [])
 
   const handleCopy = () => {
     navigator.clipboard.writeText('00179-01-88-000447-9')
@@ -245,102 +202,7 @@ export default function Home() {
         />
       </div>
 
-      {/* Sticky Dynamic Breadcrumb Bar */}
-      <AnimatePresence>
-        {showBreadcrumb && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: -20, x: '-50%' }}
-            transition={{ duration: 0.3 }}
-            className="fixed top-6 left-1/2 z-50 w-[90%] max-w-md bg-[#022c22]/90 backdrop-blur-md border border-[#D4AF37]/35 rounded-full px-4 py-2 shadow-[0_10px_35px_rgba(0,0,0,0.6),_0_0_15px_rgba(212,175,55,0.1)] flex items-center justify-between gap-2"
-          >
-            {/* Breadcrumb path */}
-            <div className="flex items-center gap-1.5 md:gap-2 text-[#FDFBF7]/60 text-xs md:text-sm font-medium">
-              <button 
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="hover:text-[#D4AF37] flex items-center gap-1 cursor-pointer transition-colors duration-200"
-              >
-                <HomeIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
-                <span>Beranda</span>
-              </button>
-              
-              <ChevronRight className="w-3.5 h-3.5 text-[#D4AF37]/40" />
-              
-              {/* Dynamic current location */}
-              <span className="text-[#D4AF37] font-semibold tracking-wide truncate max-w-[120px] sm:max-w-[180px]">
-                {activeSection}
-              </span>
-            </div>
 
-            {/* Dropdown Selector Button */}
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-[#022c22] hover:bg-[#D4AF37]/10 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-[#FDFBF7] text-xs font-semibold rounded-full cursor-pointer transition-all duration-300 active:scale-95"
-              >
-                <span>Navigasi</span>
-                <ChevronDown className={`w-3 h-3 text-[#D4AF37] transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* Dropdown Menu */}
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                    className="absolute right-0 mt-3 w-56 bg-[#022c22]/95 backdrop-blur-xl border border-[#D4AF37]/30 rounded-2xl p-2.5 shadow-2xl z-50 overflow-hidden"
-                  >
-                    {/* Golden subtle ambient light inside dropdown */}
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-[#D4AF37]/5 rounded-full blur-xl pointer-events-none" />
-                    
-                    <div className="space-y-1 relative z-10">
-                      <p className="text-[9px] uppercase tracking-widest text-[#D4AF37]/50 font-semibold px-2 pb-1.5 border-b border-[#D4AF37]/10 mb-1">
-                        Lompat ke Informasi
-                      </p>
-                      {sections.map((section) => (
-                        <button
-                          key={section.id}
-                          onClick={() => {
-                            const el = document.getElementById(section.id)
-                            if (el) {
-                              const yOffset = -80; 
-                              const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
-                              window.scrollTo({ top: y, behavior: 'smooth' });
-                            }
-                            setIsDropdownOpen(false)
-                          }}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer flex items-center justify-between ${
-                            activeSection === section.label
-                              ? 'bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/20 shadow-[0_0_10px_rgba(212,175,55,0.05)]'
-                              : 'text-[#FDFBF7]/80 hover:bg-[#D4AF37]/5 hover:text-[#FDFBF7]'
-                          }`}
-                        >
-                          <span>{section.label}</span>
-                          {activeSection === section.label && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                          )}
-                        </button>
-                      ))}
-                      
-                      <div className="h-px bg-[#D4AF37]/10 my-1.5" />
-                      <Link
-                        href="/dashboard"
-                        className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-all duration-200 cursor-pointer flex items-center gap-2"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Akses Panitia</span>
-                      </Link>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24 flex flex-col items-center">
         
@@ -1160,30 +1022,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Floating Committee Access Button (Desktop only) */}
-      <motion.div 
-        initial={{ opacity: 0, y: 50, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="hidden md:block fixed md:bottom-6 right-6 z-40"
-      >
-        <Link 
-          href="/dashboard" 
-          className="group relative flex items-center gap-2 px-4 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.5),_0_0_20px_rgba(212,175,55,0.15)] border border-[#D4AF37]/30 hover:border-[#D4AF37]/70 bg-[#022c22]/90 backdrop-blur-md cursor-pointer"
-        >
-          {/* Subtle Shimmer Background on Hover */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-r from-transparent via-[#D4AF37]/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] ease-out" />
-          
-          {/* Small glowing dot */}
-          <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/70 group-hover:bg-[#D4AF37] group-hover:shadow-[0_0_8px_#D4AF37] transition-all duration-300" />
-          
-          <ShieldCheck className="w-4 h-4 text-[#D4AF37]/90 group-hover:text-[#D4AF37] transition-colors" />
-          
-          <span className="text-[10px] md:text-xs text-[#FDFBF7]/70 group-hover:text-[#D4AF37] tracking-[0.25em] uppercase font-semibold transition-colors duration-300">
-            Akses Panitia
-          </span>
-        </Link>
-      </motion.div>
+
     </div>
   )
 }

@@ -111,32 +111,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                     <div className="h-8 w-px bg-[#D4AF37]/30 hidden md:block" />
 
-                    {/* Navigation (Desktop) */}
-                    <div className="hidden md:flex items-center gap-2">
+                    {/* Logout Button (Desktop only) */}
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleLogout} 
+                        className="hidden md:flex border-[#D4AF37]/50 text-[#FDFBF7] hover:bg-[#D4AF37] hover:text-[#022c22] ml-2"
+                    >
+                        <LogOut className="h-4 w-4 mr-1" /> Keluar
+                    </Button>
+                </div>
+            </nav>
+
+            {/* Sidebar (Desktop only) */}
+            <aside className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 w-64 bg-[#022c22]/95 backdrop-blur-xl border-r border-[#D4AF37]/20 pt-24 pb-6 px-4 z-40 shadow-[4px_0_30px_rgba(0,0,0,0.5)]">
+                <div className="flex-1 flex flex-col justify-between">
+                    {/* Navigation items stacked vertically */}
+                    <div className="space-y-1.5">
                         {navItems.map((item) => {
                             const Icon = item.icon
                             const isActive = activePath === item.path
                             return (
-                                <Button 
+                                <button
                                     key={item.path}
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => handleNavigation(item.path)} 
-                                    className={`text-[#FDFBF7] transition-all ${isActive ? 'bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30' : 'hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]'}`}
+                                    onClick={() => handleNavigation(item.path)}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
+                                        isActive
+                                            ? 'bg-[#D4AF37] text-black font-bold shadow-[0_0_15px_rgba(212,175,55,0.25)] border border-[#D4AF37]/40'
+                                            : 'text-[#FDFBF7]/70 hover:text-white hover:bg-white/5 border border-transparent'
+                                    }`}
                                 >
-                                    <Icon className="h-4 w-4 mr-2" /> {item.name}
-                                </Button>
+                                    <Icon className="h-4 w-4 shrink-0" />
+                                    <span>{item.name}</span>
+                                </button>
                             )
                         })}
-                        <Button variant="outline" size="sm" onClick={handleLogout} className="border-[#D4AF37]/50 text-[#FDFBF7] hover:bg-[#D4AF37] hover:text-[#022c22] ml-2">
-                            <LogOut className="h-4 w-4 mr-1" /> Keluar
-                        </Button>
                     </div>
                 </div>
-            </nav>
+            </aside>
 
             {/* Content */}
-            <main className="p-4 md:p-6 pt-24 md:pt-28 relative">{children}</main>
+            <main className="p-4 md:p-6 pt-24 md:pt-28 md:pl-72 relative">{children}</main>
 
             {/* Mobile Floating Bottom Nav */}
             <div className="fixed bottom-6 left-4 right-4 z-50 md:hidden flex justify-around items-center bg-black/60 backdrop-blur-lg border border-[#D4AF37]/30 rounded-2xl py-3 px-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] print:hidden">

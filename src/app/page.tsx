@@ -168,11 +168,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] relative font-sans">
+    <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] selection:bg-[#D4AF37] selection:text-[#022c22] relative font-sans">
       <PublicHeader />
       
       {/* Ultra Premium Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#022c22]" />
         
         {/* Soft Gold Orb */}

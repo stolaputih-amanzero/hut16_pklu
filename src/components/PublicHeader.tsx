@@ -120,31 +120,6 @@ export function PublicHeader() {
           </div>
         )}
       </header>
-
-      {/* Floating Glassmorphism Mobile Bottom Navbar */}
-      <div className="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-[#022c22]/90 backdrop-blur-xl border border-[#D4AF37]/35 rounded-full px-2 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.6),_0_0_12px_rgba(212,175,55,0.15)] flex items-center justify-around">
-        {navLinks.map((link) => {
-          const isActive = pathname === link.href;
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center justify-center py-1 flex-1 px-1 rounded-full transition-all duration-300 relative ${
-                isActive
-                  ? "text-[#D4AF37] scale-105"
-                  : "text-gray-400 hover:text-white hover:scale-105"
-              }`}
-            >
-              <Icon className="w-5 h-5 mb-0.5" />
-              <span className="text-[9px] font-medium tracking-tight whitespace-nowrap">{link.name}</span>
-              {isActive && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2px] bg-[#D4AF37] rounded-full shadow-[0_0_8px_#D4AF37]" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
     </>
   );
 }

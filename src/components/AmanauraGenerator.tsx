@@ -297,20 +297,6 @@ export function AmanauraGenerator({ onDownloadSuccess }: AmanauraGeneratorProps)
           Download Hasil Amanaura (JPG)
         </Button>
       </div>
-
-      {/* Fallback & Manual Instructions */}
-      <div className="pt-4 border-t border-white/10 text-center text-xs text-gray-400 space-y-1">
-        <p>Kendala menggabungkan foto otomatis di browser Anda?</p>
-        <a 
-          href="/amanaura.png" 
-          download="amanaura-hut16-pklu.png" 
-          className="text-[#D4AF37] hover:underline font-semibold inline-block"
-          aria-label="Unduh mentahan frame PNG transparan"
-        >
-          Unduh Mentahan Frame PNG Transparan Di Sini ↓
-        </a>
-        <p className="text-[10px] text-gray-500">Dapat diolah manual di Canva, PicsArt, atau Photoshop.</p>
-      </div>
     </div>
   );
 }

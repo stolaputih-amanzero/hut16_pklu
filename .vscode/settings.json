@@ -1,3 +1,11 @@
 {
-  "css.lint.unknownAtRules": "ignore"
+  "css.lint.unknownAtRules": "ignore",  
+  "antigravity.ai.provider": "gemini",
+  "antigravity.ai.endpoint": "http://127.0.0.1:3000/v1",
+  "antigravity.ai.apiKey": "dummy-key",
+  "antigravity.ai.model": "qwen-coder",
+  "antigravity.agent.provider": "gemini",
+  "antigravity.agent.endpoint": "http://127.0.0.1:3000/v1",
+  "antigravity.agent.apiKey": "dummy-key",
+  "antigravity.agent.model": "qwen-coder"
 }

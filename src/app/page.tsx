@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, ShieldCheck, ChevronRight, ChevronDown, Home as HomeIcon } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, ShieldCheck, ChevronRight, ChevronDown, Home as HomeIcon, UserCheck, ShoppingBag, HeartHandshake, Sparkles, Search } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 import { supabase } from '@/lib/supabase/client'
 import { getNextNumber } from '@/lib/numbering'
@@ -51,8 +51,9 @@ const sections = [
   { id: 'waktu-tempat', label: 'Waktu & Tempat' },
   { id: 'rundown', label: 'Rundown Acara' },
   { id: 'dukungan', label: 'Dukungan Kasih' },
-  { id: 'rekening', label: 'Rekening Panitia' },
 ]
+
+import { PublicHeader } from '@/components/PublicHeader'
 
 export default function Home() {
   const [copied, setCopied] = useState(false)
@@ -211,6 +212,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22] relative font-sans">
+      <PublicHeader />
       
       {/* Ultra Premium Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -396,12 +398,118 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* New Tagline */}
-          <motion.div variants={fadeIn} className="mt-10 py-6 border-y border-[#D4AF37]/20 w-3/4 mx-auto">
+          {/* Tagline */}
+          <motion.div variants={fadeIn} className="mt-8 py-4 border-y border-[#D4AF37]/20 w-3/4 mx-auto">
             <p className="text-[#FDFBF7]/90 text-xs md:text-sm tracking-[0.3em] uppercase text-center font-medium">
               Untuk Lansia <span className="text-[#D4AF37] mx-3">•</span> Oleh Lansia <span className="text-[#D4AF37] mx-3">•</span> Bersama PKLU GPIB
             </p>
           </motion.div>
+        </motion.div>
+
+        {/* 🌟 PORTAL LAYANAN & PARTISIPASI PUBLIK (INTEGRATED FEATURE HUB) */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="w-full max-w-5xl mb-24 space-y-6"
+        >
+          <div className="text-center space-y-2">
+            <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold flex items-center justify-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#D4AF37]" /> Layanan &amp; Partisipasi Publik
+            </span>
+            <h2 className={`text-3xl md:text-5xl text-white ${playfair.className}`}>
+              Pintu Gerbang Partisipasi Acara
+            </h2>
+            <p className="text-xs md:text-sm text-gray-300 max-w-lg mx-auto">
+              Akses cepat untuk pendaftaran peserta, pasang twibbon sosmed, pesan merchandise souvenir, dan kirim ucapan doa.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* 1. Form Pendaftaran */}
+            <Link href="/daftar" className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-black/60 p-5 backdrop-blur-xl hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 shadow-xl flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-[#D4AF37]/20 rounded-xl border border-[#D4AF37]/40 text-[#D4AF37] group-hover:scale-110 transition-transform">
+                    <UserCheck className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    Resmi
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-base group-hover:text-[#D4AF37] transition-colors">Pendaftaran Peserta</h3>
+                  <p className="text-xs text-gray-300 mt-1 line-clamp-2">Daftar secara perorangan maupun rombongan utusan jemaat GPIB.</p>
+                </div>
+              </div>
+              <div className="flex items-center text-xs font-bold text-[#D4AF37] pt-2 border-t border-white/10">
+                Isi Form Registrasi <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* 2. Twibbon & Kit Sosmed */}
+            <Link href="/twibbon" className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-black/60 p-5 backdrop-blur-xl hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 shadow-xl flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-[#D4AF37]/20 rounded-xl border border-[#D4AF37]/40 text-[#D4AF37] group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30">
+                    Kampanye
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-base group-hover:text-[#D4AF37] transition-colors">Twibbon &amp; Kit Sosmed</h3>
+                  <p className="text-xs text-gray-300 mt-1 line-clamp-2">Pasang bingkai foto mewah HUT PKLU &amp; copy teks caption media sosial.</p>
+                </div>
+              </div>
+              <div className="flex items-center text-xs font-bold text-[#D4AF37] pt-2 border-t border-white/10">
+                Buat Foto Twibbon <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* 3. Pemesanan Merchandise */}
+            <Link href="/merch" className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-black/60 p-5 backdrop-blur-xl hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 shadow-xl flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-[#D4AF37]/20 rounded-xl border border-[#D4AF37]/40 text-[#D4AF37] group-hover:scale-110 transition-transform">
+                    <ShoppingBag className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
+                    Souvenir
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-base group-hover:text-[#D4AF37] transition-colors">Pemesanan Merchandise</h3>
+                  <p className="text-xs text-gray-300 mt-1 line-clamp-2">Pesan kaos edisi khusus, topi, pin, mug, dan goodie bag souvenir.</p>
+                </div>
+              </div>
+              <div className="flex items-center text-xs font-bold text-[#D4AF37] pt-2 border-t border-white/10">
+                Pesan Souvenir <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* 4. Buku Tamu & Ucapan */}
+            <Link href="/ucapan" className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-black/60 p-5 backdrop-blur-xl hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all duration-300 shadow-xl flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 bg-[#D4AF37]/20 rounded-xl border border-[#D4AF37]/40 text-[#D4AF37] group-hover:scale-110 transition-transform">
+                    <HeartHandshake className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/30">
+                    Publik
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-base group-hover:text-[#D4AF37] transition-colors">Buku Tamu &amp; Ucapan</h3>
+                  <p className="text-xs text-gray-300 mt-1 line-clamp-2">Kirim ucapan selamat dan doa sukacita untuk HUT ke-16 PKLU GPIB.</p>
+                </div>
+              </div>
+              <div className="flex items-center text-xs font-bold text-[#D4AF37] pt-2 border-t border-white/10">
+                Tulis Ucapan Selamat <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </div>
         </motion.div>
 
 
@@ -860,112 +968,7 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Informasi Rekening Panitia Section */}
-        <motion.div
-          id="rekening"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 1 }}
-          className="w-full max-w-xl mb-12 text-center space-y-6"
-        >
-          <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
-          <h2 className={`text-2xl md:text-3xl text-[#D4AF37] ${playfair.className}`}>Rekening Resmi Panitia</h2>
-          <p className="text-sm text-[#FDFBF7]/70 max-w-md mx-auto font-light leading-relaxed">
-            Seluruh dukungan dana disalurkan secara aman dan transparan melalui satu pintu rekening resmi Kepanitiaan berikut:
-          </p>
-          
-          <div className="relative p-6 rounded-2xl bg-[#022c22]/60 backdrop-blur-md border border-[#D4AF37]/20 shadow-xl overflow-hidden group">
-            {/* Ambient hover effect */}
-            <div className="absolute inset-0 bg-[#D4AF37]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <div className="space-y-5 relative z-10">
-              <div className="flex flex-col items-center">
-                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1">Bank</span>
-                <span className={`text-xl font-bold text-[#FDFBF7] ${playfair.className}`}>Bank BTN</span>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1">Nomor Rekening</span>
-                <div className="flex items-center gap-3 mt-1 bg-[#022c22]/80 px-4 py-2 rounded-lg border border-[#D4AF37]/10 group/number">
-                  <span className="text-xl md:text-2xl font-mono tracking-wider text-[#FDFBF7] font-semibold select-all">
-                    00179-01-88-000447-9
-                  </span>
-                  <button 
-                    onClick={handleCopy}
-                    className="p-1.5 rounded-md hover:bg-[#D4AF37]/20 text-[#D4AF37] hover:text-[#FDFBF7] transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer relative"
-                    title="Salin Nomor Rekening"
-                  >
-                    <AnimatePresence mode="wait" initial={false}>
-                      {copied ? (
-                        <motion.div
-                          key="check"
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Check className="w-5 h-5 text-emerald-400" />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="copy"
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Copy className="w-5 h-5 transition-transform group-hover/number:scale-110" />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </button>
-                </div>
-                
-                <div className="h-4 flex items-center justify-center mt-1">
-                  <AnimatePresence>
-                    {copied && (
-                      <motion.span 
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        className="text-xs text-emerald-400 font-medium"
-                      >
-                        Nomor rekening berhasil disalin!
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1">Atas Nama</span>
-                <span className="text-base font-semibold text-[#FDFBF7] uppercase tracking-wide">
-                  PANITIA MUPEL GPIB BEKASI
-                </span>
-              </div>
 
-              {/* Elegant Divider */}
-              <div className="h-[1px] w-full bg-[#D4AF37]/20 my-4" />
-
-              <div className="flex flex-col items-center">
-                <span className="text-[#D4AF37] text-xs uppercase tracking-widest font-semibold mb-1.5">Kontak Konfirmasi (WhatsApp)</span>
-                <span className="text-base font-semibold text-[#FDFBF7] tracking-wide mb-2">
-                  ANASTASIA CHRISTINE DOLO
-                </span>
-                <a 
-                  href="https://wa.me/6281291451945" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#047857]/20 hover:bg-[#047857]/40 text-[#FDFBF7] hover:text-[#D4AF37] border border-[#047857]/30 hover:border-[#D4AF37]/30 transition-all duration-300 active:scale-95 text-sm font-medium cursor-pointer"
-                >
-                  <MessageSquare className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="font-mono tracking-wider">+62 812-9145-1945</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Footer Credits */}
         <motion.div 
@@ -990,7 +993,7 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-md bg-[#022c22] border border-[#D4AF37]/30 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md bg-[#022c22] border border-[#D4AF37]/30 rounded-2xl p-6 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               {/* Gold light effects inside modal */}
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-2xl pointer-events-none" />
@@ -1012,11 +1015,47 @@ export default function Home() {
 
               <div className="mb-6">
                 <h3 className={`text-2xl font-bold text-[#FDFBF7] ${playfair.className}`}>
-                  Formulir Dukungan Kasih
+                  Salurkan Dukungan Kasih
                 </h3>
                 <p className="text-xs text-[#D4AF37] mt-1.5 font-light leading-relaxed">
-                  Silakan masukkan identitas Anda. Panitia akan segera menghubungi Anda untuk follow-up dokumen cetak dan administrasi.
+                  Dukungan dana dapat ditransfer ke rekening resmi panitia di bawah ini. Setelah transfer, mohon isi data konfirmasi agar dapat kami catat &amp; tindaklanjuti.
                 </p>
+              </div>
+
+              {/* Informasi Rekening Resmi inside Modal */}
+              <div className="mb-6 p-4 rounded-xl bg-black/40 border border-[#D4AF37]/30 text-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-[#D4AF37]/20 pb-2">
+                  <span className="text-[#D4AF37] font-semibold uppercase tracking-wider">Rekening Transfer Panitia</span>
+                  <span className="text-[10px] text-emerald-400 font-medium">Bank Resmi</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 text-[#FDFBF7]">
+                  <div>
+                    <span className="text-white/50 block text-[10px] uppercase">Bank</span>
+                    <span className="font-semibold text-sm">Bank BTN</span>
+                  </div>
+                  <div>
+                    <span className="text-white/50 block text-[10px] uppercase">Atas Nama</span>
+                    <span className="font-semibold text-[11px] truncate block" title="PANITIA MUPEL GPIB BEKASI">PANITIA MUPEL GPIB BEKASI</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-3">
+                  <div className="flex-1">
+                    <span className="text-white/50 block text-[10px] uppercase">Nomor Rekening</span>
+                    <span className="font-mono text-sm tracking-wider font-semibold text-[#FDFBF7] select-all">
+                      00179-01-88-000447-9
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="flex-shrink-0 px-2.5 py-1.5 rounded bg-[#D4AF37]/20 hover:bg-[#D4AF37]/35 text-[#D4AF37] hover:text-[#FDFBF7] border border-[#D4AF37]/30 transition-all duration-300 active:scale-95 text-[10px] font-semibold flex items-center gap-1 cursor-pointer"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? "Tersalin" : "Salin"}
+                  </button>
+                </div>
               </div>
 
               <form onSubmit={handleModalSubmit} className="space-y-5">

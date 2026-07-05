@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE89C" />
+      <stop offset="25%" stop-color="#D4AF37" />
+      <stop offset="50%" stop-color="#FAF0CA" />
+      <stop offset="75%" stop-color="#B38F24" />
+      <stop offset="100%" stop-color="#FDF0A6" />
+    </linearGradient>
+    <linearGradient id="emerald" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#043E31" />
+      <stop offset="100%" stop-color="#011B15" />
+    </linearGradient>
+    <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#D4AF37" stop-opacity="0" />
+    </radialGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <mask id="photoWindow">
+      <rect width="1080" height="1080" fill="white" />
+      <circle cx="540" cy="510" r="390" fill="black" />
+    </mask>
+  </defs>
+
+  <g mask="url(#photoWindow)">
+    <rect width="1080" height="1080" fill="url(#emerald)" />
+    <circle cx="540" cy="510" r="500" fill="url(#goldGlow)" />
+  </g>
+
+  <circle cx="540" cy="510" r="396" fill="none" stroke="url(#gold)" stroke-width="8" filter="url(#shadow)" />
+  <circle cx="540" cy="510" r="388" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.4" />
+  <circle cx="540" cy="510" r="404" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.6" stroke-dasharray="8 8" />
+
+  <g transform="translate(100, 100)">
+    <circle cx="0" cy="0" r="60" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.5"/>
+    <circle cx="0" cy="0" r="40" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  </g>
+  <g transform="translate(980, 100)">
+    <circle cx="0" cy="0" r="60" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.5"/>
+    <circle cx="0" cy="0" r="40" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  </g>
+
+  <rect x="25" y="25" width="1030" height="1030" fill="none" stroke="url(#gold)" stroke-width="10" rx="35" filter="url(#shadow)" />
+  <rect x="40" y="40" width="1000" height="1000" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.25" rx="25" />
+
+  <g filter="url(#shadow)">
+    <path d="M 220 35 L 860 35 L 880 75 L 860 115 L 220 115 L 200 75 Z" fill="url(#emerald)" stroke="url(#gold)" stroke-width="4" />
+    <rect x="240" y="45" width="600" height="60" fill="none" stroke="url(#gold)" stroke-width="1.5" rx="8" opacity="0.6"/>
+    <text x="540" y="74" font-family="'Times New Roman', Georgia, serif" font-size="24" font-weight="bold" fill="url(#gold)" text-anchor="middle" letter-spacing="4">
+      ✝ GPIB • MUPEL BEKASI ✝
+    </text>
+    <text x="540" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="600" fill="#FDFBF7" text-anchor="middle" letter-spacing="2">
+      TEMU &amp; PERAYAAN LANSIA 2026
+    </text>
+  </g>
+
+  <g transform="translate(80, 830)" filter="url(#shadow)">
+    <rect width="920" height="210" fill="url(#emerald)" stroke="url(#gold)" stroke-width="5" rx="30" />
+    <rect x="15" y="15" width="890" height="180" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.2" rx="20" />
+    <g transform="translate(85, 105)">
+      <circle cx="0" cy="0" r="65" fill="#011B15" stroke="url(#gold)" stroke-width="4" filter="url(#shadow)" />
+      <circle cx="0" cy="0" r="58" fill="none" stroke="url(#gold)" stroke-width="1" stroke-dasharray="5 3" />
+      <text x="0" y="-12" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#FDFBF7" text-anchor="middle">HUT KE</text>
+      <text x="0" y="26" font-family="'Impact', Arial, sans-serif" font-size="44" font-weight="black" fill="url(#gold)" text-anchor="middle" filter="url(#glow)">16</text>
+    </g>
+    <g transform="translate(180, 0)">
+      <text x="360" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="34" font-weight="900" fill="url(#gold)" text-anchor="middle" letter-spacing="1">
+        PKLU GPIB 2026
+      </text>
+      <rect x="80" y="75" width="560" height="38" fill="#D4AF37" fill-opacity="0.15" stroke="url(#gold)" stroke-width="1.5" rx="19" />
+      <text x="360" y="100" font-family="'Segoe UI', sans-serif" font-size="18" font-weight="bold" fill="#FDFBF7" text-anchor="middle">
+        "Bertumbuh dalam Keselamatan"
+      </text>
+      <text x="360" y="138" font-family="'Georgia', serif" font-size="16" font-style="italic" fill="#D4AF37" text-anchor="middle">
+        Sub Tema: Lansia Teladan dalam Iman, Karya dan Pelayanan
+      </text>
+      <g transform="translate(360, 178)">
+        <rect x="-220" y="-20" width="440" height="30" fill="#011B15" stroke="url(#gold)" stroke-width="1.5" rx="15"/>
+        <text x="0" y="0" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#FDFBF7" text-anchor="middle" letter-spacing="1">
+          📍 SENIN, 12 OKTOBER 2026 • BCC BEKASI
+        </text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(540, 128)" filter="url(#shadow)">
+    <rect x="-160" y="0" width="320" height="32" fill="#D4AF37" rx="16" />
+    <text x="0" y="21" font-family="'Segoe UI', sans-serif" font-size="15" font-weight="900" fill="#011B15" text-anchor="middle" letter-spacing="2">
+      TAGLINE: TERUSKAN BAKTIMU
+    </text>
+  </g>
+</svg>

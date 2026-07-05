@@ -1,0 +1,144 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { 
+  Home, 
+  UserCheck, 
+  Sparkles, 
+  ShoppingBag, 
+  HeartHandshake, 
+  Search, 
+  Menu, 
+  X 
+} from "lucide-react";
+import { useState } from "react";
+
+export function PublicHeader() {
+  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    { name: "Beranda", href: "/", icon: Home },
+    { name: "Pendaftaran", href: "/daftar", icon: UserCheck },
+    { name: "Twibbon", href: "/twibbon", icon: Sparkles },
+    { name: "Merchandise", href: "/merch", icon: ShoppingBag },
+    { name: "Buku Tamu", href: "/ucapan", icon: HeartHandshake },
+  ];
+
+  return (
+    <>
+      {/* Top Desktop Navigation Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-[#D4AF37]/20 bg-[#022c22]/90 backdrop-blur-xl transition-all">
+        <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          {/* Logo Brand */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative h-9 w-9 overflow-hidden rounded-full border border-[#D4AF37]/50 bg-black/40 p-0.5 group-hover:border-[#D4AF37] transition-colors">
+              <img
+                src="/logo_hut16_pklu.png"
+                alt="Logo HUT 16 PKLU"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-[#FDFBF7] text-sm tracking-tight group-hover:text-[#D4AF37] transition-colors">
+                HUT ke-16 PKLU GPIB
+              </span>
+              <span className="text-[10px] text-[#D4AF37] tracking-widest uppercase">
+                Teruskan Baktimu!
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    isActive
+                      ? "bg-[#D4AF37] text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Quick Action Button Desktop */}
+          <div className="hidden md:flex items-center gap-2">
+            <Link href="/daftar">
+              <button className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs px-4 py-2 rounded-full shadow transition-all">
+                Daftar Peserta
+              </button>
+            </Link>
+          </div>
+
+          {/* Mobile Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-gray-300 hover:text-white rounded-lg"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6 text-[#D4AF37]" /> : <Menu className="w-6 h-6 text-[#D4AF37]" />}
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-white/10 bg-[#022c22]/95 p-4 space-y-2 animate-in slide-in-from-top-2">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${
+                    isActive
+                      ? "bg-[#D4AF37] text-black"
+                      : "text-gray-200 hover:bg-white/10"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {link.name}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </header>
+
+      {/* Floating Glassmorphism Mobile Bottom Navbar */}
+      <div className="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-[#022c22]/90 backdrop-blur-xl border border-[#D4AF37]/40 rounded-full px-2 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.8),_0_0_15px_rgba(212,175,55,0.2)] flex items-center justify-around">
+        {navLinks.map((link) => {
+          const isActive = pathname === link.href;
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-bold transition-all ${
+                isActive
+                  ? "text-[#D4AF37]"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              <div className={`p-1.5 rounded-full ${isActive ? "bg-[#D4AF37]/20 border border-[#D4AF37]/40" : ""}`}>
+                <Icon className={`w-4 h-4 ${isActive ? "text-[#D4AF37]" : ""}`} />
+              </div>
+              <span>{link.name}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </>
+  );
+}

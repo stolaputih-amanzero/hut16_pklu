@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { LogOut, LayoutDashboard, FileText, Users, User, Home, FileSpreadsheet, Plus } from 'lucide-react'
+import { LogOut, LayoutDashboard, FileText, Users, User, Home, FileSpreadsheet, Plus, MessageSquareQuote, ShoppingBag } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -71,6 +71,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { name: 'Beranda', path: '/', icon: Home },
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'Data Registrasi', path: '/rekap-registrasi', icon: Users },
+        { name: 'Buku Tamu', path: '/admin-ucapan', icon: MessageSquareQuote },
+        { name: 'Merchandise', path: '/admin-merch', icon: ShoppingBag },
         { name: 'Proposal', path: '/buat-proposal', icon: Plus },
         { name: 'Laporan', path: '/daftar-proposal', icon: FileSpreadsheet },
     ]

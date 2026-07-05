@@ -1,0 +1,72 @@
+"use client";
+
+import { useState, useRef } from "react";
+import { TwibbonGenerator } from "@/components/TwibbonGenerator";
+import { SocialMediaCampaignKit } from "@/components/SocialMediaCampaignKit";
+import { CheckCircle2, ArrowDown, HelpCircle } from "lucide-react";
+
+export function TwibbonPageClient() {
+  const [downloaded, setDownloaded] = useState(false);
+  const kitRef = useRef<HTMLDivElement | null>(null);
+
+  const handleDownloadSuccess = () => {
+    setDownloaded(true);
+    setTimeout(() => {
+      kitRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Step-by-Step Guide Card */}
+      <div className="rounded-2xl border border-[#D4AF37]/30 bg-black/60 p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-inner">
+        <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2 border-b border-white/10 pb-2">
+          <HelpCircle className="w-5 h-5 text-[#D4AF37]" />
+          Panduan 4 Langkah Mudah Membuat & Membagikan Twibbon:
+        </h2>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
+          <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1">
+            <span className="font-bold text-[#D4AF37] block">1. Pilih Foto</span>
+            <p className="text-gray-300">Klik tombol <strong>Pilih / Ambil Foto</strong> untuk memasukkan foto terbaik Anda dari galeri HP atau kamera.</p>
+          </div>
+
+          <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1">
+            <span className="font-bold text-[#D4AF37] block">2. Atur Posisi & Zoom</span>
+            <p className="text-gray-300">Geser foto menggunakan jari/mouse dan sesuaikan ukuran slider <strong>Zoom</strong> agar pas di tengah frame.</p>
+          </div>
+
+          <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1">
+            <span className="font-bold text-[#D4AF37] block">3. Unduh Hasil</span>
+            <p className="text-gray-300">Klik <strong>Download Hasil Twibbon</strong> untuk menyimpan gambar Twibbon berformat JPG 1080x1080 ke galeri HP Anda.</p>
+          </div>
+
+          <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1">
+            <span className="font-bold text-[#D4AF37] block">4. Salin Caption & Share</span>
+            <p className="text-gray-300">Pilih tab media sosial (IG, FB, TikTok, WA), klik <strong>Salin Caption</strong>, lalu posting foto Twibbon Anda!</p>
+          </div>
+        </div>
+      </div>
+
+      {downloaded && (
+        <div className="bg-emerald-500/20 border border-emerald-500/40 p-4 rounded-xl text-emerald-300 text-sm flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <span>
+              <strong>Twibbon Berhasil Diunduh!</strong> Sekarang salin caption di bawah untuk diposting ke media sosial Anda.
+            </span>
+          </div>
+          <ArrowDown className="w-5 h-5 animate-bounce hidden sm:block text-emerald-400" />
+        </div>
+      )}
+
+      <div className="grid gap-8 md:grid-cols-2 items-start">
+        <TwibbonGenerator onDownloadSuccess={handleDownloadSuccess} />
+        
+        <div ref={kitRef} className="transition-all duration-300">
+          <SocialMediaCampaignKit />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,329 @@
+"use client";
+
+import { useEffect, useState, useMemo } from "react";
+import { 
+  fetchAdminGuestbookMessages, 
+  approveGuestbookMessage, 
+  unapproveGuestbookMessage, 
+  deleteGuestbookMessage 
+} from "./actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { 
+  MessageSquareQuote, 
+  Search, 
+  CheckCircle, 
+  XCircle, 
+  Trash2, 
+  Clock, 
+  Check, 
+  RefreshCw, 
+  ShieldAlert, 
+  MapPin, 
+  Calendar 
+} from "lucide-react";
+
+type GuestbookItem = {
+  id: string;
+  name: string;
+  church_city: string;
+  message: string;
+  avatar_url?: string | null;
+  is_approved: boolean;
+  created_at: string;
+};
+
+export default function AdminGuestbookPage() {
+  const [messages, setMessages] = useState<GuestbookItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved">("all");
+  const [actionId, setActionId] = useState<string | null>(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    const res = await fetchAdminGuestbookMessages();
+    if (res.success) {
+      setMessages(res.data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Filter Data
+  const filteredMessages = useMemo(() => {
+    return messages.filter((item) => {
+      // Status Filter
+      if (statusFilter === "pending" && item.is_approved) return false;
+      if (statusFilter === "approved" && !item.is_approved) return false;
+
+      // Search Filter
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return (
+        item.name.toLowerCase().includes(q) ||
+        item.church_city.toLowerCase().includes(q) ||
+        item.message.toLowerCase().includes(q)
+      );
+    });
+  }, [messages, statusFilter, search]);
+
+  // Stat Counters
+  const totalCount = messages.length;
+  const pendingCount = messages.filter((m) => !m.is_approved).length;
+  const approvedCount = messages.filter((m) => m.is_approved).length;
+
+  // Actions
+  const handleApprove = async (id: string) => {
+    setActionId(id);
+    const res = await approveGuestbookMessage(id);
+    setActionId(null);
+    if (res.success) {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, is_approved: true } : m))
+      );
+    }
+  };
+
+  const handleUnapprove = async (id: string) => {
+    setActionId(id);
+    const res = await unapproveGuestbookMessage(id);
+    setActionId(null);
+    if (res.success) {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, is_approved: false } : m))
+      );
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus ucapan ini secara permanen?")) return;
+    setActionId(id);
+    const res = await deleteGuestbookMessage(id);
+    setActionId(null);
+    if (res.success) {
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D4AF37]/20 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#FDFBF7] flex items-center gap-2">
+            <MessageSquareQuote className="h-6 w-6 text-[#D4AF37]" />
+            Moderasi Buku Tamu &amp; Ucapan Selamat
+          </h1>
+          <p className="text-xs text-gray-300">
+            Tinjau, setujui, atau hapus ucapan publik sebelum ditampilkan pada Buku Tamu Utama.
+          </p>
+        </div>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={loadData}
+          disabled={loading}
+          className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10"
+        >
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+          Refresh Data
+        </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="rounded-xl border border-white/10 bg-black/40 p-4 backdrop-blur-md flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400">
+            <MessageSquareQuote className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 font-medium">Total Ucapan Masuk</p>
+            <p className="text-2xl font-bold text-white">{totalCount}</p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 backdrop-blur-md flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-amber-300 font-medium">Menunggu Persetujuan</p>
+            <p className="text-2xl font-bold text-amber-200">{pendingCount}</p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 backdrop-blur-md flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300">
+            <CheckCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-emerald-300 font-medium">Disetujui (Tampil Publik)</p>
+            <p className="text-2xl font-bold text-emerald-200">{approvedCount}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Search & Status Filter Controls */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-black/40 p-4 rounded-xl border border-white/10 backdrop-blur-md">
+        {/* Status Filter Tabs */}
+        <div className="flex items-center gap-1 bg-black/60 p-1 rounded-lg border border-white/10 w-full sm:w-auto text-xs">
+          <button
+            type="button"
+            onClick={() => setStatusFilter("all")}
+            className={`px-3 py-1.5 rounded-md transition-all ${
+              statusFilter === "all" ? "bg-[#D4AF37] text-black font-bold" : "text-gray-300 hover:text-white"
+            }`}
+          >
+            Semua ({totalCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("pending")}
+            className={`px-3 py-1.5 rounded-md transition-all ${
+              statusFilter === "pending" ? "bg-amber-500 text-black font-bold" : "text-gray-300 hover:text-white"
+            }`}
+          >
+            Pending ({pendingCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("approved")}
+            className={`px-3 py-1.5 rounded-md transition-all ${
+              statusFilter === "approved" ? "bg-emerald-500 text-black font-bold" : "text-gray-300 hover:text-white"
+            }`}
+          >
+            Disetujui ({approvedCount})
+          </button>
+        </div>
+
+        {/* Global Search Input */}
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama, gereja, ucapan..."
+            className="pl-9 bg-black/50 border-white/20 text-white text-xs h-9"
+          />
+        </div>
+      </div>
+
+      {/* Messages List */}
+      {loading ? (
+        <div className="p-12 text-center text-gray-400 bg-black/40 rounded-xl border border-white/10">
+          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#D4AF37]" />
+          Memuat data ucapan...
+        </div>
+      ) : filteredMessages.length === 0 ? (
+        <div className="p-12 text-center text-gray-400 bg-black/40 rounded-xl border border-white/10 space-y-2">
+          <ShieldAlert className="w-8 h-8 mx-auto text-gray-500" />
+          <p className="text-sm font-semibold">Tidak Ada Ucapan Ditemukan</p>
+          <p className="text-xs text-gray-500">Coba ubah filter status atau kata kunci pencarian Anda.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredMessages.map((item) => (
+            <div
+              key={item.id}
+              className={`p-4 md:p-5 rounded-xl border backdrop-blur-md transition-all space-y-3 ${
+                item.is_approved
+                  ? "bg-black/40 border-emerald-500/30"
+                  : "bg-amber-950/20 border-amber-500/40"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-3">
+                  {item.avatar_url ? (
+                    <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-[#D4AF37] shadow">
+                      <img src={item.avatar_url} alt={item.name} className="h-full w-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/20 text-[#D4AF37] font-bold border border-[#D4AF37]/40 text-xs">
+                      {item.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-bold text-white text-sm">{item.name}</h3>
+                    <p className="text-xs text-[#D4AF37] flex items-center gap-1">
+                      <MapPin className="w-3 h-3" /> {item.church_city}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {new Date(item.created_at).toLocaleString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+
+                  {item.is_approved ? (
+                    <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Disetujui
+                    </span>
+                  ) : (
+                    <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Menunggu Review
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <p className="text-xs md:text-sm text-gray-200 whitespace-pre-line leading-relaxed italic bg-black/40 p-3 rounded-lg border border-white/5">
+                "{item.message}"
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-1">
+                {!item.is_approved ? (
+                  <Button
+                    size="sm"
+                    disabled={actionId === item.id}
+                    onClick={() => handleApprove(item.id)}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs h-8 px-3"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                    Setujui Ucapan
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={actionId === item.id}
+                    onClick={() => handleUnapprove(item.id)}
+                    className="border-amber-500/50 text-amber-300 hover:bg-amber-500/20 text-xs h-8 px-3"
+                  >
+                    <XCircle className="w-3.5 h-3.5 mr-1" />
+                    Batalkan Setuju
+                  </Button>
+                )}
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={actionId === item.id}
+                  onClick={() => handleDelete(item.id)}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-950/40 text-xs h-8 px-2"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  Hapus
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -72,14 +72,6 @@ export function PublicHeader() {
             })}
           </nav>
 
-          {/* Quick Action Button Desktop */}
-          <div className="hidden md:flex items-center gap-2">
-            <Link href="/daftar">
-              <button className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs px-4 py-2 rounded-full shadow transition-all">
-                Daftar Peserta
-              </button>
-            </Link>
-          </div>
 
           {/* Mobile Toggle */}
           <button

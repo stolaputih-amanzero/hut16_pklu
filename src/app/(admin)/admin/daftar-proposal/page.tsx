@@ -976,8 +976,9 @@ export default function DaftarProposalPage() {
                 >
                     <div className="space-y-6 h-full">
                         <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl h-full flex flex-col">
-                            <CardHeader className="flex-none">
-                                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                            <CardHeader className="flex-none space-y-4">
+                                {/* Baris 1: Judul dan Pencarian */}
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                     <div>
                                         <CardTitle className="text-[#FDFBF7] font-playfair tracking-wide flex items-center gap-2">
                                             <FileText className="h-5 w-5 text-[#D4AF37]" />
@@ -987,80 +988,81 @@ export default function DaftarProposalPage() {
                                             {filteredProposals.length} proposal ditemukan
                                         </CardDescription>
                                     </div>
-                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                                        {/* Filter Tipe (Radio Buttons Segmented Control) */}
-                                        <div className="flex items-center h-8 bg-[#022c22]/50 border border-[#D4AF37]/35 rounded-lg p-0.5 gap-1 w-full sm:w-auto justify-around sm:justify-start">
-                                            {[
-                                                { value: 'all', label: 'Semua' },
-                                                { value: 'donatur', label: 'Donatur' },
-                                                { value: 'sponsorship', label: 'Sponsor' },
-                                            ].map((type) => (
-                                                <button
-                                                    key={type.value}
-                                                    onClick={() => setTypeFilter(type.value as any)}
-                                                    className={`h-full px-3 rounded-md text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex-1 sm:flex-initial text-center flex items-center justify-center ${
-                                                        typeFilter === type.value
-                                                            ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_10px_rgba(212,175,55,0.25)]'
-                                                            : 'text-[#FDFBF7]/60 hover:text-[#D4AF37]'
-                                                    }`}
-                                                >
-                                                    {type.label}
-                                                </button>
-                                            ))}
-                                        </div>
+                                    <div className="relative w-full sm:w-80">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
+                                        <Input
+                                            placeholder="Cari berdasarkan nomor atau nama target..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="pl-9 h-10 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 rounded-xl"
+                                        />
+                                    </div>
+                                </div>
 
-                                        {/* Filter Status */}
-                                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                            <SelectTrigger className="w-full sm:w-44 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
-                                                <SelectValue placeholder="Filter Status" />
+                                {/* Baris 2: Filter Data */}
+                                <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 pt-2 border-t border-[#D4AF37]/10">
+                                    {/* Filter Tipe (Radio Buttons Segmented Control) */}
+                                    <div className="flex items-center h-10 bg-[#022c22]/50 border border-[#D4AF37]/35 rounded-xl p-1 gap-1 w-full sm:w-auto">
+                                        {[
+                                            { value: 'all', label: 'Semua Tipe' },
+                                            { value: 'donatur', label: 'Donatur' },
+                                            { value: 'sponsorship', label: 'Sponsor' },
+                                        ].map((type) => (
+                                            <button
+                                                key={type.value}
+                                                onClick={() => setTypeFilter(type.value as any)}
+                                                className={`h-full px-4 rounded-lg text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex-1 sm:flex-initial text-center flex items-center justify-center ${
+                                                    typeFilter === type.value
+                                                        ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_10px_rgba(212,175,55,0.25)]'
+                                                        : 'text-[#FDFBF7]/60 hover:text-[#D4AF37]'
+                                                }`}
+                                            >
+                                                {type.label}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Filter Status */}
+                                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                        <SelectTrigger className="w-full sm:w-48 h-10 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37] rounded-xl">
+                                            <SelectValue placeholder="Filter Status" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7] rounded-xl">
+                                            <SelectItem value="all">Semua Status</SelectItem>
+                                            <SelectItem value="request">Request (Calon)</SelectItem>
+                                            <SelectItem value="terkirim">Terkirim (Belum Follow Up)</SelectItem>
+                                            <SelectItem value="komitmen">Komitmen Dicatat</SelectItem>
+                                            <SelectItem value="lunas">Lunas</SelectItem>
+                                            <SelectItem value="batal">Batal</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Sort Select (Only visible on Mobile View) */}
+                                    <div className="md:hidden w-full sm:w-auto flex-1">
+                                        <Select 
+                                            value={sortField + '_' + sortDirection} 
+                                            onValueChange={(val: string) => {
+                                                const [field, dir] = val.split('_') as [any, any]
+                                                setSortField(field)
+                                                setSortDirection(dir)
+                                            }}
+                                        >
+                                            <SelectTrigger className="w-full h-10 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37] rounded-xl">
+                                                <SelectValue placeholder="Urutkan" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                <SelectItem value="all">Semua Status</SelectItem>
-                                                <SelectItem value="request">Request (Calon Donatur/Sponsor)</SelectItem>
-                                                <SelectItem value="terkirim">Terkirim (Belum Follow Up)</SelectItem>
-                                                <SelectItem value="komitmen">Komitmen Dicatat</SelectItem>
-                                                <SelectItem value="lunas">Lunas</SelectItem>
-                                                <SelectItem value="batal">Batal</SelectItem>
+                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7] rounded-xl">
+                                                <SelectItem value="date_desc">Urutan: Terbaru</SelectItem>
+                                                <SelectItem value="date_asc">Urutan: Terlama</SelectItem>
+                                                <SelectItem value="name_asc">Nama: A - Z</SelectItem>
+                                                <SelectItem value="name_desc">Nama: Z - A</SelectItem>
+                                                <SelectItem value="number_asc">No. Proposal: A - Z</SelectItem>
+                                                <SelectItem value="number_desc">No. Proposal: Z - A</SelectItem>
+                                                <SelectItem value="type_asc">Jenis: A - Z</SelectItem>
+                                                <SelectItem value="type_desc">Jenis: Z - A</SelectItem>
+                                                <SelectItem value="status_desc">Status: Tinggi - Rendah</SelectItem>
+                                                <SelectItem value="status_asc">Status: Rendah - Tinggi</SelectItem>
                                             </SelectContent>
                                         </Select>
-
-                                        {/* Sort Select (Only visible on Mobile View) */}
-                                        <div className="md:hidden w-full sm:w-auto">
-                                            <Select 
-                                                value={sortField + '_' + sortDirection} 
-                                                onValueChange={(val: string) => {
-                                                    const [field, dir] = val.split('_') as [any, any]
-                                                    setSortField(field)
-                                                    setSortDirection(dir)
-                                                }}
-                                            >
-                                                <SelectTrigger className="w-full h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
-                                                    <SelectValue placeholder="Urutkan" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                                    <SelectItem value="date_desc">Urutan: Terbaru</SelectItem>
-                                                    <SelectItem value="date_asc">Urutan: Terlama</SelectItem>
-                                                    <SelectItem value="name_asc">Nama: A - Z</SelectItem>
-                                                    <SelectItem value="name_desc">Nama: Z - A</SelectItem>
-                                                    <SelectItem value="number_asc">No. Proposal: A - Z</SelectItem>
-                                                    <SelectItem value="number_desc">No. Proposal: Z - A</SelectItem>
-                                                    <SelectItem value="type_asc">Jenis: A - Z</SelectItem>
-                                                    <SelectItem value="type_desc">Jenis: Z - A</SelectItem>
-                                                    <SelectItem value="status_desc">Status: Tinggi - Rendah</SelectItem>
-                                                    <SelectItem value="status_asc">Status: Rendah - Tinggi</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        <div className="relative w-full sm:w-64 h-8">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
-                                            <Input
-                                                placeholder="Cari nomor atau nama..."
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="pl-9 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                                            />
-                                        </div>
                                     </div>
                                 </div>
                             </CardHeader>

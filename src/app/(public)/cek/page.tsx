@@ -6,7 +6,7 @@ import { getRegistrationByCode } from "@/app/(public)/daftar/actions";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck } from "lucide-react";
+import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download } from "lucide-react";
 
 function CheckContent() {
   const searchParams = useSearchParams();
@@ -16,6 +16,43 @@ function CheckContent() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[] | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [downloadingCode, setDownloadingCode] = useState<string | null>(null);
+
+  const downloadTicketImage = async (code: string) => {
+    const element = document.getElementById(`ticket-${code}`);
+    if (!element) return;
+    setDownloadingCode(code);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      const { toPng } = await import("html-to-image");
+      
+      const dataUrl = await toPng(element, {
+        cacheBust: true,
+        backgroundColor: "#0B0904",
+        pixelRatio: 3,
+        style: {
+          borderRadius: "12px",
+        },
+        filter: (node: any) => {
+          if (node.classList?.contains("no-export")) {
+            return false;
+          }
+          return true;
+        }
+      });
+      
+      const link = document.createElement("a");
+      link.download = `PKLU-Registration-${code}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Gagal menyimpan gambar:", err);
+      alert("Gagal menyimpan gambar. Silakan coba screenshot layar Anda.");
+    } finally {
+      setDownloadingCode(null);
+    }
+  };
 
   const handleSearch = async (codeToSearch?: string) => {
     const q = codeToSearch || query;
@@ -78,7 +115,11 @@ function CheckContent() {
               const fullUrl = typeof window !== "undefined" ? `${window.location.origin}/cek?code=${reg.registration_code}` : reg.registration_code;
               
               return (
-                <div key={reg.id} className="rounded-xl border border-[#D4AF37]/40 bg-black/80 p-6 space-y-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden">
+                <div 
+                  key={reg.id} 
+                  id={`ticket-${reg.registration_code}`}
+                  className="rounded-xl border border-[#D4AF37]/40 bg-[#0B0904] p-6 space-y-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden"
+                >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
                     <div>
                       <span className="text-xs uppercase tracking-wider text-gray-400">Kode Registrasi</span>
@@ -126,6 +167,19 @@ function CheckContent() {
                       <QRCodeSVG value={fullUrl} size={130} level="H" />
                       <p className="text-[10px] font-bold text-gray-600 text-center tracking-tight">SCAN KODE VERIFIKASI</p>
                     </div>
+                  </div>
+
+                  {/* Actions Section (Excluded from image export via 'no-export' class) */}
+                  <div className="flex justify-end pt-4 border-t border-white/10 no-export">
+                    <Button
+                      type="button"
+                      disabled={downloadingCode === reg.registration_code}
+                      onClick={() => downloadTicketImage(reg.registration_code)}
+                      className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs py-2 px-4 rounded-lg inline-flex items-center gap-1.5 cursor-pointer shadow-[0_0_10px_rgba(212,175,55,0.15)]"
+                    >
+                      <Download className="w-4 h-4" />
+                      {downloadingCode === reg.registration_code ? "Menyimpan..." : "Simpan Gambar"}
+                    </Button>
                   </div>
                 </div>
               );

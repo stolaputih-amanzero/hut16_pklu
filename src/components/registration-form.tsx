@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle, Upload, Copy, CheckCircle2 } from "lucide-react";
+import { AlertCircle, Upload, Copy, CheckCircle2, Download } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import Image from "next/image";
 import { submitRegistration } from "@/app/(public)/daftar/actions";
+import { toPng } from "html-to-image";
 import {
   Dialog,
   DialogContent,
@@ -213,6 +214,36 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
 
   const [successData, setSuccessData] = useState<{ code: string; mode: string } | null>(null);
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const downloadImage = async () => {
+    if (!cardRef.current || !successData) return;
+    setIsDownloading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        backgroundColor: "#0B0904",
+        pixelRatio: 3,
+        style: {
+          borderRadius: "16px",
+        }
+      });
+      
+      const link = document.createElement("a");
+      link.download = `PKLU-Registration-${successData.code}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Gagal menyimpan gambar:", err);
+      alert("Gagal menyimpan gambar. Silakan coba screenshot layar Anda.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const onSubmit = (data: FormValues) => {
     setPendingData(data);
     setShowConfirmModal(true);
@@ -273,32 +304,74 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
     const fullUrl = typeof window !== "undefined" ? `${window.location.origin}/cek?code=${successData.code}` : successData.code;
 
     return (
-      <div className="space-y-6 rounded-2xl border border-[#D4AF37]/50 bg-black/60 p-8 text-center text-[#FDFBF7] shadow-[0_0_30px_rgba(212,175,55,0.2)] animate-in fade-in zoom-in-95">
-        <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]">
-          <CheckCircle2 className="size-10 text-[#D4AF37]" />
-        </div>
-        
-        <div className="space-y-2">
-          <h2 className="text-3xl font-extrabold text-[#D4AF37]">Pendaftaran Berhasil!</h2>
-          <p className="text-sm text-gray-300">
-            Terima kasih telah mendaftar di Temu PKLU GPIB 2026. Data dan berkas Anda telah terekam secara valid.
-          </p>
-        </div>
-
-        <div className="my-6 rounded-xl border border-[#D4AF37]/30 bg-black/80 p-6 flex flex-col items-center justify-center space-y-4">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Kode Registrasi Anda</p>
-            <p className="font-mono text-4xl font-black text-[#D4AF37] tracking-wider select-all">{successData.code}</p>
+      <div className="space-y-6 animate-in fade-in zoom-in-95">
+        <div 
+          ref={cardRef} 
+          className="space-y-6 rounded-2xl border border-[#D4AF37]/50 bg-[#0B0904] p-8 text-center text-[#FDFBF7] shadow-[0_0_30px_rgba(212,175,55,0.2)] flex flex-col items-center"
+        >
+          {/* Header Ticket (Branding) */}
+          <div className="w-full border-b border-[#D4AF37]/20 pb-4 flex flex-col items-center">
+            <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">TEMU PKLU GPIB 2026</span>
+            <span className="text-[10px] uppercase tracking-wider text-gray-400 mt-1">Bukti Pendaftaran Resmi</span>
           </div>
 
-          <div className="p-3 bg-white rounded-xl shadow-md border border-white/20">
-            <QRCodeSVG value={fullUrl} size={150} level="H" />
+          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]">
+            <CheckCircle2 className="size-10 text-[#D4AF37]" />
+          </div>
+          
+          <div className="space-y-2">
+            <h2 className="text-3xl font-extrabold text-[#D4AF37]">Pendaftaran Berhasil!</h2>
+            <p className="text-sm text-gray-300">
+              Terima kasih telah mendaftar di Temu PKLU GPIB 2026. Data dan berkas Anda telah terekam secara valid.
+            </p>
           </div>
 
-          <p className="text-xs text-amber-300/90 max-w-md leading-relaxed">
-            Scan QR Code di atas atau simpan/screenshot kode registrasi untuk bukti keabsahan pendaftaran dan saat verifikasi di lokasi event.
-          </p>
+          <div className="my-6 rounded-xl border border-[#D4AF37]/30 bg-black/80 p-6 flex flex-col items-center justify-center space-y-4 w-full">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Kode Registrasi Anda</p>
+              <p className="font-mono text-4xl font-black text-[#D4AF37] tracking-wider select-all">{successData.code}</p>
+            </div>
 
+            <div className="p-3 bg-white rounded-xl shadow-md border border-white/20">
+              <QRCodeSVG value={fullUrl} size={150} level="H" />
+            </div>
+
+            <p className="text-xs text-amber-300/90 max-w-md leading-relaxed text-center">
+              Scan QR Code di atas atau simpan kode registrasi untuk bukti keabsahan pendaftaran dan saat verifikasi di lokasi event.
+            </p>
+          </div>
+          
+          <div className="w-full pt-4 border-t border-[#D4AF37]/10 flex flex-col items-center text-[10px] text-gray-400">
+            <p>© Panitia Temu PKLU GPIB 2026</p>
+          </div>
+        </div>
+
+        {/* Action Buttons (Not saved in the image) */}
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <Button 
+            type="button" 
+            disabled={isDownloading}
+            onClick={downloadImage}
+            className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold px-8 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+          >
+            <Download className="size-5" />
+            {isDownloading ? "Menyimpan..." : "Simpan Gambar Tiket"}
+          </Button>
+
+          <Button 
+            type="button" 
+            onClick={() => {
+              setSuccessData(null);
+              setPendingData(null);
+              form.reset();
+            }}
+            className="w-full sm:w-auto bg-black/40 hover:bg-black/60 text-white font-bold px-8 py-3 rounded-xl border border-white/10 transition-all cursor-pointer"
+          >
+            Daftar Kembali
+          </Button>
+        </div>
+
+        <div className="text-center">
           <a 
             href={`/cek?code=${successData.code}`} 
             target="_blank" 
@@ -307,18 +380,6 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
             Buka Halaman Cek Status Pendaftaran →
           </a>
         </div>
-
-        <Button 
-          type="button" 
-          onClick={() => {
-            setSuccessData(null);
-            setPendingData(null);
-            form.reset();
-          }}
-          className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold px-8 py-3 rounded-xl"
-        >
-          Daftar Kembali
-        </Button>
       </div>
     );
   }

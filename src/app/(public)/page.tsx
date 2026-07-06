@@ -46,6 +46,30 @@ const puncakRundown = [
 export default function Home() {
   const [copied, setCopied] = useState(false)
   const [activeRundown, setActiveRundown] = useState<'puncak' | 'pra'>('pra')
+  const [wishes, setWishes] = useState<any[]>([])
+  const [loadingWishes, setLoadingWishes] = useState(true)
+
+  useEffect(() => {
+    const fetchWishes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('guestbook_messages')
+          .select('*')
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false })
+          .limit(6)
+
+        if (!error && data) {
+          setWishes(data)
+        }
+      } catch (err) {
+        console.error('Error fetching wishes on home:', err)
+      } finally {
+        setLoadingWishes(false)
+      }
+    }
+    fetchWishes()
+  }, [])
 
   const handleCopy = () => {
     navigator.clipboard.writeText('00179-01-88-000447-9')
@@ -767,6 +791,130 @@ export default function Home() {
               )}
             </AnimatePresence>
           </div>
+        </motion.div>
+
+        {/* Doa & Ucapan Selamat Section */}
+        <motion.div
+          id="ucapan-selamat"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 1 }}
+          className="w-full max-w-5xl mb-24 mt-12"
+        >
+          <div className="text-center mb-12 space-y-2 select-none">
+            <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold flex items-center justify-center gap-1.5">
+              <MessageSquare className="w-4 h-4 text-[#D4AF37]" /> Buku Tamu Sukacita
+            </span>
+            <h2 className={`text-3xl md:text-5xl text-[#FDFBF7] ${playfair.className}`}>
+              Gema Doa &amp; Ucapan Selamat
+            </h2>
+            <p className="text-xs md:text-sm text-gray-300 max-w-xl mx-auto">
+              Ungkapan syukur, sukacita, dan untaian doa dari jemaat serta simpatisan untuk perayaan syukur HUT ke-16 Pelkat PKLU GPIB.
+            </p>
+          </div>
+
+          {loadingWishes ? (
+            <div className="flex flex-col items-center justify-center py-12 space-y-3">
+              <Loader2 className="w-8 h-8 text-[#D4AF37] animate-spin" />
+              <p className="text-xs text-gray-400 font-montserrat">Memuat ucapan selamat...</p>
+            </div>
+          ) : wishes.length === 0 ? (
+            <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#022c22]/40 backdrop-blur-md p-8 text-center text-[#FDFBF7] shadow-lg max-w-md mx-auto space-y-3">
+              <p className="text-xs text-gray-400">Belum ada ucapan yang terverifikasi.</p>
+              <Link
+                href="/ucapan"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#D4AF37] hover:underline"
+              >
+                Kirim Ucapan Pertama Anda <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {/* Greetings Cards Grid */}
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {wishes.map((item, idx) => {
+                  const initials = item.name ? item.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : '?';
+                  return (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: Math.min(idx * 0.1, 0.5) }}
+                      className="group relative flex flex-col justify-between p-6 rounded-2xl bg-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-lg"
+                    >
+                      {/* Left vertical visual marker */}
+                      <div className="absolute left-0 top-6 bottom-6 w-0.5 rounded-r bg-gradient-to-b from-[#D4AF37] to-transparent opacity-60" />
+
+                      <div className="space-y-4">
+                        {/* Card Header: Icon & Quote symbol */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {item.avatar_url ? (
+                              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-[#D4AF37]/40 shrink-0">
+                                <Image
+                                  src={item.avatar_url}
+                                  alt={item.name}
+                                  fill
+                                  sizes="40px"
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="h-10 w-10 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/35 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+                                {initials}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-white text-sm truncate" title={item.name}>{item.name}</h4>
+                              <p className="text-[10px] text-[#D4AF37] truncate" title={item.church_city}>{item.church_city}</p>
+                            </div>
+                          </div>
+                          <Quote className="w-5 h-5 text-[#D4AF37]/30 shrink-0" />
+                        </div>
+
+                        {/* Card Message Body */}
+                        <p className="text-xs text-gray-200 leading-relaxed italic line-clamp-4 select-text">
+                          "{item.message}"
+                        </p>
+                      </div>
+
+                      {/* Card Footer: Timestamp */}
+                      <div className="mt-4 pt-3 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-400 select-none">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-[#D4AF37]/60" />
+                          {new Date(item.created_at).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short"
+                          })}
+                        </span>
+                        <span className="text-[9px] uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
+                          Terverifikasi
+                        </span>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+
+              {/* Call to action navigation button */}
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4 select-none">
+                <Link
+                  href="/ucapan"
+                  className="w-full sm:w-auto text-center px-6 py-3 bg-[#D4AF37] hover:bg-[#B3932D] text-[#022c22] rounded-full text-xs font-bold shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all cursor-pointer"
+                >
+                  Tulis Ucapan Selamat Anda
+                </Link>
+                <Link
+                  href="/ucapan"
+                  className="w-full sm:w-auto text-center px-6 py-3 border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:text-white rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer"
+                >
+                  Lihat Semua Ucapan
+                </Link>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Dukungan Kasih Section */}

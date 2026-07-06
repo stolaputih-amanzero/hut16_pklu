@@ -969,17 +969,10 @@ export default function DaftarProposalPage() {
                 </button>
             </div>
 
-            <AnimatePresence mode="wait">
-                {activeTab === 'laporan' ? (
-                    <motion.div
-                        key="laporan-tab"
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -15 }}
-                        transition={{ duration: 0.25 }}
-                        className="space-y-6"
-                    >
-                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">
+            <div className="relative">
+                <div className={activeTab === 'laporan' ? 'block animate-in fade-in zoom-in-95 duration-300' : 'hidden'}>
+                    <div className="space-y-6">
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl min-h-[calc(100vh-220px)]">
                             <CardHeader>
                                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                     <div>
@@ -1309,17 +1302,12 @@ export default function DaftarProposalPage() {
                                 )}
                             </CardContent>
                         </Card>
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="buat-tab"
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -15 }}
-                        transition={{ duration: 0.25 }}
-                        className="space-y-6"
-                    >
-                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden">
+                    </div>
+                </div>
+                
+                <div className={activeTab === 'buat' ? 'block animate-in fade-in zoom-in-95 duration-300' : 'hidden'}>
+                    <div className="space-y-6">
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden min-h-[calc(100vh-220px)]">
                             <CardHeader>
                                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                     <div>
@@ -1672,9 +1660,9 @@ export default function DaftarProposalPage() {
                                 </AnimatePresence>
                             </CardContent>
                         </Card>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    </div>
+                </div>
+            </div>
 
             {/* Custom Modal */}
             {isOpen && (

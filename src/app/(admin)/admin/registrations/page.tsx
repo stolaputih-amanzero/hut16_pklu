@@ -26,7 +26,8 @@ import {
   ExternalLink,
   RefreshCw,
   CheckCircle2,
-  Building
+  Building,
+  RotateCcw
 } from "lucide-react";
 
 export default function RekapRegistrasiPage() {
@@ -42,6 +43,14 @@ export default function RekapRegistrasiPage() {
   const [selectedMupel, setSelectedMupel] = useState("ALL");
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const resetFilters = () => {
+    setSearch("");
+    setSelectedMode("ALL");
+    setSelectedCategory("ALL");
+    setSelectedType("ALL");
+    setSelectedMupel("ALL");
+  };
 
   // Selected Detail Modal
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
@@ -383,7 +392,7 @@ export default function RekapRegistrasiPage() {
 
       {/* Filter Bar */}
       <div className="rounded-xl border border-white/10 bg-black/40 p-4 space-y-4 shadow-lg backdrop-blur-sm">
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           {/* Keyword Search */}
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-3.5 text-gray-400" />
@@ -443,6 +452,17 @@ export default function RekapRegistrasiPage() {
               ))}
             </SelectContent>
           </Select>
+
+          {/* Reset Filters Button */}
+          <Button 
+            type="button" 
+            onClick={resetFilters}
+            variant="outline"
+            className="h-11 border-red-500/30 hover:border-red-500/60 text-red-400 hover:bg-red-950/20 font-bold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset Filter
+          </Button>
         </div>
       </div>
 

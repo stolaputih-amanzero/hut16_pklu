@@ -48,7 +48,7 @@ export default function DaftarProposalPage() {
     const [isMounted, setIsMounted] = useState(false)
     
     // Tab state
-    const [activeTab, setActiveTab] = useState<'laporan' | 'buat'>('laporan')
+    const [activeTab, setActiveTab] = useState<'laporan' | 'buat'>('buat')
 
     // Proposal Creation States (from buat-proposal page)
     const [createProposalType, setCreateProposalType] = useState<'donatur' | 'sponsorship'>('donatur')
@@ -132,8 +132,8 @@ export default function DaftarProposalPage() {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search)
             const tab = params.get('tab')
-            if (tab === 'buat') {
-                setActiveTab('buat')
+            if (tab === 'laporan') {
+                setActiveTab('laporan')
             }
         }
     }, [])
@@ -927,44 +927,11 @@ export default function DaftarProposalPage() {
                         <Download className="h-4 w-4" />
                         Laporan LPJ
                     </Button>
-                    {activeTab === 'laporan' ? (
-                        <Button 
-                            onClick={() => setActiveTab('buat')}
-                            className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2 cursor-pointer"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Buat Proposal
-                        </Button>
-                    ) : (
-                        <Button 
-                            onClick={() => setActiveTab('laporan')}
-                            className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2 cursor-pointer"
-                        >
-                            <FileText className="h-4 w-4" />
-                            Riwayat Proposal
-                        </Button>
-                    )}
                 </div>
             </div>
 
             {/* Tabs Control */}
             <div className="flex border-b border-[#D4AF37]/20 gap-6 select-none">
-                <button
-                    onClick={() => setActiveTab('laporan')}
-                    className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
-                        activeTab === 'laporan'
-                            ? 'text-[#D4AF37]'
-                            : 'text-[#FDFBF7]/60 hover:text-white'
-                    }`}
-                >
-                    Riwayat & Laporan
-                    {activeTab === 'laporan' && (
-                        <motion.div
-                            layoutId="activeTabUnderline"
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#D4AF37]"
-                        />
-                    )}
-                </button>
                 <button
                     onClick={() => setActiveTab('buat')}
                     className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
@@ -975,6 +942,22 @@ export default function DaftarProposalPage() {
                 >
                     Buat Proposal Baru
                     {activeTab === 'buat' && (
+                        <motion.div
+                            layoutId="activeTabUnderline"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#D4AF37]"
+                        />
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveTab('laporan')}
+                    className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
+                        activeTab === 'laporan'
+                            ? 'text-[#D4AF37]'
+                            : 'text-[#FDFBF7]/60 hover:text-white'
+                    }`}
+                >
+                    Riwayat & Laporan
+                    {activeTab === 'laporan' && (
                         <motion.div
                             layoutId="activeTabUnderline"
                             className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#D4AF37]"

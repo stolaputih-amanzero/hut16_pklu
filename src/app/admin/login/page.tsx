@@ -74,11 +74,17 @@ export default function AdminLoginPage() {
         });
 
       if (signInError) {
-        // Handle specific error codes or provide friendly feedback
-        if (signInError.message.includes("Invalid login credentials")) {
+        const isNetworkErr =
+          signInError.message.toLowerCase().includes("fetch") ||
+          signInError.message.toLowerCase().includes("network") ||
+          signInError.message.toLowerCase().includes("failed to fetch");
+
+        if (isNetworkErr) {
+          setError("Koneksi internet bermasalah, silakan coba lagi");
+        } else if (signInError.message.includes("Invalid login credentials")) {
           setError("Email atau sandi salah. Silakan coba kembali.");
         } else if (signInError.message.includes("Email not confirmed")) {
-          setError("Alamat email belum dikonfirmasi oleh sistem.");
+          setError("Akun belum diverifikasi");
         } else {
           setError(signInError.message);
         }
@@ -104,8 +110,18 @@ export default function AdminLoginPage() {
         // Redirect to admin dashboard
         router.push("/admin/dashboard");
       }
-    } catch (err) {
-      setError("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+    } catch (err: any) {
+      const errMsg = err?.message || "";
+      const isNetworkErr =
+        errMsg.toLowerCase().includes("fetch") ||
+        errMsg.toLowerCase().includes("network") ||
+        err instanceof TypeError;
+
+      if (isNetworkErr) {
+        setError("Koneksi internet bermasalah, silakan coba lagi");
+      } else {
+        setError("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+      }
       setLoading(false);
     }
   };

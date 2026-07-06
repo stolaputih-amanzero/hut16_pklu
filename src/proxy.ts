@@ -18,17 +18,23 @@ export async function proxy(request: NextRequest) {
   // 2. Initialize Supabase client and response from our utility
   const { supabase, response } = createMiddlewareClient(request);
 
+  let user;
   try {
     // 3. Retrieve user session (getUser securely re-validates the JWT with Supabase auth servers)
     const {
-      data: { user },
+      data: { user: userData },
       error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
+    if (userError || !userData) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
+    user = userData;
+  } catch (authError) {
+    return NextResponse.redirect(new URL("/admin/login", request.url));
+  }
 
+  try {
     // 4. Verify user exists in the admin_profiles table
     const { data: profile, error: dbError } = await supabase
       .from("admin_profiles")
@@ -44,9 +50,9 @@ export async function proxy(request: NextRequest) {
     response.headers.set("x-user-id", user.id);
 
     return response;
-  } catch (error) {
-    // 6. Generic redirect to login on exceptions (e.g. DB unreachable, session corrupt)
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+  } catch (dbError) {
+    // DB timeout/error saat cek admin_profiles -> default redirect ke /admin/unauthorized (fail-safe)
+    return NextResponse.redirect(new URL("/admin/unauthorized", request.url));
   }
 }
 

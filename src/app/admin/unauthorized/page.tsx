@@ -17,10 +17,13 @@ export default function UnauthorizedPage() {
 
         <div className="space-y-2">
           <h1 className="text-2xl font-black tracking-tight text-[#FDFBF7]">
-            Akses Tidak Diizinkan
+            Akses Ditolak
           </h1>
           <p className="text-sm text-gray-300 max-w-xs mx-auto leading-relaxed">
-            Akun Anda berhasil masuk, tetapi tidak terdaftar atau tidak memiliki wewenang dalam daftar administrator panitia.
+            Maaf, akun Anda tidak memiliki akses ke area admin.
+          </p>
+          <p className="text-xs text-gray-400 max-w-xs mx-auto leading-relaxed">
+            Jika Anda merasa ini kesalahan, silakan hubungi administrator sistem.
           </p>
         </div>
 
@@ -36,7 +39,7 @@ export default function UnauthorizedPage() {
             className="w-full sm:w-auto px-5 py-2.5 bg-black/40 hover:bg-black/60 border border-white/10 text-gray-300 hover:text-white font-bold text-xs rounded-xl transition-all inline-flex items-center justify-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Kembali ke Beranda
+            Kembali ke Halaman Publik
           </Link>
         </div>
       </div>

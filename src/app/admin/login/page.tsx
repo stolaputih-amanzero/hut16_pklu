@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr";
+import { supabase } from "@/lib/supabase/client";
 import { Lock, Mail, ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,14 +10,6 @@ import Image from "next/image";
 export default function AdminLoginPage() {
   const router = useRouter();
   const emailInputRef = useRef<HTMLInputElement>(null);
-
-  // Initialize Supabase Browser Client
-  const [supabase] = useState(() =>
-    createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +50,7 @@ export default function AdminLoginPage() {
     };
 
     checkSession();
-  }, [router, supabase]);
+  }, [router]);
 
   // 2. Handle admin credentials submission
   const handleLogin = async (e: React.FormEvent) => {

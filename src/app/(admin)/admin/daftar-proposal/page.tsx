@@ -972,8 +972,8 @@ export default function DaftarProposalPage() {
             <div className="relative">
                 <div className={activeTab === 'laporan' ? 'block animate-in fade-in zoom-in-95 duration-300' : 'hidden'}>
                     <div className="space-y-6">
-                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl min-h-[calc(100vh-220px)]">
-                            <CardHeader>
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl h-[calc(100vh-220px)] flex flex-col">
+                            <CardHeader className="flex-none">
                                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                     <div>
                                         <CardTitle className="text-[#FDFBF7] font-playfair tracking-wide flex items-center gap-2">
@@ -1061,7 +1061,7 @@ export default function DaftarProposalPage() {
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
                                 {loading ? (
                                     <div className="py-12 flex justify-center">
                                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]" />
@@ -1307,8 +1307,8 @@ export default function DaftarProposalPage() {
                 
                 <div className={activeTab === 'buat' ? 'block animate-in fade-in zoom-in-95 duration-300' : 'hidden'}>
                     <div className="space-y-6">
-                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden min-h-[calc(100vh-220px)]">
-                            <CardHeader>
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden h-[calc(100vh-220px)] flex flex-col">
+                            <CardHeader className="flex-none">
                                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                     <div>
                                         <CardTitle className="text-[#FDFBF7] font-playfair tracking-wide flex items-center gap-2">
@@ -1331,7 +1331,7 @@ export default function DaftarProposalPage() {
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-4 md:p-6 space-y-6">
+                            <CardContent className="p-4 md:p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
                                 <AnimatePresence mode="wait">
                             {createIsSuccess ? (
                                 <motion.div 

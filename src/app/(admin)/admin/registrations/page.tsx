@@ -307,22 +307,25 @@ export default function RekapRegistrasiPage() {
           <p className="text-sm text-gray-300">Data pendaftaran publik Temu PKLU GPIB 2026</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={fetchData} disabled={loading} className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10">
+        <div className="flex flex-wrap items-center gap-3 mt-4 sm:mt-0">
+          <Button variant="outline" onClick={fetchData} disabled={loading} className="flex-1 sm:flex-none border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10">
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-            Refresh Data
+            Refresh
           </Button>
-          <Button onClick={exportToCSV} className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold">
+          <Button onClick={exportToCSV} className="flex-1 sm:flex-none bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold">
             <Download className="w-4 h-4 mr-2" />
-            Export Excel (CSV)
+            Export CSV
           </Button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         {/* Card 1: Total Headcount */}
-        <div className="rounded-xl border border-[#D4AF37]/30 bg-black/40 p-5 shadow-lg backdrop-blur-md">
+        <div className="rounded-xl border border-[#D4AF37]/20 bg-gradient-to-br from-black/80 to-black/40 p-5 shadow-xl backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute -right-6 -top-6 text-[#D4AF37]/5 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-500">
+            <Users className="w-32 h-32" />
+          </div>
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase text-gray-400">Total Pendaftar</span>
             <div className="p-2 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37]">
@@ -337,7 +340,10 @@ export default function RekapRegistrasiPage() {
         </div>
 
         {/* Card 2: Total Revenue */}
-        <div className="rounded-xl border border-[#D4AF37]/30 bg-black/40 p-5 shadow-lg backdrop-blur-md">
+        <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-black/80 to-black/40 p-5 shadow-xl backdrop-blur-md relative overflow-hidden group">
+          <div className="absolute -right-6 -top-6 text-emerald-500/5 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-500">
+            <Banknote className="w-32 h-32" />
+          </div>
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase text-gray-400">Est. Total Kontribusi</span>
             <div className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-extrabold text-xs">
@@ -352,14 +358,17 @@ export default function RekapRegistrasiPage() {
         </div>
 
         {/* Card 3: Agregat Kaos */}
-        <div className="rounded-xl border border-[#D4AF37]/30 bg-black/40 p-5 shadow-lg backdrop-blur-md sm:col-span-2">
+        <div className="rounded-xl border border-blue-500/20 bg-gradient-to-br from-black/80 to-black/40 p-5 shadow-xl backdrop-blur-md sm:col-span-2 relative overflow-hidden group">
+          <div className="absolute -right-6 -top-6 text-blue-500/5 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-500">
+            <Shirt className="w-32 h-32" />
+          </div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase text-gray-400">Agregat Ukuran Baju (Vendor Konveksi)</span>
             <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
               <Shirt className="w-5 h-5" />
             </div>
           </div>
-          <div className="grid grid-cols-6 gap-2 text-center mt-2">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center mt-4 relative z-10">
             {Object.entries(stats.shirtSummary).map(([sz, qty]) => (
               sz !== "Random" ? (
                 <div key={sz} className="bg-black/50 border border-white/10 rounded-lg p-2">
@@ -373,58 +382,58 @@ export default function RekapRegistrasiPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="rounded-xl border border-white/10 bg-black/40 p-4 space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-5">
+      <div className="rounded-xl border border-white/10 bg-black/40 p-4 space-y-4 shadow-lg backdrop-blur-sm">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
           {/* Keyword Search */}
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-3.5 text-gray-400" />
             <Input 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              placeholder="Cari Nama / PIC / WA / Kode..." 
-              className="pl-9 bg-black/50 border-white/20 text-white" 
+              placeholder="Cari Nama / PIC / WA..." 
+              className="pl-9 h-11 bg-black/50 border-white/20 text-white rounded-lg focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]" 
             />
           </div>
 
           {/* Mode Filter */}
           <Select value={selectedMode} onValueChange={setSelectedMode}>
-            <SelectTrigger className="bg-black/50 border-white/20 text-white">
-              <SelectValue placeholder="Mode Pendaftaran" />
+            <SelectTrigger className="h-11 bg-black/50 border-white/20 text-white rounded-lg focus:border-[#D4AF37]">
+              <SelectValue placeholder="Mode" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">Semua Mode</SelectItem>
-              <SelectItem value="Mandiri">Mandiri (1 Orang)</SelectItem>
-              <SelectItem value="Rombongan">Jalur Cepat Rombongan</SelectItem>
+              <SelectItem value="Mandiri">Mandiri</SelectItem>
+              <SelectItem value="Rombongan">Rombongan</SelectItem>
             </SelectContent>
           </Select>
 
           {/* Category Filter */}
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="bg-black/50 border-white/20 text-white">
+            <SelectTrigger className="h-11 bg-black/50 border-white/20 text-white rounded-lg focus:border-[#D4AF37]">
               <SelectValue placeholder="Kategori" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">Semua Kategori (Umum/TR)</SelectItem>
-              <SelectItem value="Umum">Umum (Rp 475.000)</SelectItem>
-              <SelectItem value="Tuan Rumah">Tuan Rumah (Rp 350.000)</SelectItem>
+              <SelectItem value="ALL">Semua Kategori</SelectItem>
+              <SelectItem value="Umum">Umum</SelectItem>
+              <SelectItem value="Tuan Rumah">Tuan Rumah</SelectItem>
             </SelectContent>
           </Select>
 
-          {/* Type Filter (Peserta / Pendamping) */}
+          {/* Type Filter */}
           <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="bg-black/50 border-white/20 text-white">
-              <SelectValue placeholder="Tipe Pendaftaran" />
+            <SelectTrigger className="h-11 bg-black/50 border-white/20 text-white rounded-lg focus:border-[#D4AF37]">
+              <SelectValue placeholder="Tipe" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">Semua Tipe (Peserta/Pendamping)</SelectItem>
-              <SelectItem value="Peserta">Khusus Peserta</SelectItem>
-              <SelectItem value="Pendamping">Khusus Pendamping</SelectItem>
+              <SelectItem value="ALL">Semua Tipe</SelectItem>
+              <SelectItem value="Peserta">Peserta</SelectItem>
+              <SelectItem value="Pendamping">Pendamping</SelectItem>
             </SelectContent>
           </Select>
 
           {/* Mupel Filter */}
           <Select value={selectedMupel} onValueChange={setSelectedMupel}>
-            <SelectTrigger className="bg-black/50 border-white/20 text-white">
+            <SelectTrigger className="h-11 bg-black/50 border-white/20 text-white rounded-lg focus:border-[#D4AF37]">
               <SelectValue placeholder="Mupel Asal" />
             </SelectTrigger>
             <SelectContent className="max-h-[250px]">
@@ -437,8 +446,99 @@ export default function RekapRegistrasiPage() {
         </div>
       </div>
 
-      {/* Main Data Table */}
-      <div className="rounded-xl border border-white/10 bg-black/40 overflow-hidden shadow-xl">
+      {/* DATA VIEW (HYBRID: MOBILE CARDS & DESKTOP TABLE) */}
+      
+      {/* 1. MOBILE CARDS VIEW (< xl) */}
+      <div className="xl:hidden space-y-4">
+        {loading ? (
+          <div className="py-12 text-center text-gray-400 border border-white/10 rounded-xl bg-black/40">Memuat data registrasi...</div>
+        ) : sortedData.length === 0 ? (
+          <div className="py-12 text-center text-gray-400 border border-white/10 rounded-xl bg-black/40">Tidak ada data pendaftaran ditemukan.</div>
+        ) : (
+          sortedData.map((item) => {
+            const isRombongan = item.registration_mode === "Rombongan";
+            const headcount = isRombongan ? (item.participant_count || 0) + (item.companion_count || 0) : 1;
+            const nameDisplay = isRombongan ? item.pic_name : item.full_name;
+            const cleanWa = (item.whatsapp_number || "").replace(/^0/, "62").replace(/\D/g, "");
+
+            return (
+              <div 
+                key={item.id} 
+                onClick={() => setSelectedRecord(item)}
+                className="bg-black/40 border border-[#D4AF37]/20 rounded-xl p-4 shadow-lg backdrop-blur-sm cursor-pointer hover:bg-black/60 transition-colors space-y-3"
+              >
+                {/* Card Header: Badges & Actions */}
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${isRombongan ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" : "bg-blue-500/20 text-blue-300 border border-blue-500/30"}`}>
+                        {item.registration_mode}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${item.category === "Tuan Rumah" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"}`}>
+                        {item.category}
+                      </span>
+                    </div>
+                    <span className="font-mono text-sm font-bold text-[#D4AF37] block">{item.registration_code}</span>
+                  </div>
+                  <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                    <Button size="icon" variant="ghost" onClick={() => setSelectedRecord(item)} className="h-8 w-8 text-gray-300 hover:text-white bg-white/5 rounded-lg">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => handleDelete(item.id)} disabled={deletingId === item.id} className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-950/50 bg-red-500/10 rounded-lg border border-red-500/20">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Card Body: Info */}
+                <div>
+                  <h3 className="font-bold text-white text-lg leading-tight">{nameDisplay}</h3>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    <span className="text-gray-300 font-medium">{item.church_name}</span> • {item.mupel}
+                  </div>
+                  <div className="text-[11px] mt-1">
+                    {!isRombongan ? (
+                      <span className={item.type === "Peserta" ? "text-blue-300" : "text-purple-300"}>
+                        {item.type} {item.role ? `(${item.role})` : ""}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">P: {item.participant_count || 0} Peserta | D: {item.companion_count || 0} Pendamping</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Footer: Status & File Icons */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/10" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-xs font-semibold text-white bg-white/10 px-2 py-1 rounded-md">
+                      <Users className="w-3.5 h-3.5 text-gray-400" />
+                      {headcount}
+                    </div>
+                    {cleanWa && (
+                      <a 
+                        href={`https://wa.me/${cleanWa}`} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20 text-xs font-mono font-medium"
+                      >
+                        WA
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {item.proof_of_transfer_url && <ImageIcon className="w-4 h-4 text-emerald-400" />}
+                    {item.assignment_letter_url && <FileText className="w-4 h-4 text-blue-400" />}
+                    {item.participant_list_url && <ExternalLink className="w-4 h-4 text-purple-400" />}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* 2. DESKTOP TABLE VIEW (>= xl) */}
+      <div className="hidden xl:block rounded-xl border border-white/10 bg-black/40 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-300">
             <thead className="bg-black/60 text-xs uppercase text-[#D4AF37] border-b border-white/10 select-none">
@@ -595,7 +695,7 @@ export default function RekapRegistrasiPage() {
 
           {selectedRecord && (
             <div className="space-y-5 py-4 max-h-[70vh] overflow-y-auto text-sm pr-2">
-              <div className="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
                 <div>
                   <span className="text-xs text-gray-400 block">Mode Pendaftaran</span>
                   <strong className="text-white text-base">{selectedRecord.registration_mode}</strong>

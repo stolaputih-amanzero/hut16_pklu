@@ -16,7 +16,16 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
+  const [checkingSession, setCheckingSession] = useState(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const keys = Object.keys(localStorage);
+      const hasToken = keys.some((key) => key.startsWith("sb-") && key.endsWith("-auth-token"));
+      return hasToken;
+    } catch (e) {
+      return true;
+    }
+  });
   const [error, setError] = useState<string | null>(null);
 
   // 1. Auto-focus email field on page load & check if user is already authenticated

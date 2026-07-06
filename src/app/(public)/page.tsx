@@ -48,6 +48,7 @@ export default function Home() {
   const [activeRundown, setActiveRundown] = useState<'puncak' | 'pra'>('pra')
   const [wishes, setWishes] = useState<any[]>([])
   const [loadingWishes, setLoadingWishes] = useState(true)
+  const [currentSlide, setCurrentSlide] = useState(0)
 
   useEffect(() => {
     const fetchWishes = async () => {
@@ -57,7 +58,7 @@ export default function Home() {
           .select('*')
           .eq('is_approved', true)
           .order('created_at', { ascending: false })
-          .limit(6)
+          .limit(8)
 
         if (!error && data) {
           setWishes(data)
@@ -70,6 +71,25 @@ export default function Home() {
     }
     fetchWishes()
   }, [])
+
+  // Autoplay slider logic
+  useEffect(() => {
+    if (wishes.length <= 1) return
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % wishes.length)
+    }, 7000)
+    return () => clearInterval(interval)
+  }, [wishes])
+
+  const handleNextSlide = () => {
+    if (wishes.length === 0) return
+    setCurrentSlide((prev) => (prev + 1) % wishes.length)
+  }
+
+  const handlePrevSlide = () => {
+    if (wishes.length === 0) return
+    setCurrentSlide((prev) => (prev - 1 + wishes.length) % wishes.length)
+  }
 
   const handleCopy = () => {
     navigator.clipboard.writeText('00179-01-88-000447-9')
@@ -800,7 +820,7 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-5xl mb-24 mt-12"
+          className="w-full max-w-5xl mb-24 mt-12 px-4"
         >
           <div className="text-center mb-12 space-y-2 select-none">
             <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold flex items-center justify-center gap-1.5">
@@ -809,13 +829,10 @@ export default function Home() {
             <h2 className={`text-3xl md:text-5xl text-[#FDFBF7] ${playfair.className}`}>
               Gema Doa &amp; Ucapan Selamat
             </h2>
-            <p className="text-xs md:text-sm text-gray-300 max-w-xl mx-auto">
-              Ungkapan syukur, sukacita, dan untaian doa dari jemaat serta simpatisan untuk perayaan syukur HUT ke-16 Pelkat PKLU GPIB.
-            </p>
           </div>
 
           {loadingWishes ? (
-            <div className="flex flex-col items-center justify-center py-12 space-y-3">
+            <div className="flex flex-col items-center justify-center py-16 space-y-3">
               <Loader2 className="w-8 h-8 text-[#D4AF37] animate-spin" />
               <p className="text-xs text-gray-400 font-montserrat">Memuat ucapan selamat...</p>
             </div>
@@ -830,76 +847,86 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-8">
-              {/* Greetings Cards Grid */}
-              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {wishes.map((item, idx) => {
-                  const initials = item.name ? item.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : '?';
-                  return (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: Math.min(idx * 0.1, 0.5) }}
-                      className="group relative flex flex-col justify-between p-6 rounded-2xl bg-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-lg"
-                    >
-                      {/* Left vertical visual marker */}
-                      <div className="absolute left-0 top-6 bottom-6 w-0.5 rounded-r bg-gradient-to-b from-[#D4AF37] to-transparent opacity-60" />
+            <div className="space-y-12">
+              {/* Premium Slider Container */}
+              <div className="relative min-h-[280px] flex flex-col items-center justify-center text-center px-6 md:px-16 py-10 bg-[#022c22]/20 border border-[#D4AF37]/15 rounded-[2.5rem] backdrop-blur-xl shadow-2xl overflow-hidden">
+                {/* Visual glow backdrop decoration */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-[90px] pointer-events-none" />
 
-                      <div className="space-y-4">
-                        {/* Card Header: Icon & Quote symbol */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            {item.avatar_url ? (
-                              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-[#D4AF37]/40 shrink-0">
-                                <Image
-                                  src={item.avatar_url}
-                                  alt={item.name}
-                                  fill
-                                  sizes="40px"
-                                  className="object-cover"
-                                />
-                              </div>
-                            ) : (
-                              <div className="h-10 w-10 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/35 flex items-center justify-center font-mono font-bold text-xs shrink-0">
-                                {initials}
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <h4 className="font-bold text-white text-sm truncate" title={item.name}>{item.name}</h4>
-                              <p className="text-[10px] text-[#D4AF37] truncate" title={item.church_city}>{item.church_city}</p>
-                            </div>
-                          </div>
-                          <Quote className="w-5 h-5 text-[#D4AF37]/30 shrink-0" />
-                        </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentSlide}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="space-y-8 max-w-3xl w-full relative z-10"
+                  >
+                    {/* Badge Category Tag */}
+                    <div className="flex items-center justify-center gap-2 text-[10px] tracking-[0.2em] font-semibold text-[#D4AF37] uppercase select-none">
+                      <span className="w-1.5 h-1.5 rounded-full border border-[#D4AF37]/70 bg-transparent shrink-0" />
+                      <span>DOA JEMAAT</span>
+                    </div>
 
-                        {/* Card Message Body */}
-                        <p className="text-xs text-gray-200 leading-relaxed italic line-clamp-4 select-text">
-                          "{item.message}"
-                        </p>
-                      </div>
+                    {/* Testimonial Quote text */}
+                    <p className={`text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-light leading-relaxed select-text italic ${playfair.className}`}>
+                      "{wishes[currentSlide].message}"
+                    </p>
 
-                      {/* Card Footer: Timestamp */}
-                      <div className="mt-4 pt-3 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-400 select-none">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#D4AF37]/60" />
-                          {new Date(item.created_at).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short"
-                          })}
-                        </span>
-                        <span className="text-[9px] uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
-                          Terverifikasi
-                        </span>
-                      </div>
-                    </motion.div>
-                  )
-                })}
+                    {/* Author block details */}
+                    <div className="space-y-1 select-none">
+                      <h4 className="font-extrabold text-sm md:text-base text-[#D4AF37] tracking-wider uppercase font-sans">
+                        {wishes[currentSlide].name}
+                      </h4>
+                      <p className="text-[10px] md:text-xs text-gray-400 tracking-[0.2em] uppercase font-mono">
+                        {wishes[currentSlide].church_city}
+                      </p>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Navigation arrows & pagination indicators */}
+                <div className="flex items-center justify-center gap-6 mt-8 pt-4 select-none relative z-10">
+                  {/* Left Button */}
+                  <button
+                    onClick={handlePrevSlide}
+                    aria-label="Previous Slide"
+                    className="w-10 h-10 rounded-full border border-[#D4AF37]/30 hover:border-[#D4AF37] text-[#D4AF37] hover:text-white flex items-center justify-center transition-all active:scale-90 hover:bg-[#D4AF37]/10 cursor-pointer"
+                  >
+                    <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Dot Indicators */}
+                  <div className="flex items-center gap-2">
+                    {wishes.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                        className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                          currentSlide === index ? "w-6 bg-[#D4AF37]" : "w-2 bg-[#D4AF37]/30 hover:bg-[#D4AF37]/60"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Right Button */}
+                  <button
+                    onClick={handleNextSlide}
+                    aria-label="Next Slide"
+                    className="w-10 h-10 rounded-full border border-[#D4AF37]/30 hover:border-[#D4AF37] text-[#D4AF37] hover:text-white flex items-center justify-center transition-all active:scale-90 hover:bg-[#D4AF37]/10 cursor-pointer"
+                  >
+                    <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
-              {/* Call to action navigation button */}
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4 select-none">
+              {/* Call to action navigation buttons */}
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 select-none">
                 <Link
                   href="/ucapan"
                   className="w-full sm:w-auto text-center px-6 py-3 bg-[#D4AF37] hover:bg-[#B3932D] text-[#022c22] rounded-full text-xs font-bold shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all cursor-pointer"

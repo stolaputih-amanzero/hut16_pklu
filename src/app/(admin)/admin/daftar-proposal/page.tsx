@@ -1350,14 +1350,14 @@ export default function DaftarProposalPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                 >
-                                    <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden">
-                                        <div className="bg-gradient-to-r from-[#D4AF37]/20 via-transparent to-transparent p-6 text-center">
+                                    <div className="border border-[#D4AF37]/30 rounded-xl overflow-hidden bg-[#022c22]/30 relative z-20">
+                                        <div className="bg-gradient-to-r from-[#D4AF37]/20 via-[#D4AF37]/5 to-transparent p-6 text-center border-b border-[#D4AF37]/20">
                                             <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
                                             <h2 className="text-2xl font-bold text-[#FDFBF7] mb-2">Proposal Berhasil Dibuat!</h2>
                                             <p className="text-[#D4AF37] font-mono text-lg">{createProposalNumber}</p>
                                             <p className="text-[#FDFBF7] font-semibold mt-1.5 text-sm tracking-wide capitalize">{createFormData.name}</p>
                                         </div>
-                                        <CardContent className="p-6">
+                                        <div className="p-6">
                                             <div className="bg-[#022c22] rounded-lg p-4 border border-[#D4AF37]/20 mb-6 flex flex-col md:flex-row gap-6">
                                                 <div className="flex-1 space-y-2">
                                                     <div className="text-sm text-[#A0AEC0]">Tipe Proposal</div>
@@ -1424,8 +1424,8 @@ export default function DaftarProposalPage() {
                                                     + Buat Proposal Lainnya
                                                 </Button>
                                             </div>
-                                        </CardContent>
-                                    </Card>
+                                        </div>
+                                    </div>
                                 </motion.div>
                             ) : (
                                 <motion.div 
@@ -1436,16 +1436,14 @@ export default function DaftarProposalPage() {
                                     className="space-y-6"
                                 >
                                     {/* GLOBAL CHOICES */}
-                                    <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl relative z-20 overflow-visible">
-                                        <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
-                                            <CardTitle className="text-[#D4AF37] flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-sm font-semibold">
-                                                    1
-                                                </div>
-                                                Pengaturan Global
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="border border-[#D4AF37]/20 rounded-xl relative z-20 overflow-visible bg-[#022c22]/30">
+                                        <div className="px-6 py-4 border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-xl flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-sm font-semibold text-[#D4AF37]">
+                                                1
+                                            </div>
+                                            <h3 className="text-[#D4AF37] font-semibold text-lg tracking-wide">Pengaturan Global</h3>
+                                        </div>
+                                        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                                             {/* Tipe Proposal (Baris Pertama) */}
                                             <div className="space-y-2 md:col-span-3">
                                                 <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Tipe Proposal</Label>
@@ -1527,23 +1525,21 @@ export default function DaftarProposalPage() {
                                                     className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] [color-scheme:dark] h-11 text-sm"
                                                 />
                                             </div>
-                                        </CardContent>
-                                    </Card>
+                                        </div>
+                                    </div>
 
                                     {/* TARGET INFORMATION */}
-                                    <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl relative z-10 overflow-visible">
+                                    <div className="border border-[#D4AF37]/20 rounded-xl relative z-10 overflow-hidden bg-[#022c22]/30">
                                         {/* Ambient gradient behind the form */}
-                                        <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 -z-10 transition-colors duration-1000 ${createProposalType === 'donatur' ? 'bg-pink-500' : 'bg-blue-500'}`} />
+                                        <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 transition-colors duration-1000 ${createProposalType === 'donatur' ? 'bg-pink-500' : 'bg-blue-500'}`} />
                                         
-                                        <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
-                                            <CardTitle className="text-[#D4AF37] flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center font-semibold">
-                                                    2
-                                                </div>
-                                                Informasi Target Dukungan
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="p-6 space-y-6">
+                                        <div className="px-6 py-4 border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-xl flex items-center gap-3 relative z-20">
+                                            <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center font-semibold text-[#D4AF37]">
+                                                2
+                                            </div>
+                                            <h3 className="text-[#D4AF37] font-semibold text-lg tracking-wide">Informasi Target Dukungan</h3>
+                                        </div>
+                                        <div className="p-6 space-y-6 relative z-20">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
                                                     <Label className="text-[#FDFBF7]">
@@ -1653,8 +1649,8 @@ export default function DaftarProposalPage() {
                                                     />
                                                 </motion.div>
                                             )}
-                                        </CardContent>
-                                    </Card>
+                                        </div>
+                                    </div>
 
                                     {/* GENERATE BUTTON */}
                                     <div className="pt-4 flex justify-end">

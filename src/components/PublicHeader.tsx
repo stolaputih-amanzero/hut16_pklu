@@ -25,7 +25,7 @@ export function PublicHeader() {
   return (
     <>
       {/* Top Desktop Navigation Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-[#D4AF37]/20 bg-[#022c22]/90 backdrop-blur-xl transition-all">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#022c22]/90 backdrop-blur-xl transition-all">
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           {/* Logo Brand */}
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -84,7 +84,7 @@ export function PublicHeader() {
       </header>
 
       {/* Floating Glassmorphism Mobile Bottom Navbar */}
-      <div className="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-[#022c22]/90 backdrop-blur-xl border border-[#D4AF37]/35 rounded-full px-2 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.6),_0_0_12px_rgba(212,175,55,0.15)] flex items-center justify-around">
+      <div className="md:hidden fixed bottom-3 left-0 right-0 mx-auto z-50 w-[92%] max-w-md bg-[#022c22]/90 backdrop-blur-xl border border-[#D4AF37]/35 rounded-full px-2 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.6),_0_0_12px_rgba(212,175,55,0.15)] flex items-center justify-around">
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
           const Icon = link.icon;

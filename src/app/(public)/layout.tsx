@@ -11,7 +11,7 @@ export default function PublicLayout({
       <PublicHeader />
 
       {/* Main Content Area */}
-      <main className="flex-1 pb-20 md:pb-12">{children}</main>
+      <main className="flex-1 pt-16 pb-20 md:pb-12">{children}</main>
 
       {/* Shared Public Footer */}
       <footer className="relative z-10 border-t border-[#D4AF37]/20 bg-black/80 pt-8 pb-28 md:pb-8 px-4 text-center text-xs text-gray-400 space-y-2">

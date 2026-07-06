@@ -33,7 +33,9 @@ import {
     HelpCircle,
     Info,
     ArrowRight,
-    FilePlus
+    FilePlus,
+    Settings,
+    UserPlus
 } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -1436,14 +1438,12 @@ export default function DaftarProposalPage() {
                                     className="space-y-6"
                                 >
                                     {/* GLOBAL CHOICES */}
-                                    <div className="border border-[#D4AF37]/20 rounded-xl relative z-20 overflow-visible bg-[#022c22]/30">
-                                        <div className="px-6 py-4 border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-xl flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-sm font-semibold text-[#D4AF37]">
-                                                1
-                                            </div>
-                                            <h3 className="text-[#D4AF37] font-semibold text-lg tracking-wide">Pengaturan Global</h3>
-                                        </div>
-                                        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-playfair text-[#D4AF37] border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                            <Settings className="w-5 h-5" />
+                                            Pengaturan Global
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                                             {/* Tipe Proposal (Baris Pertama) */}
                                             <div className="space-y-2 md:col-span-3">
                                                 <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Tipe Proposal</Label>
@@ -1529,17 +1529,12 @@ export default function DaftarProposalPage() {
                                     </div>
 
                                     {/* TARGET INFORMATION */}
-                                    <div className="border border-[#D4AF37]/20 rounded-xl relative z-10 overflow-hidden bg-[#022c22]/30">
-                                        {/* Ambient gradient behind the form */}
-                                        <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 transition-colors duration-1000 ${createProposalType === 'donatur' ? 'bg-pink-500' : 'bg-blue-500'}`} />
-                                        
-                                        <div className="px-6 py-4 border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-xl flex items-center gap-3 relative z-20">
-                                            <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center font-semibold text-[#D4AF37]">
-                                                2
-                                            </div>
-                                            <h3 className="text-[#D4AF37] font-semibold text-lg tracking-wide">Informasi Target Dukungan</h3>
-                                        </div>
-                                        <div className="p-6 space-y-6 relative z-20">
+                                    <div className="space-y-4 pt-4">
+                                        <h3 className="text-lg font-playfair text-[#D4AF37] border-b border-[#D4AF37]/20 pb-2 flex items-center gap-2">
+                                            <UserPlus className="w-5 h-5" />
+                                            Informasi Target Dukungan
+                                        </h3>
+                                        <div className="space-y-6 pt-2">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
                                                     <Label className="text-[#FDFBF7]">

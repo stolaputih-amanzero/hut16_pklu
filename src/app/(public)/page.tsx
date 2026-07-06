@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles, Search } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 import { supabase } from '@/lib/supabase/client'
 import { getNextNumber } from '@/lib/numbering'
@@ -42,18 +42,6 @@ const puncakRundown = [
   { time: '13:50 – 16:00', duration: "130'", title: 'Acara Perayaan & Apresiasi Pemenang Lomba', desc: 'Panggung gembira (penampilan seni lansia), pengumuman pemenang lomba, peniupan lilin HUT, dan snack break.' },
   { time: '16:00 – 17:00', duration: "60'", title: 'Sesi Foto Bersama & Doa Penutup', desc: 'Kebersamaan menyanyikan lagu tema, dokumentasi foto bersama per Mupel/jemaat, dan diakhiri doa berkat.' }
 ]
-
-const sections = [
-  { id: 'pendahuluan', label: 'Pendahuluan' },
-  { id: 'tujuan', label: 'Maksud & Tujuan' },
-  { id: 'tuan-rumah', label: 'Tuan Rumah' },
-  { id: 'kegiatan', label: 'Rangkaian Kegiatan' },
-  { id: 'waktu-tempat', label: 'Waktu & Tempat' },
-  { id: 'rundown', label: 'Rundown Acara' },
-  { id: 'dukungan', label: 'Dukungan Kasih' },
-]
-
-import { PublicHeader } from '@/components/PublicHeader'
 
 export default function Home() {
   const [copied, setCopied] = useState(false)
@@ -168,9 +156,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] selection:bg-[#D4AF37] selection:text-[#022c22] relative font-sans">
-      <PublicHeader />
-      
+    <div className="relative w-full">
       {/* Ultra Premium Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#022c22]" />
@@ -201,8 +187,6 @@ export default function Home() {
           style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
         />
       </div>
-
-
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24 flex flex-col items-center">
         
@@ -384,9 +368,6 @@ export default function Home() {
           </div>
         </motion.div>
 
-
-
-
         {/* Pendahuluan Section */}
         <motion.div
           id="pendahuluan"
@@ -480,11 +461,11 @@ export default function Home() {
                       <strong>Musyawarah Pelayanan (Mupel) GPIB Bekasi</strong> merupakan persekutuan pelayanan, kesaksian, dan wadah misioner lintas jemaat di bawah naungan Gereja Protestan di Indonesia bagian Barat (GPIB) untuk wilayah Bekasi Kota dan Kabupaten.
                    </p>
                    <p className="text-[#FDFBF7]/80 text-base md:text-lg leading-relaxed font-light text-justify">
-                     Sebagai tuan rumah perayaan dan ibadah syukur HUT ke-16 Pelkat PKLU GPIB tingkat nasional tahun 2026, Mupel Bekasi mengoordinasikan seluruh persiapan demi kelancaran dan kenyamanan para lansia teladan dari penjuru Nusantara.
+                     Sebagai tuan rumah perayaan and ibadah syukur HUT ke-16 Pelkat PKLU GPIB tingkat nasional tahun 2026, Mupel Bekasi mengoordinasikan seluruh persiapan demi kelancaran dan kenyamanan para lansia teladan dari penjuru Nusantara.
                    </p>
                  </div>
- 
-                 {/* Map Section - Landscape at the left bottom, stretches to align bottom border */}
+  
+                 {/* Map Section */}
                  <div className="flex-grow flex flex-col space-y-3">
                    <h3 className={`text-xl text-[#D4AF37] font-semibold ${playfair.className} text-center md:text-left`}>
                      Peta Sebaran Jemaat Mupel Bekasi
@@ -621,7 +602,7 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Glassmorphism Event Details & Map */}
+        {/* Glassmorphism Event Details */}
         <motion.div
           id="waktu-tempat"
           initial={{ opacity: 0, y: 40 }}
@@ -770,7 +751,7 @@ export default function Home() {
                       
                       {/* content */}
                       <div className="p-6 rounded-2xl bg-[#022c22]/40 backdrop-blur-sm border border-[#D4AF37]/20 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
-                        <div className="md:hidden text-xs text-[#D4AF37] font-semibold mb-2">
+                        <div className="md:hidden text-xs text-[#D4AF37] font-semibold mb-2 leading-tight">
                           {item.period}
                         </div>
                         <h3 className={`text-lg md:text-xl text-[#FDFBF7] font-semibold mb-2 ${playfair.className}`}>
@@ -788,16 +769,19 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Himbauan Dukungan Pelayanan Section */}
+        {/* Dukungan Kasih Section */}
         <motion.div
           id="dukungan"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl mb-16 text-center space-y-8 mt-12"
+          className="w-full max-w-4xl mb-24 mt-12 text-center"
         >
-          <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <div className="text-center mb-12">
+            <h2 className={`text-4xl md:text-5xl text-[#D4AF37] ${playfair.className}`}>Dukungan Kasih</h2>
+            <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          </div>
           
           <div className="relative p-6 md:p-12 rounded-[2rem] bg-gradient-to-br from-[#033B2B]/60 to-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/35 shadow-2xl">
             {/* Soft background glow */}
@@ -838,20 +822,6 @@ export default function Home() {
               </button>
             </div>
           </div>
-        </motion.div>
-
-
-
-        {/* Footer Credits */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-16 mb-28 md:mb-8 w-full max-w-5xl border-t border-[#D4AF37]/20 pt-8 flex flex-col items-center gap-2 text-center"
-        >
-          <p className="text-[10px] md:text-xs text-[#FDFBF7]/30 tracking-[0.2em] uppercase">
-            © 2026 Pelkat PKLU GPIB Mupel Bekasi. All Rights Reserved.
-          </p>
         </motion.div>
 
       </div>
@@ -1021,7 +991,6 @@ export default function Home() {
           </div>
         )}
       </AnimatePresence>
-
 
     </div>
   )

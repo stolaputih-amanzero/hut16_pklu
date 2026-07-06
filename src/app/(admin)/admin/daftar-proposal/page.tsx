@@ -1314,7 +1314,7 @@ export default function DaftarProposalPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -15 }}
                         transition={{ duration: 0.25 }}
-                        className="space-y-6 max-w-4xl mx-auto"
+                        className="space-y-6"
                     >
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>

@@ -83,10 +83,10 @@ export function AmanauraPageClient() {
         </div>
       )}
 
-      <div className="grid gap-8 md:grid-cols-2 items-start">
+      <div className="grid gap-8 md:grid-cols-2 items-stretch">
         <AmanauraGenerator onDownloadSuccess={handleDownloadSuccess} />
         
-        <div ref={kitRef} className="transition-all duration-300">
+        <div ref={kitRef} className="transition-all duration-300 h-full">
           <SocialMediaCampaignKit />
         </div>
       </div>

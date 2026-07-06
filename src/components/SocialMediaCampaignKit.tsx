@@ -86,7 +86,7 @@ export function SocialMediaCampaignKit() {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7]">
+    <div className="h-full flex flex-col rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7] space-y-6">
       <div className="text-center space-y-1">
         <h2 className="text-xl font-bold text-[#D4AF37]">Social Media Campaign Kit</h2>
         <p className="text-xs text-gray-300">Pilih platform media sosial dan salin caption resmi untuk postingan Anda.</p>
@@ -147,13 +147,13 @@ export function SocialMediaCampaignKit() {
       </div>
 
       {/* Caption Preview Box */}
-      <div className="relative bg-black/60 p-4 rounded-xl border border-white/10 space-y-3">
+      <div className="flex-1 flex flex-col relative bg-black/60 p-4 rounded-xl border border-white/10 space-y-3">
         <div className="flex items-center justify-between border-b border-white/10 pb-2">
           <span className="text-xs font-semibold text-[#D4AF37]">Template Caption ({activeTab})</span>
           <span className="text-[10px] text-gray-400">Hashtag Resmi Terlampir</span>
         </div>
 
-        <p className="text-xs text-gray-200 whitespace-pre-line leading-relaxed max-h-[220px] overflow-y-auto pr-1 select-all font-mono">
+        <p className="flex-1 text-xs text-gray-200 whitespace-pre-line leading-relaxed max-h-[320px] md:max-h-none overflow-y-auto pr-1 select-all font-mono">
           {currentCaption}
         </p>
 

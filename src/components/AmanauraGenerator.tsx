@@ -182,69 +182,71 @@ export function AmanauraGenerator({ onDownloadSuccess }: AmanauraGeneratorProps)
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7]">
-      <div className="text-center space-y-1">
-        <h2 className="text-xl font-bold text-[#D4AF37]">Amanaura Frame Generator</h2>
-        <p className="text-xs text-gray-300">Geser dan atur ukuran foto Anda agar pas di dalam frame.</p>
-      </div>
+    <div className="h-full flex flex-col justify-between rounded-2xl border border-transparent sm:border-[#D4AF37]/30 bg-transparent sm:bg-black/40 p-0 sm:p-6 sm:backdrop-blur-md text-[#FDFBF7] space-y-6">
+      <div className="space-y-6 flex flex-col">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl font-bold text-[#D4AF37]">Amanaura Frame Generator</h2>
+          <p className="text-xs text-gray-300">Geser dan atur ukuran foto Anda agar pas di dalam frame.</p>
+        </div>
 
-      {/* Interactive Touch/Mouse Canvas Container */}
-      <div
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        className={`relative mx-auto w-full max-w-[360px] aspect-square rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-black/50 shadow-xl flex items-center justify-center touch-none select-none ${
-          imageSrc ? "cursor-grab active:cursor-grabbing" : ""
-        }`}
-      >
-        <canvas ref={canvasRef} className="w-full h-full object-contain pointer-events-none" />
-        
+        {/* Interactive Touch/Mouse Canvas Container */}
+        <div
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          className={`relative mx-auto w-full max-w-[360px] aspect-square rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-black/50 shadow-xl flex items-center justify-center touch-none select-none ${
+            imageSrc ? "cursor-grab active:cursor-grabbing" : ""
+          }`}
+        >
+          <canvas ref={canvasRef} className="w-full h-full object-contain pointer-events-none" />
+          
+          {imageSrc && (
+            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] text-gray-300 flex items-center gap-1">
+              <Move className="w-3 h-3 text-[#D4AF37]" />
+              Geser Foto
+            </div>
+          )}
+        </div>
+
+        {/* Controls: Zoom Slider & Reset */}
         {imageSrc && (
-          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] text-gray-300 flex items-center gap-1">
-            <Move className="w-3 h-3 text-[#D4AF37]" />
-            Geser Foto
+          <div className="space-y-3 bg-black/50 p-4 rounded-xl border border-white/10">
+            <div className="flex items-center justify-between text-xs font-semibold text-gray-300">
+              <span className="flex items-center gap-1 text-[#D4AF37]">
+                <ZoomIn className="w-4 h-4" /> Zoom / Ukuran Foto
+              </span>
+              <span>{Math.round(zoom * 100)}%</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <ZoomOut className="w-4 h-4 text-gray-400 shrink-0" />
+              <input
+                type="range"
+                min="0.5"
+                max="2.5"
+                step="0.02"
+                value={zoom}
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                className="w-full accent-[#D4AF37] cursor-pointer"
+              />
+              <ZoomIn className="w-4 h-4 text-gray-400 shrink-0" />
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleReset}
+                className="text-xs text-gray-400 hover:text-white"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" /> Reset Posisi &amp; Zoom
+              </Button>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Controls: Zoom Slider & Reset */}
-      {imageSrc && (
-        <div className="space-y-3 bg-black/50 p-4 rounded-xl border border-white/10">
-          <div className="flex items-center justify-between text-xs font-semibold text-gray-300">
-            <span className="flex items-center gap-1 text-[#D4AF37]">
-              <ZoomIn className="w-4 h-4" /> Zoom / Ukuran Foto
-            </span>
-            <span>{Math.round(zoom * 100)}%</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <ZoomOut className="w-4 h-4 text-gray-400 shrink-0" />
-            <input
-              type="range"
-              min="0.5"
-              max="2.5"
-              step="0.02"
-              value={zoom}
-              onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="w-full accent-[#D4AF37] cursor-pointer"
-            />
-            <ZoomIn className="w-4 h-4 text-gray-400 shrink-0" />
-          </div>
-
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleReset}
-              className="text-xs text-gray-400 hover:text-white"
-            >
-              <RotateCcw className="w-3 h-3 mr-1" /> Reset Posisi &amp; Zoom
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Action Buttons */}
       <div className="space-y-3">

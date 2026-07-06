@@ -1,53 +1,62 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Info } from "lucide-react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Info, ChevronDown } from "lucide-react";
 
 export function GuideModal() {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 w-full sm:w-auto">
-          <Info className="w-4 h-4 mr-2" />
-          Baca Panduan Pendaftaran
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-2xl bg-black/90 border-[#D4AF37]/30 text-[#FDFBF7]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-[#D4AF37]">Tata Cara Pendaftaran</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Panduan untuk mendaftar secara mandiri (1 orang) maupun rombongan kolektif.
-          </DialogDescription>
-        </DialogHeader>
+  const [isOpen, setIsOpen] = useState(true);
 
-        <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-2">
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsOpen(false);
+    }
+  }, []);
+
+  return (
+    <div className="rounded-2xl border border-[#D4AF37]/30 bg-black/60 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-inner w-full mb-6">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none"
+      >
+        <h2 className="text-base font-bold flex items-center gap-2">
+          <Info className="w-5 h-5 text-[#D4AF37]" />
+          Tata Cara / Panduan Pendaftaran:
+        </h2>
+        <ChevronDown
+          className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <div
+        className={`transition-all duration-300 overflow-hidden ${
+          isOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="space-y-6 pt-2 max-h-[70vh] overflow-y-auto pr-2">
           {/* Pendaftaran Mandiri */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[#D4AF37] border-b border-[#D4AF37]/20 pb-1">
+            <h3 className="text-base font-semibold text-[#D4AF37] border-b border-[#D4AF37]/20 pb-1">
               A. Pendaftaran Mandiri (1 Orang)
             </h3>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300 leading-relaxed">
+            <ol className="list-decimal list-inside space-y-2 text-xs text-gray-300 leading-relaxed">
               <li>Pilih <strong>Kategori</strong> dan <strong>Asal Jemaat</strong> Anda.</li>
-              <li>Isi data diri Anda di bagian <strong>Pendaftar #1</strong>.</li>
-              <li>Jika Anda adalah <span className="text-blue-400">Peserta</span>, Anda wajib memilih peran dan surat tugas nantinya bisa digabung dengan bukti transfer jika diminta, atau abaikan form surat tugas kolektif. (Atau unggah surat tugas pribadi Anda di kolom <em>Surat Tugas Kolektif</em> di bagian bawah).</li>
+              <li>Isi data diri Anda di bagian <strong>Pendaftar (Mandiri)</strong>.</li>
+              <li>Jika Anda adalah <span className="text-blue-400">Peserta</span>, Anda wajib memilih peran dan surat tugas. (Unggah surat tugas pribadi Anda di kolom <em>Surat Tugas</em> di bagian bawah).</li>
               <li>Lakukan pembayaran sesuai nominal kategori Anda (Umum: Rp 475.000, Tuan Rumah: Rp 350.000).</li>
               <li>Unggah <strong>Bukti Transfer</strong> di bagian bawah form.</li>
-              <li>Klik tombol <strong>Submit Pendaftaran Kolektif</strong>.</li>
+              <li>Klik tombol <strong>Kirim Formulir Pendaftaran</strong>.</li>
             </ol>
           </div>
 
           {/* Pendaftaran Rombongan */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[#D4AF37] border-b border-[#D4AF37]/20 pb-1">
+            <h3 className="text-base font-semibold text-[#D4AF37] border-b border-[#D4AF37]/20 pb-1">
               B. Pendaftaran Rombongan / Bulk (Lebih dari 1 Orang)
             </h3>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300 leading-relaxed">
+            <ol className="list-decimal list-inside space-y-2 text-xs text-gray-300 leading-relaxed">
               <li>Pilih mode pendaftaran <strong>Jalur Cepat Rombongan</strong>.</li>
               <li>Pilih <strong>Kategori</strong> dan <strong>Asal Jemaat</strong> untuk rombongan ini (semua peserta dalam 1 form harus dari Jemaat yang sama).</li>
               <li>Isi data Penanggung Jawab (PIC).</li>
@@ -60,7 +69,7 @@ export function GuideModal() {
             </ol>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

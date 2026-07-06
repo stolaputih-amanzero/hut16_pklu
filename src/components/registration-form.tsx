@@ -324,14 +324,16 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* 1. MODE PENDAFTARAN */}
-      <div className="space-y-4 rounded-xl border border-[#D4AF37]/30 bg-black/40 p-5 shadow-inner">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <Label className="text-lg font-bold text-[#D4AF37]">Pilih Mode Pendaftaran</Label>
-          <GuideModal />
-        </div>
-        <Controller
+    <div className="space-y-6">
+      <GuideModal />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* 1. MODE PENDAFTARAN */}
+        <div className="space-y-4 rounded-xl border border-[#D4AF37]/30 bg-black/40 p-5 shadow-inner">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Label className="text-lg font-bold text-[#D4AF37]">Pilih Mode Pendaftaran</Label>
+          </div>
+          <Controller
           control={control}
           name="registration_mode"
           render={({ field }) => (
@@ -815,5 +817,6 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
         </DialogContent>
       </Dialog>
     </form>
+    </div>
   );
 }

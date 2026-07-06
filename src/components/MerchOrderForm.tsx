@@ -28,7 +28,8 @@ import {
   Plus,
   Minus,
   Trash2,
-  ShoppingCart
+  ShoppingCart,
+  ChevronDown
 } from "lucide-react";
 
 export const merchSchema = z.object({
@@ -80,6 +81,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isGuideOpen, setIsGuideOpen] = useState(true);
+
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsGuideOpen(false);
+    }
+  }, []);
 
   // Multi-Select Cart State
   const [cartItems, setCartItems] = useState<CartItemState[]>([]);
@@ -427,27 +435,77 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   // FORM INPUT VIEW
   return (
     <div className="space-y-6">
-      {/* 👤 CONTACT PERSON SEKSI DANA CARD */}
-      <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-4 md:p-5 text-emerald-200 text-xs md:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-        <div className="space-y-1">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
-            <MessageSquare className="w-3.5 h-3.5" /> Contact Person Seksi Dana Panitia
-          </span>
-          <p className="font-bold text-white text-base">Ibu Vicora Tulende</p>
-          <p className="text-xs text-emerald-300">Hubungi panitia untuk pertanyaan seputar pemesanan &amp; konfirmasi kontribusi merchandise.</p>
-        </div>
-
-        <a
-          href="https://wa.me/6281284212250?text=Halo%20Ibu%20Vicora%20Tulende%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pemesanan%20merchandise"
-          target="_blank"
-          rel="noreferrer"
-          className="w-full sm:w-auto shrink-0"
+      {/* Combined Collapsible Guidelines Block */}
+      <div className="rounded-2xl border border-[#D4AF37]/30 bg-black/60 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-inner">
+        <button
+          type="button"
+          onClick={() => setIsGuideOpen(!isGuideOpen)}
+          className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none"
         >
-          <Button size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
-            <MessageSquare className="w-3.5 h-3.5 mr-1.5" /> Chat WA (081284212250)
-          </Button>
-        </a>
+          <h2 className="text-base font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-[#D4AF37]" />
+            Informasi Penting &amp; Kontak Pemesanan:
+          </h2>
+          <ChevronDown
+            className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 ${
+              isGuideOpen ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        <div
+          className={`transition-all duration-300 overflow-hidden ${
+            isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="space-y-4 pt-2">
+            {/* 👤 CONTACT PERSON SEKSI DANA CARD */}
+            <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-4 text-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                  <MessageSquare className="w-3.5 h-3.5" /> Contact Person Seksi Dana Panitia
+                </span>
+                <p className="font-bold text-white text-base">Ibu Vicora Tulende</p>
+                <p className="text-xs text-emerald-300">Hubungi panitia untuk pertanyaan seputar pemesanan &amp; konfirmasi kontribusi merchandise.</p>
+              </div>
+
+              <a
+                href="https://wa.me/6281284212250?text=Halo%20Ibu%20Vicora%20Tulende%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pemesanan%20merchandise"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full sm:w-auto shrink-0"
+              >
+                <Button type="button" size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
+                  <MessageSquare className="w-3.5 h-3.5 mr-1.5" /> Chat WA (081284212250)
+                </Button>
+              </a>
+            </div>
+
+            {/* 📍 VENUE CLAIM BANNER NOTICE */}
+            <div className="rounded-xl border border-[#D4AF37]/50 bg-[#D4AF37]/15 p-4 text-amber-200 text-xs space-y-1.5 shadow-lg">
+              <div className="flex items-center gap-2 font-bold text-[#D4AF37] text-xs">
+                <Calendar className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                📌 CATATAN PENGAMBILAN MERCHANDISE:
+              </div>
+              <p className="leading-relaxed">
+                Seluruh barang merchandise/cenderamata yang Anda pesan dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>).
+              </p>
+            </div>
+
+            {/* ⚠️ CRITICAL WARNING ALERT BANNER */}
+            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-amber-200 text-xs leading-relaxed space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                PERHATIAN PENTING:
+              </div>
+              <p>
+                Formulir ini <strong>KHUSUS untuk Pemesanan Merchandise Tambahan (Cenderamata Opsional)</strong>. Ini BUKAN untuk Kaos Seragam Resmi Acara yang ukurannya sudah diisi saat pendaftaran.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
+
       {/* 1. MODAL DETAIL PRODUCT PREVIEW */}
       {previewProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
@@ -529,28 +587,6 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
       {/* 2. FORM INPUT CONTAINER */}
       <div className="space-y-6 text-[#FDFBF7]">
-        {/* 📍 VENUE CLAIM BANNER NOTICE */}
-        <div className="rounded-xl border border-[#D4AF37]/50 bg-[#D4AF37]/15 p-4 text-amber-200 text-xs md:text-sm space-y-1.5 shadow-lg">
-          <div className="flex items-center gap-2 font-bold text-[#D4AF37] text-sm md:text-base">
-            <Calendar className="w-5 h-5 text-[#D4AF37] shrink-0" />
-            📌 CATATAN PENGAMBILAN MERCHANDISE:
-          </div>
-          <p className="leading-relaxed">
-            Seluruh barang merchandise/cenderamata yang Anda pesan dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>).
-          </p>
-        </div>
-
-        {/* ⚠️ CRITICAL WARNING ALERT BANNER */}
-        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-amber-200 text-xs leading-relaxed space-y-1">
-          <div className="flex items-center gap-1.5 font-bold text-amber-300">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            PERHATIAN PENTING:
-          </div>
-          <p>
-            Formulir ini <strong>KHUSUS untuk Pemesanan Merchandise Tambahan (Cenderamata Opsional)</strong>. Ini BUKAN untuk Kaos Seragam Resmi Acara yang ukurannya sudah diisi saat pendaftaran.
-          </p>
-        </div>
-
         <div className="border-b border-white/10 pb-3">
           <h2 className="text-xl font-bold text-[#D4AF37] flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />

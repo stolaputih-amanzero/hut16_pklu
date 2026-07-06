@@ -46,8 +46,7 @@ export function Sidebar({ fullName, role }: SidebarProps) {
     { name: "Data Pendaftaran", path: "/admin/registrations", icon: Users },
     { name: "Pesanan Merchandise", path: "/admin/merch", icon: ShoppingBag },
     { name: "Buku Tamu Moderasi", path: "/admin/guestbook", icon: MessageSquareQuote },
-    { name: "Buat Proposal", path: "/admin/buat-proposal", icon: Plus },
-    { name: "Laporan Proposal", path: "/admin/daftar-proposal", icon: FileSpreadsheet },
+    { name: "Proposal & Laporan", path: "/admin/daftar-proposal", icon: FileSpreadsheet },
   ];
 
   return (

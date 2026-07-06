@@ -9,11 +9,36 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, FileText, ExternalLink, Calendar, CheckCircle, Clock, Edit2, Trash2, Plus, X, Loader2, Users, MessageCircle, Printer, Download, ArrowUp, ArrowDown } from 'lucide-react'
+import {
+    Search,
+    FileText,
+    ExternalLink,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Edit2,
+    Trash2,
+    Plus,
+    X,
+    Loader2,
+    Users,
+    MessageCircle,
+    Printer,
+    Download,
+    ArrowUp,
+    ArrowDown,
+    Heart,
+    Send,
+    Building2,
+    HelpCircle,
+    Info,
+    ArrowRight
+} from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 import { getNextNumber } from '@/lib/numbering'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 
 export default function DaftarProposalPage() {
     const [proposals, setProposals] = useState<any[]>([])
@@ -22,6 +47,31 @@ export default function DaftarProposalPage() {
     const [searchQuery, setSearchQuery] = useState('')
     const [isMounted, setIsMounted] = useState(false)
     
+    // Tab state
+    const [activeTab, setActiveTab] = useState<'laporan' | 'buat'>('laporan')
+
+    // Proposal Creation States (from buat-proposal page)
+    const [createProposalType, setCreateProposalType] = useState<'donatur' | 'sponsorship'>('donatur')
+    const [createFormData, setCreateFormData] = useState({
+        name: '',
+        display_name: '',
+        company_name: '',
+        pic_name: '',
+        pic_position: '',
+        phone: '',
+        email: '',
+        congregation: '',
+        language: 'id',
+        committee_id: '',
+        proposal_date: new Date().toISOString().split('T')[0]
+    })
+    const [createIsGenerating, setCreateIsGenerating] = useState(false)
+    const [createProposalId, setCreateProposalId] = useState('')
+    const [createProposalNumber, setCreateProposalNumber] = useState('')
+    const [createProposalPdfUrl, setCreateProposalPdfUrl] = useState('')
+    const [createIsSuccess, setCreateIsSuccess] = useState(false)
+    const [createIsGuideOpen, setCreateIsGuideOpen] = useState(false)
+
     // Modal states
     const [isOpen, setIsOpen] = useState(false)
     const [selectedProposal, setSelectedProposal] = useState<any | null>(null)
@@ -44,7 +94,7 @@ export default function DaftarProposalPage() {
         }
     }
 
-    // Form states
+    // Form states for existing proposal edit/view
     const [formData, setFormData] = useState({
         id: '',
         type: 'donatur',
@@ -77,6 +127,15 @@ export default function DaftarProposalPage() {
         setIsMounted(true)
         fetchProposals()
         fetchCommittees()
+
+        // Check query parameters safely on mount
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search)
+            const tab = params.get('tab')
+            if (tab === 'buat') {
+                setActiveTab('buat')
+            }
+        }
     }, [])
 
     const fetchProposals = async () => {
@@ -117,6 +176,161 @@ export default function DaftarProposalPage() {
         } catch (error: any) {
             console.error('Unexpected error fetching committees:', error)
         }
+    }
+
+    // Proposal Creation Handlers (from buat-proposal page)
+    const handleCreateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCreateFormData({ ...createFormData, [e.target.name]: e.target.value })
+    }
+
+    const resetCreateForm = () => {
+        setCreateFormData(prev => ({
+            ...prev,
+            name: '',
+            display_name: '',
+            company_name: '',
+            pic_name: '',
+            pic_position: '',
+            phone: '',
+            email: '',
+            congregation: '',
+            proposal_date: new Date().toISOString().split('T')[0]
+        }))
+        setCreateIsSuccess(false)
+        setCreateProposalId('')
+        setCreateProposalNumber('')
+        setCreateProposalPdfUrl('')
+    }
+
+    const generateProposalPDF = async (id: string, lang: string) => {
+        const response = await fetch('/api/generate-proposal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, lang })
+        })
+        if (!response.ok) {
+            const errResult = await response.json().catch(() => ({}))
+            throw new Error(errResult.error || 'Gagal menghasilkan PDF')
+        }
+        const blob = await response.blob()
+        return URL.createObjectURL(blob)
+    }
+
+    const handleGenerateProposal = async () => {
+        if (!createFormData.name || !createFormData.phone || !createFormData.committee_id) {
+            toast.error('Silakan lengkapi data wajib (Nama, WhatsApp, dan Panitia Penanggung Jawab)')
+            return
+        }
+
+        try {
+            setCreateIsGenerating(true)
+
+            let success = false
+            let retries = 5
+            let number = ''
+            let saveError = null
+            let proposal = null
+
+            while (retries > 0 && !success) {
+                // 1. Dapatkan nomor urut otomatis
+                number = await getNextNumber(createProposalType, 2026)
+
+                // 2. Simpan ke database (status pending, nilai kosong karena ini tahap pertama)
+                const { data, error } = await supabase
+                    .from('proposals')
+                    .insert({
+                        type: createProposalType,
+                        number: number,
+                        name: createFormData.name,
+                        display_name: createProposalType === 'donatur' ? (createFormData.display_name || createFormData.name) : null,
+                        company_name: createFormData.company_name || null,
+                        pic_name: createProposalType === 'sponsorship' ? (createFormData.pic_name || null) : null,
+                        pic_position: createProposalType === 'sponsorship' ? (createFormData.pic_position || null) : null,
+                        phone: createFormData.phone,
+                        email: createFormData.email || null,
+                        congregation: createProposalType === 'donatur' ? (createFormData.congregation || null) : null,
+                        lang: createFormData.language,
+                        payment_status: 'pending',
+                        committee_id: createFormData.committee_id,
+                        proposal_date: createFormData.proposal_date
+                    })
+                    .select()
+                    .single()
+
+                if (!error) {
+                    success = true
+                    proposal = data
+                    setCreateProposalNumber(number)
+                } else if (error.code === '23505') {
+                    // Unique constraint violation (concurrency collision), retry with next number
+                    retries--
+                    saveError = error
+                    await new Promise(resolve => setTimeout(resolve, 100))
+                } else {
+                    // Other database errors, fail immediately
+                    throw error
+                }
+            }
+
+            if (!success || !proposal) {
+                throw new Error(`Gagal mengunci nomor proposal: ${saveError?.message || 'Kesalahan tidak diketahui'}`)
+            }
+
+            setCreateProposalId(proposal.id)
+            
+            // 3. Generate PDF proposal via API
+            const pdfUrl = await generateProposalPDF(proposal.id, createFormData.language)
+            setCreateProposalPdfUrl(pdfUrl)
+            
+            setCreateIsSuccess(true)
+            toast.success(`Proposal ${createProposalType === 'donatur' ? 'Donatur' : 'Sponsorship'} berhasil dibuat! Nomor: ` + number)
+            
+            // Refresh list
+            fetchProposals()
+
+        } catch (error: any) {
+            toast.error('Gagal membuat proposal: ' + error.message)
+        } finally {
+            setCreateIsGenerating(false)
+        }
+    }
+
+    const handleDownloadCreatePDF = async (url: string, filename: string) => {
+        try {
+            toast.loading('Menyiapkan file unduhan...', { id: 'download-create' })
+            const response = await fetch(url)
+            const blob = await response.blob()
+            const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = blobUrl
+            a.download = filename
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(blobUrl)
+            toast.success('Berhasil mengunduh proposal', { id: 'download-create' })
+        } catch (error) {
+            toast.error('Gagal mengunduh PDF, membuka di tab baru', { id: 'download-create' })
+            window.open(url, '_blank')
+        }
+    }
+
+    const sendCreatedProposalViaWA = () => {
+        if (!createProposalPdfUrl) return
+        
+        const waLink = buildWhatsAppLink(
+            createFormData.phone,
+            'proposal',
+            createFormData.language as 'id' | 'en',
+            {
+                number: createProposalNumber,
+                name: createFormData.name,
+                type: createProposalType,
+                pdfUrl: createProposalPdfUrl
+            }
+        )
+        window.open(waLink, '_blank', 'noopener,noreferrer')
+        toast.success('Membuka WhatsApp...')
     }
 
     const handleDownloadLpj = async () => {
@@ -516,14 +730,12 @@ export default function DaftarProposalPage() {
 
                 if (updateError) throw updateError
 
-
-
                 toast.success('Proposal berhasil diperbarui!')
             } else {
                 // Create
                 const number = await getNextNumber(formData.type as 'donatur' | 'sponsorship', 2026)
                 
-                const { data: newProp, error: insertError } = await supabase
+                const { error: insertError } = await supabase
                     .from('proposals')
                     .insert({
                         type: formData.type,
@@ -550,11 +762,8 @@ export default function DaftarProposalPage() {
                         confirmed_date: formData.confirmed_date || null,
                         paid_date: formData.paid_date || null
                     })
-                    .select()
-                    .single()
 
                 if (insertError) throw insertError
-
 
                 toast.success(`Proposal ${number} berhasil dibuat!`)
             }
@@ -703,10 +912,10 @@ export default function DaftarProposalPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold font-playfair text-[#FDFBF7] tracking-wider uppercase drop-shadow-md">
-                        Laporan
+                        Proposal & Laporan
                     </h1>
                     <p className="text-sm text-[#D4AF37] mt-1 font-montserrat">
-                        Seluruh riwayat proposal dukungan yang telah diterbitkan
+                        Kelola pembuatan proposal baru dan pantau riwayat dukungan
                     </p>
                 </div>
                 <div className="flex justify-between items-center w-full md:w-auto gap-3 mt-4 md:mt-0">
@@ -716,353 +925,773 @@ export default function DaftarProposalPage() {
                         className="rounded-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#022c22] font-semibold transition-all shadow-lg gap-2 cursor-pointer"
                     >
                         <Download className="h-4 w-4" />
-                        Laporan
+                        Laporan LPJ
                     </Button>
-                    <Link href="/buat-proposal" passHref>
+                    {activeTab === 'laporan' ? (
                         <Button 
-                            className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2"
+                            onClick={() => setActiveTab('buat')}
+                            className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2 cursor-pointer"
                         >
                             <Plus className="h-4 w-4" />
-                            Proposal
+                            Buat Proposal
                         </Button>
-                    </Link>
+                    ) : (
+                        <Button 
+                            onClick={() => setActiveTab('laporan')}
+                            className="rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/80 text-[#022c22] font-semibold transition-all shadow-lg hover:shadow-[#D4AF37]/25 gap-2 cursor-pointer"
+                        >
+                            <FileText className="h-4 w-4" />
+                            Riwayat Proposal
+                        </Button>
+                    )}
                 </div>
             </div>
 
-
-
-            <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">
-                <CardHeader>
-                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                        <div>
-                            <CardTitle className="text-[#FDFBF7] font-playfair tracking-wide flex items-center gap-2">
-                                <FileText className="h-5 w-5 text-[#D4AF37]" />
-                                Riwayat Proposal
-                            </CardTitle>
-                            <CardDescription className="text-[#A0AEC0]">
-                                {filteredProposals.length} proposal ditemukan
-                            </CardDescription>
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                            {/* Filter Tipe (Radio Buttons Segmented Control) */}
-                            <div className="flex items-center h-8 bg-[#022c22]/50 border border-[#D4AF37]/35 rounded-lg p-0.5 gap-1 w-full sm:w-auto justify-around sm:justify-start">
-                                {[
-                                    { value: 'all', label: 'Semua' },
-                                    { value: 'donatur', label: 'Donatur' },
-                                    { value: 'sponsorship', label: 'Sponsor' },
-                                ].map((type) => (
-                                    <button
-                                        key={type.value}
-                                        onClick={() => setTypeFilter(type.value as any)}
-                                        className={`h-full px-3 rounded-md text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex-1 sm:flex-initial text-center flex items-center justify-center ${
-                                            typeFilter === type.value
-                                                ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_10px_rgba(212,175,55,0.25)]'
-                                                : 'text-[#FDFBF7]/60 hover:text-[#D4AF37]'
-                                        }`}
-                                    >
-                                        {type.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Filter Status */}
-                            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-full sm:w-44 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
-                                    <SelectValue placeholder="Filter Status" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                    <SelectItem value="all">Semua Status</SelectItem>
-                                    <SelectItem value="request">Request (Calon Donatur/Sponsor)</SelectItem>
-                                    <SelectItem value="terkirim">Terkirim (Belum Follow Up)</SelectItem>
-                                    <SelectItem value="komitmen">Komitmen Dicatat</SelectItem>
-                                    <SelectItem value="lunas">Lunas</SelectItem>
-                                    <SelectItem value="batal">Batal</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {/* Sort Select (Only visible on Mobile View) */}
-                            <div className="md:hidden w-full sm:w-auto">
-                                <Select 
-                                    value={sortField + '_' + sortDirection} 
-                                    onValueChange={(val: string) => {
-                                        const [field, dir] = val.split('_') as [any, any]
-                                        setSortField(field)
-                                        setSortDirection(dir)
-                                    }}
-                                >
-                                    <SelectTrigger className="w-full h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
-                                        <SelectValue placeholder="Urutkan" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
-                                        <SelectItem value="date_desc">Urutan: Terbaru</SelectItem>
-                                        <SelectItem value="date_asc">Urutan: Terlama</SelectItem>
-                                        <SelectItem value="name_asc">Nama: A - Z</SelectItem>
-                                        <SelectItem value="name_desc">Nama: Z - A</SelectItem>
-                                        <SelectItem value="number_asc">No. Proposal: A - Z</SelectItem>
-                                        <SelectItem value="number_desc">No. Proposal: Z - A</SelectItem>
-                                        <SelectItem value="type_asc">Jenis: A - Z</SelectItem>
-                                        <SelectItem value="type_desc">Jenis: Z - A</SelectItem>
-                                        <SelectItem value="status_desc">Status: Tinggi - Rendah</SelectItem>
-                                        <SelectItem value="status_asc">Status: Rendah - Tinggi</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-
-
-                            <div className="relative w-full sm:w-64 h-8">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
-                                <Input
-                                    placeholder="Cari nomor atau nama..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-9 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    {loading ? (
-                        <div className="py-12 flex justify-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]" />
-                        </div>
-                    ) : filteredProposals.length === 0 ? (
-                        <div className="py-12 text-center text-[#718096]">
-                            <FileText className="mx-auto h-12 w-12 opacity-20 mb-3" />
-                            <p>Tidak ada proposal yang ditemukan.</p>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Desktop View Table */}
-                            <div className="hidden md:block overflow-x-auto">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="text-xs text-[#D4AF37] uppercase bg-[#022c22]/60 border-y border-[#D4AF37]/20 select-none">
-                                        <tr>
-                                            <th 
-                                                onClick={() => handleSort('number')}
-                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    <span>No. Proposal</span>
-                                                    {sortField === 'number' ? (
-                                                        sortDirection === 'asc' ? (
-                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        ) : (
-                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        )
-                                                    ) : (
-                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
-                                                    )}
-                                                </div>
-                                            </th>
-                                            <th 
-                                                onClick={() => handleSort('date')}
-                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    <span>Tanggal</span>
-                                                    {sortField === 'date' ? (
-                                                        sortDirection === 'asc' ? (
-                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        ) : (
-                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        )
-                                                    ) : (
-                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
-                                                    )}
-                                                </div>
-                                            </th>
-                                            <th 
-                                                onClick={() => handleSort('name')}
-                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    <span>Nama Donatur / Sponsor</span>
-                                                    {sortField === 'name' ? (
-                                                        sortDirection === 'asc' ? (
-                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        ) : (
-                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        )
-                                                    ) : (
-                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
-                                                    )}
-                                                </div>
-                                            </th>
-                                            <th 
-                                                onClick={() => handleSort('type')}
-                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    <span>Jenis</span>
-                                                    {sortField === 'type' ? (
-                                                        sortDirection === 'asc' ? (
-                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        ) : (
-                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        )
-                                                    ) : (
-                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
-                                                    )}
-                                                </div>
-                                            </th>
-                                            <th 
-                                                onClick={() => handleSort('status')}
-                                                className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    <span>Status</span>
-                                                    {sortField === 'status' ? (
-                                                        sortDirection === 'asc' ? (
-                                                            <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        ) : (
-                                                            <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
-                                                        )
-                                                    ) : (
-                                                        <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
-                                                    )}
-                                                </div>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-[#D4AF37]/10">
-                                        {filteredProposals.map((p, idx) => (
-                                            <motion.tr 
-                                                initial={{ opacity: 0, y: 8 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ duration: 0.25, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
-                                                key={p.id} 
-                                                onClick={() => handleOpenView(p)}
-                                                className={`transition-colors cursor-pointer border-l-2 ${
-                                                    isPendingRequest(p) 
-                                                        ? 'bg-red-500/5 hover:bg-red-500/10 border-l-red-500/30' 
-                                                        : 'hover:bg-[#022c22]/40 border-l-transparent'
-                                                }`}
-                                            >
-                                                <td className="px-4 py-4 font-mono text-[#FDFBF7]/90 font-medium whitespace-nowrap">
-                                                    {p.number}
-                                                </td>
-                                                <td className="px-4 py-4 text-[#A0AEC0] whitespace-nowrap">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Calendar className="h-3 w-3" />
-                                                        {formatDate(p.proposal_date || p.created_at)}
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-4">
-                                                    <div className="font-semibold text-[#FDFBF7]">{p.name}</div>
-                                                    <div className="text-xs text-[#D4AF37] mt-0.5">{p.phone}</div>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap">
-                                                    <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
-                                                        {p.type === 'donatur' ? 'Donatur' : 'Sponsorship'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap">
-                                                    {p.payment_status === 'confirmed' ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                                            <CheckCircle className="h-3 w-3 mr-1" /> Lunas
-                                                        </span>
-                                                    ) : p.payment_status === 'cancelled' ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
-                                                            Batal
-                                                        </span>
-                                                    ) : isPendingRequest(p) ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/25 animate-pulse">
-                                                            Butuh Follow Up
-                                                        </span>
-                                                    ) : p.specific_support === 'request' ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                                                            Request
-                                                        </span>
-                                                    ) : (p.contribution_value > 0 || p.contribution_form) ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                            Komitmen Dicatat
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                                            <Clock className="h-3 w-3 mr-1" /> Terkirim
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            </motion.tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                             </div>
- 
-                             {/* Mobile View Cards */}
-                             <div className="block md:hidden space-y-4">
-                                 {filteredProposals.map((p, idx) => (
-                                     <motion.div 
-                                         initial={{ opacity: 0, y: 12 }}
-                                         animate={{ opacity: 1, y: 0 }}
-                                         transition={{ duration: 0.3, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
-                                         key={p.id}
-                                         onClick={() => handleOpenView(p)}
-                                         className={`p-4 rounded-xl transition-colors cursor-pointer space-y-3 border ${
-                                             isPendingRequest(p) 
-                                                 ? 'bg-red-500/5 border-red-500/25 hover:bg-red-500/10' 
-                                                 : 'bg-[#022c22]/40 border-[#D4AF37]/20 hover:bg-[#022c22]/60 active:bg-[#022c22]/70'
-                                         }`}
-                                     >
-                                         <div className="flex justify-between items-center">
-                                             <span className="font-mono text-sm font-semibold text-[#FDFBF7]">
-                                                 {p.number}
-                                             </span>
-                                             <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
-                                                 {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
-                                             </span>
-                                         </div>
-                                         
-                                         <div className="space-y-1">
-                                             <div className="font-bold text-[#FDFBF7] text-base">{p.name}</div>
-                                             {p.company_name && (
-                                                 <div className="text-xs text-white/60">{p.company_name}</div>
-                                             )}
-                                             <div className="text-xs text-[#D4AF37] font-medium">{p.phone}</div>
-                                         </div>
-                                         
-                                         <div className="flex justify-between items-center pt-2 border-t border-[#D4AF37]/10 text-xs">
-                                             <div className="text-[#A0AEC0] flex items-center gap-1">
-                                                 <Calendar className="h-3.5 w-3.5" />
-                                                 {formatDate(p.proposal_date || p.created_at)}
-                                             </div>
-                                             <div>
-                                                 {p.payment_status === 'confirmed' ? (
-                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                                         <CheckCircle className="h-3 w-3 mr-1" /> Lunas
-                                                     </span>
-                                                 ) : p.payment_status === 'cancelled' ? (
-                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
-                                                         Batal
-                                                     </span>
-                                                 ) : isPendingRequest(p) ? (
-                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/25 animate-pulse">
-                                                         Butuh Follow Up
-                                                     </span>
-                                                 ) : p.specific_support === 'request' ? (
-                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                                                         Request
-                                                     </span>
-                                                 ) : (p.contribution_value > 0 || p.contribution_form) ? (
-                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                         Komitmen Dicatat
-                                                     </span>
-                                                 ) : (
-                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                                         <Clock className="h-3 w-3 mr-1" /> Terkirim
-                                                     </span>
-                                                 )}
-                                             </div>
-                                         </div>
-                                     </motion.div>
-                                 ))}
-                             </div>
-                        </>
+            {/* Tabs Control */}
+            <div className="flex border-b border-[#D4AF37]/20 gap-6 select-none">
+                <button
+                    onClick={() => setActiveTab('laporan')}
+                    className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
+                        activeTab === 'laporan'
+                            ? 'text-[#D4AF37]'
+                            : 'text-[#FDFBF7]/60 hover:text-white'
+                    }`}
+                >
+                    Riwayat & Laporan
+                    {activeTab === 'laporan' && (
+                        <motion.div
+                            layoutId="activeTabUnderline"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#D4AF37]"
+                        />
                     )}
-                </CardContent>
-            </Card>
+                </button>
+                <button
+                    onClick={() => setActiveTab('buat')}
+                    className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
+                        activeTab === 'buat'
+                            ? 'text-[#D4AF37]'
+                            : 'text-[#FDFBF7]/60 hover:text-white'
+                    }`}
+                >
+                    Buat Proposal Baru
+                    {activeTab === 'buat' && (
+                        <motion.div
+                            layoutId="activeTabUnderline"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#D4AF37]"
+                        />
+                    )}
+                </button>
+            </div>
+
+            <AnimatePresence mode="wait">
+                {activeTab === 'laporan' ? (
+                    <motion.div
+                        key="laporan-tab"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6"
+                    >
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl">
+                            <CardHeader>
+                                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                    <div>
+                                        <CardTitle className="text-[#FDFBF7] font-playfair tracking-wide flex items-center gap-2">
+                                            <FileText className="h-5 w-5 text-[#D4AF37]" />
+                                            Riwayat Proposal
+                                        </CardTitle>
+                                        <CardDescription className="text-[#A0AEC0]">
+                                            {filteredProposals.length} proposal ditemukan
+                                        </CardDescription>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                                        {/* Filter Tipe (Radio Buttons Segmented Control) */}
+                                        <div className="flex items-center h-8 bg-[#022c22]/50 border border-[#D4AF37]/35 rounded-lg p-0.5 gap-1 w-full sm:w-auto justify-around sm:justify-start">
+                                            {[
+                                                { value: 'all', label: 'Semua' },
+                                                { value: 'donatur', label: 'Donatur' },
+                                                { value: 'sponsorship', label: 'Sponsor' },
+                                            ].map((type) => (
+                                                <button
+                                                    key={type.value}
+                                                    onClick={() => setTypeFilter(type.value as any)}
+                                                    className={`h-full px-3 rounded-md text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex-1 sm:flex-initial text-center flex items-center justify-center ${
+                                                        typeFilter === type.value
+                                                            ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_10px_rgba(212,175,55,0.25)]'
+                                                            : 'text-[#FDFBF7]/60 hover:text-[#D4AF37]'
+                                                    }`}
+                                                >
+                                                    {type.label}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Filter Status */}
+                                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                            <SelectTrigger className="w-full sm:w-44 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
+                                                <SelectValue placeholder="Filter Status" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                <SelectItem value="all">Semua Status</SelectItem>
+                                                <SelectItem value="request">Request (Calon Donatur/Sponsor)</SelectItem>
+                                                <SelectItem value="terkirim">Terkirim (Belum Follow Up)</SelectItem>
+                                                <SelectItem value="komitmen">Komitmen Dicatat</SelectItem>
+                                                <SelectItem value="lunas">Lunas</SelectItem>
+                                                <SelectItem value="batal">Batal</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+
+                                        {/* Sort Select (Only visible on Mobile View) */}
+                                        <div className="md:hidden w-full sm:w-auto">
+                                            <Select 
+                                                value={sortField + '_' + sortDirection} 
+                                                onValueChange={(val: string) => {
+                                                    const [field, dir] = val.split('_') as [any, any]
+                                                    setSortField(field)
+                                                    setSortDirection(dir)
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-full h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] focus:border-[#D4AF37]">
+                                                    <SelectValue placeholder="Urutkan" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#022c22] border-[#D4AF37]/30 text-[#FDFBF7]">
+                                                    <SelectItem value="date_desc">Urutan: Terbaru</SelectItem>
+                                                    <SelectItem value="date_asc">Urutan: Terlama</SelectItem>
+                                                    <SelectItem value="name_asc">Nama: A - Z</SelectItem>
+                                                    <SelectItem value="name_desc">Nama: Z - A</SelectItem>
+                                                    <SelectItem value="number_asc">No. Proposal: A - Z</SelectItem>
+                                                    <SelectItem value="number_desc">No. Proposal: Z - A</SelectItem>
+                                                    <SelectItem value="type_asc">Jenis: A - Z</SelectItem>
+                                                    <SelectItem value="type_desc">Jenis: Z - A</SelectItem>
+                                                    <SelectItem value="status_desc">Status: Tinggi - Rendah</SelectItem>
+                                                    <SelectItem value="status_asc">Status: Rendah - Tinggi</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        <div className="relative w-full sm:w-64 h-8">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#718096]" />
+                                            <Input
+                                                placeholder="Cari nomor atau nama..."
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                className="pl-9 h-8 bg-[#022c22]/50 border-[#D4AF37]/30 text-[#FDFBF7] placeholder:text-[#718096] focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                {loading ? (
+                                    <div className="py-12 flex justify-center">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]" />
+                                    </div>
+                                ) : filteredProposals.length === 0 ? (
+                                    <div className="py-12 text-center text-[#718096]">
+                                        <FileText className="mx-auto h-12 w-12 opacity-20 mb-3" />
+                                        <p>Tidak ada proposal yang ditemukan.</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Desktop View Table */}
+                                        <div className="hidden md:block overflow-x-auto">
+                                            <table className="w-full text-sm text-left">
+                                                <thead className="text-xs text-[#D4AF37] uppercase bg-[#022c22]/60 border-y border-[#D4AF37]/20 select-none">
+                                                    <tr>
+                                                        <th 
+                                                            onClick={() => handleSort('number')}
+                                                            className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                <span>No. Proposal</span>
+                                                                {sortField === 'number' ? (
+                                                                    sortDirection === 'asc' ? (
+                                                                        <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    ) : (
+                                                                        <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    )
+                                                                ) : (
+                                                                    <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                                )}
+                                                            </div>
+                                                        </th>
+                                                        <th 
+                                                            onClick={() => handleSort('date')}
+                                                            className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                <span>Tanggal</span>
+                                                                {sortField === 'date' ? (
+                                                                    sortDirection === 'asc' ? (
+                                                                        <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    ) : (
+                                                                        <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    )
+                                                                ) : (
+                                                                    <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                                )}
+                                                            </div>
+                                                        </th>
+                                                        <th 
+                                                            onClick={() => handleSort('name')}
+                                                            className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                <span>Nama Donatur / Sponsor</span>
+                                                                {sortField === 'name' ? (
+                                                                    sortDirection === 'asc' ? (
+                                                                        <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    ) : (
+                                                                        <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    )
+                                                                ) : (
+                                                                    <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                                )}
+                                                            </div>
+                                                        </th>
+                                                        <th 
+                                                            onClick={() => handleSort('type')}
+                                                            className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                <span>Jenis</span>
+                                                                {sortField === 'type' ? (
+                                                                    sortDirection === 'asc' ? (
+                                                                        <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    ) : (
+                                                                        <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    )
+                                                                ) : (
+                                                                    <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                                )}
+                                                            </div>
+                                                        </th>
+                                                        <th 
+                                                            onClick={() => handleSort('status')}
+                                                            className="px-4 py-4 font-montserrat tracking-wider cursor-pointer hover:bg-[#022c22]/80 transition-colors group"
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                <span>Status</span>
+                                                                {sortField === 'status' ? (
+                                                                    sortDirection === 'asc' ? (
+                                                                        <ArrowUp className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    ) : (
+                                                                        <ArrowDown className="h-3.5 w-3.5 text-[#D4AF37] shrink-0" />
+                                                                    )
+                                                                ) : (
+                                                                    <ArrowDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-30 transition-opacity text-[#FDFBF7] shrink-0" />
+                                                                )}
+                                                            </div>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-[#D4AF37]/10">
+                                                    {filteredProposals.map((p, idx) => (
+                                                        <motion.tr 
+                                                            initial={{ opacity: 0, y: 8 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ duration: 0.25, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
+                                                            key={p.id} 
+                                                            onClick={() => handleOpenView(p)}
+                                                            className={`transition-colors cursor-pointer border-l-2 ${
+                                                                isPendingRequest(p) 
+                                                                    ? 'bg-red-500/5 hover:bg-red-500/10 border-l-red-500/30' 
+                                                                    : 'hover:bg-[#022c22]/40 border-l-transparent'
+                                                            }`}
+                                                        >
+                                                            <td className="px-4 py-4 font-mono text-[#FDFBF7]/90 font-medium whitespace-nowrap">
+                                                                {p.number}
+                                                            </td>
+                                                            <td className="px-4 py-4 text-[#A0AEC0] whitespace-nowrap">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <Calendar className="h-3 w-3" />
+                                                                    {formatDate(p.proposal_date || p.created_at)}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-4 py-4">
+                                                                <div className="font-semibold text-[#FDFBF7]">{p.name}</div>
+                                                                <div className="text-xs text-[#D4AF37] mt-0.5">{p.phone}</div>
+                                                            </td>
+                                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                                <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                                                    {p.type === 'donatur' ? 'Donatur' : 'Sponsorship'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                                {p.payment_status === 'confirmed' ? (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                                        <CheckCircle className="h-3 w-3 mr-1" /> Lunas
+                                                                    </span>
+                                                                ) : p.payment_status === 'cancelled' ? (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                                        Batal
+                                                                    </span>
+                                                                ) : isPendingRequest(p) ? (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/25 animate-pulse">
+                                                                        Butuh Follow Up
+                                                                    </span>
+                                                                ) : p.specific_support === 'request' ? (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                                        Request
+                                                                    </span>
+                                                                ) : (p.contribution_value > 0 || p.contribution_form) ? (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                                        Komitmen Dicatat
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                                        <Clock className="h-3 w-3 mr-1" /> Terkirim
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                        </motion.tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        {/* Mobile View Cards */}
+                                        <div className="block md:hidden space-y-4">
+                                            {filteredProposals.map((p, idx) => (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, y: 12 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ duration: 0.3, delay: Math.min(idx * 0.04, 0.3), ease: 'easeOut' }}
+                                                    key={p.id}
+                                                    onClick={() => handleOpenView(p)}
+                                                    className={`p-4 rounded-xl transition-colors cursor-pointer space-y-3 border ${
+                                                        isPendingRequest(p) 
+                                                            ? 'bg-red-500/5 border-red-500/25 hover:bg-red-500/10' 
+                                                            : 'bg-[#022c22]/40 border-[#D4AF37]/20 hover:bg-[#022c22]/60 active:bg-[#022c22]/70'
+                                                    }`}
+                                                >
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="font-mono text-sm font-semibold text-[#FDFBF7]">
+                                                            {p.number}
+                                                        </span>
+                                                        <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${p.type === 'donatur' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-amber-500/50 text-amber-400 bg-amber-500/10'}`}>
+                                                            {p.type === 'donatur' ? 'Donatur' : 'Sponsor'}
+                                                        </span>
+                                                    </div>
+                                                    
+                                                    <div className="space-y-1">
+                                                        <div className="font-bold text-[#FDFBF7] text-base">{p.name}</div>
+                                                        {p.company_name && (
+                                                            <div className="text-xs text-white/60">{p.company_name}</div>
+                                                        )}
+                                                        <div className="text-xs text-[#D4AF37] font-medium">{p.phone}</div>
+                                                    </div>
+                                                    
+                                                    <div className="flex justify-between items-center pt-2 border-t border-[#D4AF37]/10 text-xs">
+                                                        <div className="text-[#A0AEC0] flex items-center gap-1">
+                                                            <Calendar className="h-3.5 w-3.5" />
+                                                            {formatDate(p.proposal_date || p.created_at)}
+                                                        </div>
+                                                        <div>
+                                                            {p.payment_status === 'confirmed' ? (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                                    <CheckCircle className="h-3 w-3 mr-1" /> Lunas
+                                                                </span>
+                                                            ) : p.payment_status === 'cancelled' ? (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                                    Batal
+                                                                </span>
+                                                            ) : isPendingRequest(p) ? (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/25 animate-pulse">
+                                                                    Butuh Follow Up
+                                                                </span>
+                                                            ) : p.specific_support === 'request' ? (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                                    Request
+                                                                </span>
+                                                            ) : (p.contribution_value > 0 || p.contribution_form) ? (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                                    Komitmen Dicatat
+                                                                </span>
+                                                            ) : (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                                    <Clock className="h-3 w-3 mr-1" /> Terkirim
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="buat-tab"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 max-w-4xl mx-auto"
+                    >
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] to-[#FDFBF7]">
+                                    Pembuatan Proposal Baru
+                                </h2>
+                                <p className="text-[#A0AEC0] text-sm mt-1">Pusat pembuatan dokumen Proposal Donatur dan Sponsorship</p>
+                            </div>
+                            <div>
+                                <button
+                                    type="button"
+                                    className="w-full md:w-56 h-10 rounded-md border border-[#D4AF37]/50 text-[#D4AF37] bg-[#D4AF37]/5 hover:bg-[#D4AF37] hover:text-[#022c22] font-bold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer text-sm shadow-[0_0_10px_rgba(212,175,55,0.05)] hover:shadow-[0_0_15px_rgba(212,175,55,0.25)] animate-none"
+                                    onClick={() => setCreateIsGuideOpen(true)}
+                                >
+                                    <HelpCircle className="w-4 h-4 transition-colors" />
+                                    Panduan Pembuatan
+                                </button>
+                            </div>
+                        </div>
+
+                        <AnimatePresence mode="wait">
+                            {createIsSuccess ? (
+                                <motion.div 
+                                    key="success"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                >
+                                    <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm overflow-hidden">
+                                        <div className="bg-gradient-to-r from-[#D4AF37]/20 via-transparent to-transparent p-6 text-center">
+                                            <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
+                                            <h2 className="text-2xl font-bold text-[#FDFBF7] mb-2">Proposal Berhasil Dibuat!</h2>
+                                            <p className="text-[#D4AF37] font-mono text-lg">{createProposalNumber}</p>
+                                            <p className="text-[#FDFBF7] font-semibold mt-1.5 text-sm tracking-wide capitalize">{createFormData.name}</p>
+                                        </div>
+                                        <CardContent className="p-6">
+                                            <div className="bg-[#022c22] rounded-lg p-4 border border-[#D4AF37]/20 mb-6 flex flex-col md:flex-row gap-6">
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="text-sm text-[#A0AEC0]">Tipe Proposal</div>
+                                                    <div className="font-semibold text-[#FDFBF7] capitalize">{createProposalType}</div>
+                                                </div>
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="text-sm text-[#A0AEC0]">Nama Target</div>
+                                                    <div className="font-semibold text-[#FDFBF7]">{createFormData.name}</div>
+                                                </div>
+                                                {createFormData.company_name && (
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="text-sm text-[#A0AEC0]">Perusahaan / Instansi</div>
+                                                        <div className="font-semibold text-[#FDFBF7]">{createFormData.company_name}</div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                                <Button
+                                                    onClick={() => handleDownloadCreatePDF(createProposalPdfUrl, `Proposal_${createProposalType}_${createProposalNumber.replace(/\//g, '_')}.pdf`)}
+                                                    className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#022c22] flex-1 py-6 text-lg shadow-lg hover:shadow-[#D4AF37]/25"
+                                                    disabled={!createProposalPdfUrl}
+                                                >
+                                                    <Download className="mr-2 h-5 w-5" />
+                                                    Download PDF
+                                                </Button>
+                                                <Button
+                                                    onClick={sendCreatedProposalViaWA}
+                                                    className="bg-[#25D366] hover:bg-[#128C7E] text-white flex-1 py-6 text-lg shadow-lg hover:shadow-[#25D366]/25"
+                                                    disabled={!createProposalPdfUrl}
+                                                >
+                                                    <Send className="mr-2 h-5 w-5" />
+                                                    Kirim via WhatsApp
+                                                </Button>
+                                            </div>
+                                            
+                                            <div className="mt-6 p-4 bg-black/25 rounded-lg border border-[#D4AF37]/15 text-left space-y-2 max-w-xl mx-auto">
+                                                <h4 className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5">
+                                                    <Info className="w-3.5 h-3.5" />
+                                                    Alur Pengiriman Dokumen
+                                                </h4>
+                                                <div className="space-y-1.5 text-[11px] text-[#A0AEC0] leading-relaxed">
+                                                    <div className="flex gap-2">
+                                                        <span className="text-[#D4AF37] font-semibold">1.</span>
+                                                        <p>Unduh berkas proposal dengan mengeklik tombol <strong className="text-[#FDFBF7]">Download PDF</strong>.</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <span className="text-[#D4AF37] font-semibold">2.</span>
+                                                        <p>Setelah berhasil terunduh, klik tombol <strong className="text-[#FDFBF7]">Kirim via WhatsApp</strong> untuk otomatis membuka WhatsApp beserta isi pesan pengantar.</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <span className="text-[#D4AF37] font-semibold">3.</span>
+                                                        <p>Pada chat WhatsApp yang terbuka, klik ikon lampiran <strong className="text-[#FDFBF7]">(clip kertas / tambah +)</strong>, pilih <strong className="text-[#FDFBF7]">Dokumen</strong>, lalu lampirkan file PDF proposal yang baru Anda unduh.</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <span className="text-[#D4AF37] font-semibold">4.</span>
+                                                        <p>Kirim pesan dan lampiran proposal tersebut secara bersamaan.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-8 text-center">
+                                                <Button variant="ghost" className="text-[#A0AEC0] hover:text-[#FDFBF7]" onClick={resetCreateForm}>
+                                                    + Buat Proposal Lainnya
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ) : (
+                                <motion.div 
+                                    key="form"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="space-y-6"
+                                >
+                                    {/* GLOBAL CHOICES */}
+                                    <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative z-20 overflow-visible">
+                                        <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
+                                            <CardTitle className="text-[#D4AF37] flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-sm font-semibold">
+                                                    1
+                                                </div>
+                                                Pengaturan Global
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            {/* Tipe Proposal (Baris Pertama) */}
+                                            <div className="space-y-2 md:col-span-3">
+                                                <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Tipe Proposal</Label>
+                                                <div className="flex bg-[#011a14] p-1 rounded-lg border border-[#D4AF37]/20 h-11 w-full">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCreateProposalType('donatur')}
+                                                        className={`flex-1 text-sm rounded-md transition-all font-semibold flex items-center justify-center gap-1.5 cursor-pointer ${
+                                                            createProposalType === 'donatur' 
+                                                            ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_8px_rgba(212,175,55,0.25)]' 
+                                                            : 'text-[#A0AEC0] hover:text-[#D4AF37]'
+                                                        }`}
+                                                    >
+                                                        <Heart className="w-4 h-4" />
+                                                        Donatur
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCreateProposalType('sponsorship')}
+                                                        className={`flex-1 text-sm rounded-md transition-all font-semibold flex items-center justify-center gap-1.5 cursor-pointer ${
+                                                            createProposalType === 'sponsorship' 
+                                                            ? 'bg-[#D4AF37] text-[#022c22] shadow-[0_0_8px_rgba(212,175,55,0.25)]' 
+                                                            : 'text-[#A0AEC0] hover:text-[#D4AF37]'
+                                                        }`}
+                                                    >
+                                                        <Users className="w-4 h-4" />
+                                                        Sponsorship
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Bahasa Proposal */}
+                                            <div className="space-y-2 md:col-span-1">
+                                                <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Bahasa</Label>
+                                                <div className="flex bg-[#011a14] p-1 rounded-lg border border-[#D4AF37]/20 h-11">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCreateFormData({ ...createFormData, language: 'id' })}
+                                                        className={`flex-1 text-sm rounded-md transition-all font-semibold cursor-pointer ${
+                                                            createFormData.language === 'id' ? 'bg-[#D4AF37] text-[#022c22]' : 'text-[#A0AEC0] hover:text-[#FDFBF7]'
+                                                        }`}
+                                                    >
+                                                        ID
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCreateFormData({ ...createFormData, language: 'en' })}
+                                                        className={`flex-1 text-sm rounded-md transition-all font-semibold cursor-pointer ${
+                                                            createFormData.language === 'en' ? 'bg-[#D4AF37] text-[#022c22]' : 'text-[#A0AEC0] hover:text-[#FDFBF7]'
+                                                        }`}
+                                                    >
+                                                        EN
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* PIC Selection */}
+                                            <div className="space-y-2 md:col-span-1">
+                                                <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">
+                                                    PIC Panitia <span className="text-red-400">*</span>
+                                                </Label>
+                                                <SearchableSelect
+                                                    options={committees.map(c => ({ value: c.id, label: c.name }))}
+                                                    value={createFormData.committee_id}
+                                                    onChange={(val) => setCreateFormData(prev => ({ ...prev, committee_id: val }))}
+                                                    placeholder="Pilih nama..."
+                                                    disabled={committees.length === 0}
+                                                />
+                                            </div>
+
+                                            {/* Proposal Date */}
+                                            <div className="space-y-2 md:col-span-1">
+                                                <Label className="text-[#FDFBF7] text-xs font-semibold uppercase tracking-wider">Tanggal</Label>
+                                                <Input
+                                                    type="date"
+                                                    name="proposal_date"
+                                                    value={createFormData.proposal_date}
+                                                    onChange={handleCreateInputChange}
+                                                    className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] [color-scheme:dark] h-11 text-sm"
+                                                />
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* TARGET INFORMATION */}
+                                    <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative z-10 overflow-visible">
+                                        {/* Ambient gradient behind the form */}
+                                        <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 -z-10 transition-colors duration-1000 ${createProposalType === 'donatur' ? 'bg-pink-500' : 'bg-blue-500'}`} />
+                                        
+                                        <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
+                                            <CardTitle className="text-[#D4AF37] flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center font-semibold">
+                                                    2
+                                                </div>
+                                                Informasi Target Dukungan
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="p-6 space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <Label className="text-[#FDFBF7]">
+                                                        {createProposalType === 'donatur' ? 'Nama Lengkap Donatur (Sesuai Identitas)' : 'Nama Sponsor / Perusahaan / Lembaga'} <span className="text-red-400">*</span>
+                                                    </Label>
+                                                    <Input
+                                                        name="name"
+                                                        value={createFormData.name}
+                                                        onChange={handleCreateInputChange}
+                                                        placeholder={createProposalType === 'donatur' ? 'Cth: Bapak Budi Santoso' : 'Cth: PT. Bank Mandiri'}
+                                                        className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                    />
+                                                </div>
+                                                {createProposalType === 'donatur' ? (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-[#FDFBF7]">Nama Tercantum (Di Buku Acara)</Label>
+                                                        <Input
+                                                            name="display_name"
+                                                            value={createFormData.display_name}
+                                                            onChange={handleCreateInputChange}
+                                                            placeholder="Kosongkan jika sama dengan nama lengkap"
+                                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-[#FDFBF7]">Nama Penanggung Jawab (PIC)</Label>
+                                                        <Input
+                                                            name="pic_name"
+                                                            value={createFormData.pic_name}
+                                                            onChange={handleCreateInputChange}
+                                                            placeholder="Cth: Ibu Rina Wijaya"
+                                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {createProposalType === 'donatur' ? (
+                                                <div className="space-y-2">
+                                                    <Label className="text-[#FDFBF7] flex items-center gap-2">
+                                                        Nama Perusahaan / Instansi
+                                                        <span className="text-xs font-normal text-[#A0AEC0]">(Opsional - Untuk Pencantuman Gelar/Posisi)</span>
+                                                    </Label>
+                                                    <div className="relative">
+                                                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0AEC0]" />
+                                                        <Input
+                                                            name="company_name"
+                                                            value={createFormData.company_name}
+                                                            onChange={handleCreateInputChange}
+                                                            placeholder="Cth: PT. Maju Bersama / Direktur Keuangan"
+                                                            className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50 pl-10"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <Label className="text-[#FDFBF7]">Jabatan PIC</Label>
+                                                    <Input
+                                                        name="pic_position"
+                                                        value={createFormData.pic_position}
+                                                        onChange={handleCreateInputChange}
+                                                        placeholder="Cth: Manager CSR / Humas"
+                                                        className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <Label className="text-[#FDFBF7]">Nomor WhatsApp <span className="text-red-400">*</span></Label>
+                                                    <Input
+                                                        name="phone"
+                                                        value={createFormData.phone}
+                                                        onChange={handleCreateInputChange}
+                                                        placeholder="Cth: 08123456789"
+                                                        className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-[#FDFBF7]">Email</Label>
+                                                    <Input
+                                                        name="email"
+                                                        type="email"
+                                                        value={createFormData.email}
+                                                        onChange={handleCreateInputChange}
+                                                        placeholder="Cth: budi@email.com"
+                                                        className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            {createProposalType === 'donatur' && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="space-y-2 overflow-hidden"
+                                                >
+                                                    <Label className="text-[#FDFBF7]">Asal Jemaat (Khusus Warga GPIB)</Label>
+                                                    <Input
+                                                        name="congregation"
+                                                        value={createFormData.congregation}
+                                                        onChange={handleCreateInputChange}
+                                                        placeholder="Cth: GPIB Menara Kasih"
+                                                        className="bg-[#011a14]/50 border-[#D4AF37]/30 focus:border-[#D4AF37] text-[#FDFBF7] placeholder:text-[#A0AEC0]/50"
+                                                    />
+                                                </motion.div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* GENERATE BUTTON */}
+                                    <div className="pt-4 flex justify-end">
+                                        <Button
+                                            onClick={handleGenerateProposal}
+                                            disabled={createIsGenerating}
+                                            className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#022c22] px-8 py-6 rounded-xl text-lg font-bold shadow-[0_4px_20px_rgba(212,175,55,0.3)] hover:shadow-[0_4px_25px_rgba(212,175,55,0.5)] transition-all flex items-center w-full md:w-auto"
+                                        >
+                                            {createIsGenerating ? (
+                                                <>
+                                                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                                                    Sedang Membuat...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FileText className="w-5 h-5 mr-3" />
+                                                    Generate Proposal
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Custom Modal */}
             {isOpen && (
@@ -1372,7 +2001,7 @@ export default function DaftarProposalPage() {
                                         </>
                                     )}
                                     <div>
-                                        <Label className="text-xs text-[#D4AF37]">WhatsApp (Format: 628xxx)</Label>
+                                        <Label className="text-xs text-[#D4AF37]">WhatsApp (Format: 0812xxx)</Label>
                                         <Input
                                             name="phone"
                                             value={formData.phone}
@@ -1431,7 +2060,7 @@ export default function DaftarProposalPage() {
                                                 <Label className="text-xs text-[#D4AF37]">Jenis Komitmen</Label>
                                                 <Select 
                                                     disabled={!isEditMode}
-                                                    value={formData.contribution_form} 
+                                                    value={formData.contribution_form || ''} 
                                                     onValueChange={(val) => setFormData({ ...formData, contribution_form: val })}
                                                 >
                                                     <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
@@ -1452,7 +2081,7 @@ export default function DaftarProposalPage() {
                                                     <Label className="text-xs text-[#D4AF37]">Kategori Donatur</Label>
                                                     <Select 
                                                         disabled={!isEditMode}
-                                                        value={formData.donatur_category} 
+                                                        value={formData.donatur_category || ''} 
                                                         onValueChange={(val) => setFormData({ ...formData, donatur_category: val })}
                                                     >
                                                         <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
@@ -1474,7 +2103,7 @@ export default function DaftarProposalPage() {
                                                     <Label className="text-xs text-[#D4AF37]">Paket Sponsor</Label>
                                                     <Select 
                                                         disabled={!isEditMode}
-                                                        value={formData.sponsor_package} 
+                                                        value={formData.sponsor_package || ''} 
                                                         onValueChange={(val) => setFormData({ ...formData, sponsor_package: val })}
                                                     >
                                                         <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
@@ -1496,7 +2125,7 @@ export default function DaftarProposalPage() {
                                                 <Label className="text-xs text-[#D4AF37]">Dukungan Spesifik</Label>
                                                 <Select
                                                     disabled={!isEditMode}
-                                                    value={formData.specific_support}
+                                                    value={formData.specific_support || ''}
                                                     onValueChange={(val) => setFormData({ ...formData, specific_support: val })}
                                                 >
                                                     <SelectTrigger className="bg-[#033B2B]/40 border-[#D4AF37]/20 text-[#FDFBF7]">
@@ -1706,5 +2335,145 @@ export default function DaftarProposalPage() {
                 </div>
             )}
         </div>
+    )
+}
+
+function ProposalGuideModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0"
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        initial={{ scale: 0.95, y: 20, opacity: 0 }}
+                        animate={{ scale: 1, y: 0, opacity: 1 }}
+                        exit={{ scale: 0.95, y: 20, opacity: 0 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                        className="bg-[#022c22] border border-[#D4AF37]/35 rounded-2xl w-full max-w-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative z-10"
+                    >
+                        {/* Accent Glow */}
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-[#D4AF37] to-emerald-500" />
+                        
+                        {/* Modal Header */}
+                        <div className="p-5 border-b border-[#D4AF37]/20 flex items-center justify-between bg-black/25">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 flex items-center justify-center">
+                                    <HelpCircle className="w-4 h-4 text-[#D4AF37]" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-[#FDFBF7] text-base font-playfair tracking-wide">
+                                        Panduan Pembuatan Proposal
+                                    </h3>
+                                    <p className="text-[10px] text-[#D4AF37]/80">Alur kerja sistem proposal HUT ke-16 PKLU</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="p-1 rounded-lg text-[#A0AEC0] hover:text-[#FDFBF7] hover:bg-white/5 transition-all cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-6 space-y-6 max-h-[65vh] overflow-y-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Donatur Card */}
+                                <div className="bg-black/20 border border-[#D4AF37]/15 rounded-xl p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-[#D4AF37]">
+                                        <Heart className="w-4 h-4 text-[#D4AF37]" />
+                                        <span className="font-bold text-xs uppercase tracking-wider">1. Tipe Donatur</span>
+                                    </div>
+                                    <p className="text-[11px] text-[#A0AEC0] leading-relaxed">
+                                        Ditujukan untuk perorangan, jemaat, keluarga, atau donatur pribadi. Format proposal lebih kasual, fokus pada dukungan sukarela dan kebersamaan pelayanan.
+                                    </p>
+                                    <ul className="text-[10px] text-[#A0AEC0]/85 list-disc list-inside space-y-1">
+                                        <li>Nama donatur tercantum di Buku Acara</li>
+                                        <li>Informasi asal jemaat GPIB (opsional)</li>
+                                    </ul>
+                                </div>
+
+                                {/* Sponsorship Card */}
+                                <div className="bg-black/20 border border-[#D4AF37]/15 rounded-xl p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-[#D4AF37]">
+                                        <Users className="w-4 h-4 text-[#D4AF37]" />
+                                        <span className="font-bold text-xs uppercase tracking-wider">2. Tipe Sponsorship</span>
+                                    </div>
+                                    <p className="text-[11px] text-[#A0AEC0] leading-relaxed">
+                                        Ditujukan untuk instansi komersial, perusahaan, atau organisasi. Mengedepankan kerja sama promosi timbal balik dan kontrak bernilai komitmen tertentu.
+                                    </p>
+                                    <ul className="text-[10px] text-[#A0AEC0]/85 list-disc list-inside space-y-1">
+                                        <li>Wajib mencantumkan Nama PIC instansi</li>
+                                        <li>Wajib mengisi Jabatan PIC instansi</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {/* Flow Steps */}
+                            <div className="space-y-4">
+                                <h4 className="font-semibold text-xs text-[#FDFBF7] uppercase tracking-widest border-b border-[#D4AF37]/15 pb-1">
+                                    Langkah Pembuatan & Pengiriman:
+                                </h4>
+                                
+                                <div className="space-y-3 text-xs">
+                                    <div className="flex gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            A
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-semibold text-[#FDFBF7]">Atur Pengaturan Global</p>
+                                            <p className="text-[11px] text-[#A0AEC0]">
+                                                Pilih jenis proposal, atur bahasa (ID/EN), pilih Panitia yang bertanggung jawab sebagai kontak rujukan, serta atur tanggal proposal.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            B
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-semibold text-[#FDFBF7]">Input Data Target & WhatsApp</p>
+                                            <p className="text-[11px] text-[#A0AEC0]">
+                                                Masukkan identitas calon pendukung dengan benar. Pastikan Nomor WhatsApp aktif (format nomor lokal Indonesia).
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            C
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-semibold text-[#FDFBF7]">Generate PDF & Kirimkan</p>
+                                            <p className="text-[11px] text-[#A0AEC0]">
+                                                Klik tombol generate. Sistem akan mengunci nomor proposal unik dan membuat PDF secara instan. Anda dapat langsung mengunduh PDF atau menekan "Kirim via WhatsApp" untuk mengirim proposal disertai tautan dan pesan pengantar otomatis.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-4 border-t border-[#D4AF37]/15 flex justify-end bg-black/25">
+                            <Button
+                                type="button"
+                                onClick={onClose}
+                                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#022c22] font-semibold text-xs rounded-lg px-4 h-9 cursor-pointer"
+                            >
+                                Saya Mengerti
+                            </Button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     )
 }

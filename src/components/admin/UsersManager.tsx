@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { CreateUserModal } from "./CreateUserModal";
 
 interface User {
   id: string;
@@ -176,8 +177,8 @@ export function UsersManager({ users, currentUserId, searchResolved }: UsersMana
         </>
       )}
 
-      {/* Placeholders for Modals in Step 3, 4, 5 */}
-      {/* {isCreateOpen && <CreateUserModal onClose={() => setIsCreateOpen(false)} />} */}
+      {/* Modals and Dialogs */}
+      {isCreateOpen && <CreateUserModal onClose={() => setIsCreateOpen(false)} />}
       {/* {editUser && <EditUserModal user={editUser} onClose={() => setEditUser(null)} />} */}
       {/* {deleteUser && <DeleteUserDialog user={deleteUser} onClose={() => setDeleteUser(null)} />} */}
     </div>

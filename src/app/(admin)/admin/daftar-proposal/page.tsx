@@ -969,10 +969,13 @@ export default function DaftarProposalPage() {
                 </button>
             </div>
 
-            <div className="relative">
-                <div className={activeTab === 'laporan' ? 'block' : 'hidden'}>
-                    <div className="space-y-6">
-                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl h-[calc(100vh-220px)] flex flex-col">
+            <div className="grid" style={{ gridTemplateColumns: '1fr' }}>
+                <div 
+                    style={{ gridArea: '1 / 1 / 2 / 2' }} 
+                    className={`transition-opacity duration-300 ${activeTab === 'laporan' ? 'opacity-100 z-10 visible' : 'opacity-0 z-0 invisible pointer-events-none'}`}
+                >
+                    <div className="space-y-6 h-full">
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl h-full flex flex-col">
                             <CardHeader className="flex-none">
                                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                     <div>
@@ -1061,7 +1064,7 @@ export default function DaftarProposalPage() {
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
+                            <CardContent className="flex-1">
                                 {loading ? (
                                     <div className="py-12 flex justify-center">
                                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]" />
@@ -1305,9 +1308,12 @@ export default function DaftarProposalPage() {
                     </div>
                 </div>
                 
-                <div className={activeTab === 'buat' ? 'block' : 'hidden'}>
-                    <div className="space-y-6">
-                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden h-[calc(100vh-220px)] flex flex-col">
+                <div 
+                    style={{ gridArea: '1 / 1 / 2 / 2' }} 
+                    className={`transition-opacity duration-300 ${activeTab === 'buat' ? 'opacity-100 z-10 visible' : 'opacity-0 z-0 invisible pointer-events-none'}`}
+                >
+                    <div className="space-y-6 h-full">
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden h-full flex flex-col">
                             <CardHeader className="flex-none">
                                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                     <div>
@@ -1331,7 +1337,7 @@ export default function DaftarProposalPage() {
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-4 md:p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
+                            <CardContent className="p-4 md:p-6 space-y-6 flex-1">
                                 <AnimatePresence mode="wait">
                             {createIsSuccess ? (
                                 <motion.div 

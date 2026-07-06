@@ -32,7 +32,8 @@ import {
     Building2,
     HelpCircle,
     Info,
-    ArrowRight
+    ArrowRight,
+    FilePlus
 } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -1316,26 +1317,32 @@ export default function DaftarProposalPage() {
                         transition={{ duration: 0.25 }}
                         className="space-y-6"
                     >
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] to-[#FDFBF7]">
-                                    Pembuatan Proposal Baru
-                                </h2>
-                                <p className="text-[#A0AEC0] text-sm mt-1">Pusat pembuatan dokumen Proposal Donatur dan Sponsorship</p>
-                            </div>
-                            <div>
-                                <button
-                                    type="button"
-                                    className="w-full md:w-56 h-10 rounded-md border border-[#D4AF37]/50 text-[#D4AF37] bg-[#D4AF37]/5 hover:bg-[#D4AF37] hover:text-[#022c22] font-bold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer text-sm shadow-[0_0_10px_rgba(212,175,55,0.05)] hover:shadow-[0_0_15px_rgba(212,175,55,0.25)] animate-none"
-                                    onClick={() => setCreateIsGuideOpen(true)}
-                                >
-                                    <HelpCircle className="w-4 h-4 transition-colors" />
-                                    Panduan Pembuatan
-                                </button>
-                            </div>
-                        </div>
-
-                        <AnimatePresence mode="wait">
+                        <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden">
+                            <CardHeader>
+                                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                    <div>
+                                        <CardTitle className="text-[#FDFBF7] font-playfair tracking-wide flex items-center gap-2">
+                                            <FilePlus className="h-5 w-5 text-[#D4AF37]" />
+                                            Pembuatan Proposal Baru
+                                        </CardTitle>
+                                        <CardDescription className="text-[#A0AEC0]">
+                                            Pusat pembuatan dokumen Proposal Donatur dan Sponsorship
+                                        </CardDescription>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                                        <button
+                                            type="button"
+                                            className="w-full md:w-56 h-10 rounded-md border border-[#D4AF37]/50 text-[#D4AF37] bg-[#D4AF37]/5 hover:bg-[#D4AF37] hover:text-[#022c22] font-bold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer text-sm shadow-[0_0_10px_rgba(212,175,55,0.05)] hover:shadow-[0_0_15px_rgba(212,175,55,0.25)] animate-none"
+                                            onClick={() => setCreateIsGuideOpen(true)}
+                                        >
+                                            <HelpCircle className="w-4 h-4 transition-colors" />
+                                            Panduan Pembuatan
+                                        </button>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-4 md:p-6 space-y-6">
+                                <AnimatePresence mode="wait">
                             {createIsSuccess ? (
                                 <motion.div 
                                     key="success"
@@ -1671,7 +1678,9 @@ export default function DaftarProposalPage() {
                                     </div>
                                 </motion.div>
                             )}
-                        </AnimatePresence>
+                                </AnimatePresence>
+                            </CardContent>
+                        </Card>
                     </motion.div>
                 )}
             </AnimatePresence>

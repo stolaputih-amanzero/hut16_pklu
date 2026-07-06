@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
             .maybeSingle();
 
           if (profile) {
-            router.push("/admin/dashboard");
+            window.location.href = "/admin/dashboard";
             return;
           }
         }
@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
     };
 
     checkSession();
-  }, [router]);
+  }, []);
 
   // 2. Handle admin credentials submission
   const handleLogin = async (e: React.FormEvent) => {
@@ -107,8 +107,8 @@ export default function AdminLoginPage() {
           return;
         }
 
-        // Redirect to admin dashboard
-        router.push("/admin/dashboard");
+        // Redirect to admin dashboard using hard reload to bypass broken Next.js cache
+        window.location.href = "/admin/dashboard";
       }
     } catch (err: any) {
       const errMsg = err?.message || "";

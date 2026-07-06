@@ -15,14 +15,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 1.5. Skip full DB/Auth verification for Next.js router prefetch requests to prevent performance bottlenecks
-  const isPrefetch =
-    request.headers.get("x-middleware-prefetch") === "1" ||
-    request.headers.get("purpose") === "prefetch";
-
-  if (isPrefetch) {
-    return NextResponse.next();
-  }
+  // The prefetch bypass was removed because Next.js caches prefetch responses.
+  // If we skip injecting headers during prefetch, Server Components will issue a redirect to login,
+  // which gets cached and causes an infinite loop upon router.push().
 
   // 2. Initialize Supabase client and response from our utility
   const { supabase, response } = createMiddlewareClient(request);

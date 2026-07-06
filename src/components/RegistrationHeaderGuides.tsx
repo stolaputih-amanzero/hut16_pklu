@@ -133,6 +133,19 @@ export function RegistrationHeaderGuides() {
           <li>Klik tombol <strong>Kirim Formulir Pendaftaran</strong>.</li>
         </ol>
       </div>
+
+      {/* C. Menyimpan Hasil Pendaftaran */}
+      <div className="space-y-3">
+        <h3 className="text-base font-semibold text-[#D4AF37] border-b border-[#D4AF37]/20 pb-1">
+          C. Menyimpan Bukti & Hasil Pendaftaran
+        </h3>
+        <ol className="list-decimal list-inside space-y-2 text-xs text-gray-300 leading-relaxed">
+          <li>Setelah pendaftaran berhasil dikirim, akan muncul tampilan <strong>Pendaftaran Berhasil!</strong> yang memuat <strong>Kode Registrasi</strong> dan <strong>QR Code</strong> Anda.</li>
+          <li>Klik tombol <strong className="text-amber-300">Simpan Gambar Tiket</strong> untuk mengunduh bukti pendaftaran tersebut ke perangkat Anda sebagai file gambar (PNG).</li>
+          <li>Simpan file gambar tiket tersebut di galeri perangkat Anda untuk digunakan sebagai bukti keabsahan pendaftaran resmi dan proses verifikasi cepat saat tiba di lokasi event.</li>
+          <li>Anda juga dapat membagikan link cek status pendaftaran atau membukanya kembali kapan saja melalui menu <em>Cek Status Pendaftaran</em>.</li>
+        </ol>
+      </div>
     </div>
   );
 

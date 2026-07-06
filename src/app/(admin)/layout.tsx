@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 
-export const unstable_instant = false;
-
 export default async function AdminLayout({
   children,
 }: {

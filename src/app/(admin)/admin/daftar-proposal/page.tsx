@@ -931,10 +931,10 @@ export default function DaftarProposalPage() {
             </div>
 
             {/* Tabs Control */}
-            <div className="flex border-b border-[#D4AF37]/20 gap-6 select-none">
+            <div className="flex border-b border-[#D4AF37]/20 select-none">
                 <button
                     onClick={() => setActiveTab('buat')}
-                    className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
+                    className={`pb-3 w-1/2 sm:w-52 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer text-center ${
                         activeTab === 'buat'
                             ? 'text-[#D4AF37]'
                             : 'text-[#FDFBF7]/60 hover:text-white'
@@ -950,7 +950,7 @@ export default function DaftarProposalPage() {
                 </button>
                 <button
                     onClick={() => setActiveTab('laporan')}
-                    className={`pb-3 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer ${
+                    className={`pb-3 w-1/2 sm:w-52 font-semibold text-sm tracking-wider uppercase transition-all duration-300 relative cursor-pointer text-center ${
                         activeTab === 'laporan'
                             ? 'text-[#D4AF37]'
                             : 'text-[#FDFBF7]/60 hover:text-white'
@@ -1343,7 +1343,7 @@ export default function DaftarProposalPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                 >
-                                    <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm overflow-hidden">
+                                    <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden">
                                         <div className="bg-gradient-to-r from-[#D4AF37]/20 via-transparent to-transparent p-6 text-center">
                                             <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
                                             <h2 className="text-2xl font-bold text-[#FDFBF7] mb-2">Proposal Berhasil Dibuat!</h2>
@@ -1429,7 +1429,7 @@ export default function DaftarProposalPage() {
                                     className="space-y-6"
                                 >
                                     {/* GLOBAL CHOICES */}
-                                    <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative z-20 overflow-visible">
+                                    <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl relative z-20 overflow-visible">
                                         <CardHeader className="border-b border-[#D4AF37]/20 bg-[#D4AF37]/5 rounded-t-lg">
                                             <CardTitle className="text-[#D4AF37] flex items-center gap-2">
                                                 <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-sm font-semibold">
@@ -1524,7 +1524,7 @@ export default function DaftarProposalPage() {
                                     </Card>
 
                                     {/* TARGET INFORMATION */}
-                                    <Card className="bg-[#022c22]/50 border-[#D4AF37]/30 backdrop-blur-sm shadow-xl relative z-10 overflow-visible">
+                                    <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl relative z-10 overflow-visible">
                                         {/* Ambient gradient behind the form */}
                                         <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 -z-10 transition-colors duration-1000 ${createProposalType === 'donatur' ? 'bg-pink-500' : 'bg-blue-500'}`} />
                                         

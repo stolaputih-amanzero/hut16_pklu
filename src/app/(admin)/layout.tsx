@@ -1,5 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 
@@ -8,49 +7,19 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
+  const headerList = await headers();
+  const userId = headerList.get("x-user-id");
+  const userRole = headerList.get("x-user-role");
+  const userName = headerList.get("x-user-name");
 
-  // 1. Initialize Supabase server client configured for Next.js cookies
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Can be ignored if handled by middleware session refreshes
-          }
-        },
-      },
-    }
-  );
-
-  // 2. Fetch the authenticated user session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!userId || !userRole || !userName) {
     redirect("/admin/login");
   }
 
-  // 3. Retrieve user profile (full name, role)
-  const { data: profile } = await supabase
-    .from("admin_profiles")
-    .select("full_name, role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!profile) {
-    redirect("/admin/unauthorized");
-  }
+  const profile = {
+    full_name: userName,
+    role: userRole,
+  };
 
   return (
     <div className="min-h-screen bg-[#022c22] text-[#FDFBF7] flex flex-col md:flex-row relative overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#022c22]">

@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   Users,
@@ -13,6 +13,19 @@ import Link from "next/link";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
+  const headerList = await headers();
+  const userId = headerList.get("x-user-id");
+  const userRole = headerList.get("x-user-role");
+  const userName = headerList.get("x-user-name");
+
+  if (!userId || !userRole || !userName) {
+    redirect("/admin/login");
+  }
+
+  const profile = {
+    full_name: userName,
+    role: userRole,
+  };
 
   // 1. Initialize Supabase Server Client
   const supabase = createServerClient(
@@ -26,26 +39,6 @@ export default async function DashboardPage() {
       },
     }
   );
-
-  // 2. Retrieve the authenticated admin user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/admin/login");
-  }
-
-  // 3. Fetch admin profile details
-  const { data: profile } = await supabase
-    .from("admin_profiles")
-    .select("full_name, role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!profile) {
-    redirect("/admin/unauthorized");
-  }
 
   // 4. Fetch 3 core statistics in parallel for optimal database response times
   let registrationsCount = 0;

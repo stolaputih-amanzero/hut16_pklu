@@ -1,5 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getUsers } from "./actions";
 import { UsersManager } from "@/components/admin/UsersManager";
@@ -10,38 +9,15 @@ interface PageProps {
 }
 
 export default async function ManageUsersPage({ searchParams }: PageProps) {
-  const cookieStore = await cookies();
+  const headerList = await headers();
+  const userId = headerList.get("x-user-id");
+  const userRole = headerList.get("x-user-role");
 
-  // 1. Initialize Supabase server client configured for Next.js cookies
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-      },
-    }
-  );
-
-  // 2. Double-check Server-side authentication
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!userId || !userRole) {
     redirect("/admin/login");
   }
 
-  // 3. Double-check Server-side role authorization (Super User exclusive access)
-  const { data: profile } = await supabase
-    .from("admin_profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!profile || profile.role !== "super_user") {
+  if (userRole !== "super_user") {
     redirect("/admin/unauthorized");
   }
 
@@ -70,7 +46,7 @@ export default async function ManageUsersPage({ searchParams }: PageProps) {
       {/* Main Client Shell for Interactions */}
       <UsersManager
         users={usersList}
-        currentUserId={user.id}
+        currentUserId={userId || ""}
         searchResolved={searchResolved}
       />
     </div>

@@ -5,6 +5,7 @@ import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CreateUserModal } from "./CreateUserModal";
 import { EditUserModal } from "./EditUserModal";
+import { DeleteUserDialog } from "./DeleteUserDialog";
 
 interface User {
   id: string;
@@ -181,7 +182,7 @@ export function UsersManager({ users, currentUserId, searchResolved }: UsersMana
       {/* Modals and Dialogs */}
       {isCreateOpen && <CreateUserModal onClose={() => setIsCreateOpen(false)} />}
       {editUser && <EditUserModal user={editUser} currentUserId={currentUserId} onClose={() => setEditUser(null)} />}
-      {/* {deleteUser && <DeleteUserDialog user={deleteUser} onClose={() => setDeleteUser(null)} />} */}
+      {deleteUser && <DeleteUserDialog user={deleteUser} currentUserId={currentUserId} onClose={() => setDeleteUser(null)} />}
     </div>
   );
 }

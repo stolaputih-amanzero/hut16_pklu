@@ -970,7 +970,7 @@ export default function DaftarProposalPage() {
             </div>
 
             <div className="relative">
-                <div className={activeTab === 'laporan' ? 'block animate-in fade-in zoom-in-95 duration-300' : 'hidden'}>
+                <div className={activeTab === 'laporan' ? 'block' : 'hidden'}>
                     <div className="space-y-6">
                         <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl h-[calc(100vh-220px)] flex flex-col">
                             <CardHeader className="flex-none">
@@ -1305,7 +1305,7 @@ export default function DaftarProposalPage() {
                     </div>
                 </div>
                 
-                <div className={activeTab === 'buat' ? 'block animate-in fade-in zoom-in-95 duration-300' : 'hidden'}>
+                <div className={activeTab === 'buat' ? 'block' : 'hidden'}>
                     <div className="space-y-6">
                         <Card className="bg-[#033B2B]/40 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden h-[calc(100vh-220px)] flex flex-col">
                             <CardHeader className="flex-none">

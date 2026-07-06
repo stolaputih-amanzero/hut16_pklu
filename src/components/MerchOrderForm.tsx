@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -526,10 +527,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
             {/* Photo */}
             <div className="relative h-64 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black">
-              <img
+              <Image
                 src={previewProduct.image_url}
                 alt={previewProduct.name}
-                className="h-full w-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 500px"
+                className="object-cover"
               />
             </div>
 
@@ -769,7 +772,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
                       {/* Small Thumbnail Photo */}
                       <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-white/20 bg-black shrink-0">
-                        <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />
+                        <Image
+                          src={p.image_url}
+                          alt={p.name}
+                          width={56}
+                          height={56}
+                          className="h-full w-full object-cover"
+                        />
                         {isOutOfStock && (
                           <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-[9px] font-bold text-red-400">
                             HABIS

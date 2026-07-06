@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   Home, 
@@ -30,10 +31,13 @@ export function PublicHeader() {
           {/* Logo Brand */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative h-9 w-9 overflow-hidden rounded-full border border-[#D4AF37]/50 bg-black/40 p-0.5 group-hover:border-[#D4AF37] transition-colors">
-              <img
+              <Image
                 src="/logo_hut16_pklu.png"
                 alt="Logo HUT 16 PKLU"
+                width={36}
+                height={36}
                 className="h-full w-full object-contain"
+                priority
               />
             </div>
             <div className="flex flex-col">

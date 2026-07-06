@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle, Upload, Copy, CheckCircle2 } from "lucide-react";
 import { GuideModal } from "./guide-modal";
 import { QRCodeSVG } from "qrcode.react";
+import Image from "next/image";
 import { submitRegistration } from "@/app/(public)/daftar/actions";
 import {
   Dialog,
@@ -697,8 +698,14 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
             
             <div className="mt-6 border border-[#D4AF37]/20 rounded-md overflow-hidden bg-black/50 p-2">
               <p className="text-sm text-[#FDFBF7] font-medium mb-2 text-center">Panduan Ukuran (Size Chart)</p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/sizechart.jpeg" alt="Size Chart Polo Shirt" className="w-full h-auto rounded" />
+              <Image
+                src="/sizechart.jpeg"
+                alt="Size Chart Polo Shirt"
+                width={600}
+                height={450}
+                className="w-full h-auto rounded"
+                loading="lazy"
+              />
             </div>
           </div>
 

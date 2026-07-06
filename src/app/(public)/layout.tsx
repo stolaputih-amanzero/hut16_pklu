@@ -1,4 +1,5 @@
 import { PublicHeader } from "@/components/PublicHeader";
+import Image from "next/image";
 
 export default function PublicLayout({
   children,
@@ -27,9 +28,11 @@ export default function PublicLayout({
               rel="noopener noreferrer" 
               className="inline-flex items-center gap-1 hover:text-[#D4AF37] transition-all duration-300 group"
             >
-              <img 
+              <Image 
                 src="/aman.png" 
                 alt="AMAN Ecosystem" 
+                width={64}
+                height={12}
                 className="h-3 w-auto object-contain opacity-60 group-hover:opacity-100 transition-opacity" 
               />
               <span className="font-medium tracking-wide">AMAN Ecosystem</span>

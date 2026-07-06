@@ -5,6 +5,7 @@ import { getApprovedMessagesAction } from "@/app/(public)/ucapan/actions";
 import { GuestbookMessage } from "@/components/GuestbookList";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, UserCheck, ChevronDown, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 interface GuestbookLoadMoreProps {
   initialMessages: GuestbookMessage[];
@@ -44,7 +45,13 @@ export function GuestbookLoadMore({ initialMessages, totalCount }: GuestbookLoad
               <div className="flex items-center gap-3">
                 {item.avatar_url ? (
                   <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-[#D4AF37]/50 shadow">
-                    <img src={item.avatar_url} alt={item.name} className="h-full w-full object-cover" />
+                    <Image
+                      src={item.avatar_url}
+                      alt={item.name}
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                 ) : (
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/20 text-[#D4AF37] font-bold border border-[#D4AF37]/40 text-sm">

@@ -10,6 +10,15 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   /* config options here */
   turbopack: {},
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "gxkbxuksdfaqfmrwyuno.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
 };
 
 const exportConfig = process.env.NODE_ENV === "production" 

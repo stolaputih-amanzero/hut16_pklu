@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { RegistrationForm } from "@/components/registration-form";
-import { RegistrationInfo } from "@/components/RegistrationInfo";
+import { RegistrationHeaderGuides } from "@/components/RegistrationHeaderGuides";
 import { UserCheck } from "lucide-react";
 
 export const metadata = {
@@ -48,8 +48,8 @@ export default async function RegistrationPage() {
           </div>
         </div>
 
-        {/* Informasi Kegiatan */}
-        <RegistrationInfo />
+        {/* Informasi & Panduan Kegiatan */}
+        <RegistrationHeaderGuides />
         
         <RegistrationForm churches={churches || []} />
       </div>

@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, Upload, Copy, CheckCircle2 } from "lucide-react";
-import { GuideModal } from "./guide-modal";
 import { QRCodeSVG } from "qrcode.react";
 import Image from "next/image";
 import { submitRegistration } from "@/app/(public)/daftar/actions";
@@ -325,10 +324,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
   }
 
   return (
-    <div className="space-y-6">
-      <GuideModal />
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* 1. MODE PENDAFTARAN */}
         <div className="space-y-4 rounded-xl border border-[#D4AF37]/30 bg-black/40 p-5 shadow-inner">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -824,6 +820,5 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
         </DialogContent>
       </Dialog>
     </form>
-    </div>
   );
 }

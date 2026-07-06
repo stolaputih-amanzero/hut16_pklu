@@ -165,7 +165,7 @@ export async function submitRegistration(formData: FormData) {
     return {
       success: true,
       registration_code: finalCode,
-      data: insertedData,
+      data: JSON.parse(JSON.stringify(insertedData)),
     };
   } catch (err: any) {
     console.error("Server Action Exception:", err);
@@ -193,7 +193,7 @@ export async function getRegistrationByCode(codeOrWa: string) {
       return { success: false, error: "Data pendaftaran tidak ditemukan. Periksa kembali Kode atau No WA." };
     }
 
-    return { success: true, registrations: data };
+    return { success: true, registrations: JSON.parse(JSON.stringify(data)) };
   } catch (err: any) {
     return { success: false, error: err.message || "Terjadi kesalahan sistem" };
   }

@@ -445,7 +445,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         >
           <h2 className="text-base font-bold flex items-center gap-2">
             <Info className="w-5 h-5 text-[#D4AF37]" />
-            Informasi Penting &amp; Kontak Pemesanan:
+            Info
           </h2>
           <ChevronDown
             className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 ${

@@ -33,7 +33,7 @@ export function AmanauraPageClient() {
         >
           <h2 className="text-base font-bold flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-[#D4AF37]" />
-            Panduan 4 Langkah Mudah Membuat &amp; Membagikan Amanaura:
+            Panduan
           </h2>
           <ChevronDown
             className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 ${

@@ -21,7 +21,7 @@ export function GuestbookGuidelines() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           <h2 className="text-base font-bold flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-[#D4AF37]" />
-            Tata Cara Menulis Ucapan Selamat:
+            Panduan
           </h2>
           <div className="inline-flex w-fit items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-1 rounded-full text-xs font-semibold">
             <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />

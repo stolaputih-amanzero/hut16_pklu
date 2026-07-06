@@ -10,16 +10,23 @@ import Image from "next/image";
 export default function AdminLoginPage() {
   const router = useRouter();
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // 1. Auto-focus email field on page load & check if user is already authenticated
   useEffect(() => {
-    if (emailInputRef.current) {
+    const savedEmail = localStorage.getItem("admin_remembered_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+      setTimeout(() => passwordInputRef.current?.focus(), 50);
+    } else if (emailInputRef.current) {
       emailInputRef.current.focus();
     }
 
@@ -105,6 +112,13 @@ export default function AdminLoginPage() {
           await supabase.auth.signOut();
           setLoading(false);
           return;
+        }
+
+        // Remember email if checked
+        if (rememberMe) {
+          localStorage.setItem("admin_remembered_email", email.trim());
+        } else {
+          localStorage.removeItem("admin_remembered_email");
         }
 
         // Redirect to admin dashboard using hard reload to bypass broken Next.js cache
@@ -218,6 +232,7 @@ export default function AdminLoginPage() {
                   <Lock className="h-4.5 w-4.5" />
                 </div>
                 <input
+                  ref={passwordInputRef}
                   id="password"
                   type="password"
                   required
@@ -230,6 +245,23 @@ export default function AdminLoginPage() {
                   className="block w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
                 />
               </div>
+            </div>
+
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600 bg-black/40 text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-offset-gray-900 cursor-pointer"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="ml-2 block text-xs font-semibold text-gray-300 cursor-pointer select-none"
+              >
+                Ingat Email Saya
+              </label>
             </div>
 
             {/* Submit Button */}

@@ -496,6 +496,9 @@ export default function RekapRegistrasiPage() {
                   <div className="text-xs text-gray-400 mt-0.5">
                     <span className="text-gray-300 font-medium">{item.church_name}</span> • {item.mupel}
                   </div>
+                  <div className="text-[10px] text-[#D4AF37]/90 mt-1">
+                    Daftar: {new Date(item.created_at).toLocaleDateString("id-ID")} {new Date(item.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+                  </div>
                   <div className="text-[11px] mt-1">
                     {!isRombongan ? (
                       <span className={item.type === "Peserta" ? "text-blue-300" : "text-purple-300"}>
@@ -590,7 +593,9 @@ export default function RekapRegistrasiPage() {
                     >
                       <td className="py-3 px-4">
                         <span className="font-mono font-bold text-white group-hover:text-[#D4AF37] transition-colors block">{item.registration_code}</span>
-                        <span className="text-[11px] text-gray-400">{new Date(item.created_at).toLocaleDateString("id-ID")}</span>
+                        <span className="text-[11px] text-gray-400 block mt-0.5">
+                          {new Date(item.created_at).toLocaleDateString("id-ID")} {new Date(item.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+                        </span>
                       </td>
                       <td className="py-3 px-4">
                         <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded ${isRombongan ? "bg-purple-500/20 text-purple-300" : "bg-blue-500/20 text-blue-300"}`}>
@@ -711,6 +716,18 @@ export default function RekapRegistrasiPage() {
                 <div>
                   <span className="text-xs text-gray-400 block">Nama Jemaat</span>
                   <strong className="text-white">{selectedRecord.church_name}</strong>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Waktu Pendaftaran</span>
+                  <strong className="text-white">
+                    {new Date(selectedRecord.created_at).toLocaleDateString("id-ID")} {new Date(selectedRecord.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Status Pendaftaran</span>
+                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    Terekam &amp; Valid
+                  </span>
                 </div>
               </div>
 

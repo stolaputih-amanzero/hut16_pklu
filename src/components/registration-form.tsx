@@ -212,7 +212,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
     return price * totalOrang;
   }, [category, totalOrang]);
 
-  const [successData, setSuccessData] = useState<{ code: string; mode: string } | null>(null);
+  const [successData, setSuccessData] = useState<{ code: string; mode: string; createdAt?: string } | null>(null);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -288,7 +288,11 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
       const res = await submitRegistration(formData);
       if (res.success && res.registration_code) {
         setShowConfirmModal(false);
-        setSuccessData({ code: res.registration_code, mode: pendingData.registration_mode });
+        setSuccessData({ 
+          code: res.registration_code, 
+          mode: pendingData.registration_mode,
+          createdAt: res.data?.created_at
+        });
       } else {
         alert(`Gagal mengirim pendaftaran: ${res.error}`);
       }
@@ -342,6 +346,14 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
           </div>
           
           <div className="w-full pt-4 border-t border-[#D4AF37]/10 flex flex-col items-center text-[10px] text-gray-400">
+            {successData.createdAt && (
+              <p className="mb-1 text-gray-300">
+                Waktu Registrasi: {new Date(successData.createdAt).toLocaleString("id-ID", {
+                  dateStyle: "medium",
+                  timeStyle: "short"
+                })}
+              </p>
+            )}
             <p>© Panitia Temu PKLU GPIB 2026</p>
           </div>
         </div>

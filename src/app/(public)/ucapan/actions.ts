@@ -112,7 +112,7 @@ export async function submitGuestbookMessage(formData: FormData) {
 
     // 5. Revalidate cache
     revalidatePath("/ucapan");
-    revalidatePath("/admin-ucapan");
+    revalidatePath("/admin/guestbook");
 
     return { success: true, data };
   } catch (err: any) {

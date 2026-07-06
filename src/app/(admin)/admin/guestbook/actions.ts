@@ -32,7 +32,7 @@ export async function approveGuestbookMessage(id: string) {
       return { success: false, error: error.message };
     }
 
-    revalidatePath("/admin-ucapan");
+    revalidatePath("/admin/guestbook");
     revalidatePath("/ucapan");
     return { success: true };
   } catch (err: any) {
@@ -51,7 +51,7 @@ export async function unapproveGuestbookMessage(id: string) {
       return { success: false, error: error.message };
     }
 
-    revalidatePath("/admin-ucapan");
+    revalidatePath("/admin/guestbook");
     revalidatePath("/ucapan");
     return { success: true };
   } catch (err: any) {
@@ -70,7 +70,7 @@ export async function deleteGuestbookMessage(id: string) {
       return { success: false, error: error.message };
     }
 
-    revalidatePath("/admin-ucapan");
+    revalidatePath("/admin/guestbook");
     revalidatePath("/ucapan");
     return { success: true };
   } catch (err: any) {

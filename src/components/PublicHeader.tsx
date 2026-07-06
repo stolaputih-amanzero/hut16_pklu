@@ -77,7 +77,7 @@ export function PublicHeader() {
           <div className="flex items-center gap-1.5 z-50">
             {/* Akses/Login Panitia (most right) */}
             <Link
-              href="/dashboard"
+              href="/admin/dashboard"
               className="p-2 text-[#D4AF37] hover:text-[#D4AF37]/80 hover:bg-[#D4AF37]/10 rounded-full transition-all duration-200 active:scale-95 shadow-[0_0_10px_rgba(212,175,55,0.1)] border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 flex items-center justify-center"
               title="Akses Panitia"
             >

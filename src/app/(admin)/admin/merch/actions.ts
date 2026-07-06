@@ -106,7 +106,7 @@ export async function saveMerchProduct(formData: FormData) {
     }
 
     revalidatePath("/merch");
-    revalidatePath("/admin-merch");
+    revalidatePath("/admin/merch");
 
     return { success: true, data: result.data };
   } catch (err: any) {
@@ -124,7 +124,7 @@ export async function deleteMerchProduct(id: string) {
     if (error) return { success: false, error: error.message };
 
     revalidatePath("/merch");
-    revalidatePath("/admin-merch");
+    revalidatePath("/admin/merch");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menghapus produk." };
@@ -157,7 +157,7 @@ export async function deleteMerchOrder(id: string) {
 
     if (error) return { success: false, error: error.message };
 
-    revalidatePath("/admin-merch");
+    revalidatePath("/admin/merch");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menghapus pesanan." };

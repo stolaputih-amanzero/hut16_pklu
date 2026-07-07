@@ -14,21 +14,21 @@ import { Label } from "@/components/ui/label";
 import { fetchMerchProducts } from "@/app/(admin)/admin/merch/actions";
 import { submitMerchOrder, CartItemInput, getMerchOrderByCodeOrWa } from "@/app/(public)/merch/actions";
 import { QRCodeSVG } from "qrcode.react";
-import { 
-  AlertTriangle, 
-  ShoppingBag, 
-  Info, 
-  Loader2, 
-  Shirt, 
-  Send, 
-  MessageSquare, 
-  RefreshCw, 
-  PackageCheck, 
-  Eye, 
-  X, 
-  Sparkles, 
-  Check, 
-  Church, 
+import {
+  AlertTriangle,
+  ShoppingBag,
+  Info,
+  Loader2,
+  Shirt,
+  Send,
+  MessageSquare,
+  RefreshCw,
+  PackageCheck,
+  Eye,
+  X,
+  Sparkles,
+  Check,
+  Church,
   Calendar,
   Plus,
   Minus,
@@ -86,7 +86,7 @@ interface MerchOrderFormProps {
 export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const [products, setProducts] = useState<MerchProductItem[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -112,7 +112,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     if (res.success && res.data && res.data.length > 0) {
       setStatusLookupResults(res.data);
     } else {
-      setStatusLookupError("Pesanan tidak ditemukan. Periksa kembali No WhatsApp atau Kode Pesanan Anda.");
+      setStatusLookupError("Pembelian tidak ditemukan. Periksa kembali No WhatsApp atau Kode Pembelian Anda.");
     }
   };
 
@@ -132,12 +132,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         }
       });
       const link = document.createElement("a");
-      link.download = `Bukti-Pesanan-Merch-${successData.id.slice(0, 6).toUpperCase()}.png`;
+      link.download = `Bukti-Pembelian-Merch-${successData.id.slice(0, 6).toUpperCase()}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
       console.error("Gagal menyimpan bukti:", err);
-      toast.error("Gagal menyimpan gambar bukti pesanan. Silakan lakukan screenshot pada layar Anda.");
+      toast.error("Gagal menyimpan gambar bukti pembelian. Silakan lakukan screenshot pada layar Anda.");
     } finally {
       setDownloadingImage(false);
     }
@@ -440,7 +440,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         notice: res.notice,
       });
     } else {
-      setErrorMsg(res.error || "Gagal menyimpan pesanan.");
+      setErrorMsg(res.error || "Gagal menyimpan pembelian.");
     }
   };
 
@@ -480,9 +480,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
     return (
       <div className="space-y-6 rounded-2xl border-2 border-emerald-500/40 bg-black/60 p-6 md:p-8 backdrop-blur-xl text-[#FDFBF7] shadow-[0_0_30px_rgba(16,185,129,0.15)] animate-in fade-in">
-        
+
         {/* Printable Receipt Card Container */}
-        <div 
+        <div
           ref={receiptRef}
           className="p-5 md:p-6 rounded-xl border border-[#D4AF37]/35 bg-[#011c15] text-[#FDFBF7] space-y-4 shadow-inner"
         >
@@ -498,10 +498,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           <div className="rounded-xl border border-amber-500/45 bg-amber-500/10 p-3.5 text-amber-200 text-[11px] leading-relaxed space-y-1">
             <div className="flex items-center gap-1.5 font-bold text-amber-300">
               <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>CATATAN PENGAMBILAN SOUVENIR:</span>
+              <span>CATATAN PENGAMBILAN MERCHANDISE:</span>
             </div>
             <p>
-              Seluruh cenderamata yang Anda pesan dapat diambil di <strong>Meja Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>) dengan menunjukkan bukti QR Code / Nama Pemesan.
+              Seluruh Merchandise yang Anda beli dapat diambil di <strong>Meja Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>) dengan menunjukkan bukti QR Code / Nama Pemesan.
             </p>
           </div>
 
@@ -514,7 +514,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           <div className="space-y-4 bg-black/40 p-4 rounded-xl border border-white/5 text-[11px]">
             <h3 className="font-bold text-[#D4AF37] border-b border-white/10 pb-2 flex items-center justify-between">
               <span className="flex items-center gap-1.5 font-bold">
-                <ShoppingBag className="w-3.5 h-3.5 text-[#D4AF37]" /> Ringkasan Pesanan #MB-{successData.id.slice(0, 6).toUpperCase()}
+                <ShoppingBag className="w-3.5 h-3.5 text-[#D4AF37]" /> Ringkasan Pembelian #MB-{successData.id.slice(0, 6).toUpperCase()}
               </span>
               <span className="font-mono text-emerald-400 font-bold text-xs">
                 Total: Rp {(successData.totalPrice || 0).toLocaleString("id-ID")}
@@ -547,7 +547,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             </div>
 
             <div className="pt-2 border-t border-white/10 space-y-1.5">
-              <span className="text-gray-400 font-semibold block">Rincian Item yang Dipesan:</span>
+              <span className="text-gray-400 font-semibold block">Rincian Item yang Dibeli:</span>
               <div className="bg-black/40 p-3 rounded-lg border border-white/5 space-y-1.5 font-mono text-[10px] text-gray-200">
                 {successData.item_type?.split(", ").map((item: string, idx: number) => (
                   <div key={idx} className="flex items-start gap-1.5">
@@ -569,14 +569,14 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           {/* QR Code Status Check Section */}
           <div className="bg-black/40 p-4 rounded-xl border border-[#D4AF37]/35 flex flex-col items-center justify-center space-y-2.5 text-center">
             <div className="bg-white p-2.5 rounded-lg flex items-center justify-center">
-              <QRCodeSVG 
-                value={`${window.location.origin}/cek?merch_id=${successData.id}`} 
-                size={120} 
-                level="H" 
+              <QRCodeSVG
+                value={`${window.location.origin}/cek?merch_id=${successData.id}`}
+                size={120}
+                level="H"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-bold text-[#D4AF37]">QR Code Status Pesanan</p>
+              <p className="text-xs font-bold text-[#D4AF37]">QR Code Status Pembelian</p>
               <p className="text-[9px] text-gray-400 max-w-xs leading-normal">
                 Scan atau simpan QR Code di atas untuk memantau status persetujuan pembayaran dan notes/catatan dari panitia.
               </p>
@@ -624,7 +624,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             className="w-full border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 h-auto py-4 px-4 text-xs sm:text-sm font-semibold rounded-xl whitespace-normal flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-4 h-4 mr-2 shrink-0" />
-            <span>Buat Pesanan Baru</span>
+            <span>Buat Pembelian Baru</span>
           </Button>
         </div>
       </div>
@@ -636,7 +636,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     <div className="space-y-6">
       {/* Top Banner Status Button */}
       <div className="text-center pb-2 border-b border-white/5">
-        <button 
+        <button
           type="button"
           onClick={() => setIsStatusModalOpen(true)}
           className="inline-flex items-center text-xs font-semibold text-[#D4AF37] hover:underline bg-[#D4AF37]/10 px-3 py-1.5 rounded-full border border-[#D4AF37]/30 transition-all hover:scale-[1.02] cursor-pointer"
@@ -657,16 +657,14 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             Panduan
           </h2>
           <ChevronDown
-            className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
-              isGuideOpen ? "rotate-180" : ""
-            }`}
+            className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${isGuideOpen ? "rotate-180" : ""
+              }`}
           />
         </button>
 
         <div
-          className={`transition-all duration-300 overflow-hidden ${
-            isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
-          }`}
+          className={`transition-all duration-300 overflow-hidden ${isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+            }`}
         >
           <div className="space-y-4 pt-2">
             {/* 👤 CONTACT PERSON SEKSI DANA CARD */}
@@ -698,7 +696,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 📌 CATATAN PENGAMBILAN MERCHANDISE:
               </div>
               <p className="leading-relaxed">
-                Seluruh barang merchandise/cenderamata yang Anda pesan dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>).
+                Seluruh barang merchandise yang Anda beli dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>).
               </p>
             </div>
 
@@ -737,7 +735,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               </div>
 
               {/* Photo */}
-              <div 
+              <div
                 onClick={() => setLightboxImage(previewProduct.image_url)}
                 className="relative h-44 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black cursor-zoom-in group/img shrink-0"
               >
@@ -767,11 +765,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                         </span>
                       ) : (
                         <span
-                          className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded border ${
-                            previewProduct.stock <= 10
-                              ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                              : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                          }`}
+                          className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded border ${previewProduct.stock <= 10
+                            ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                            : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                            }`}
                         >
                           Stok: {previewProduct.stock} pcs
                         </span>
@@ -802,11 +799,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                           key={sz}
                           type="button"
                           onClick={() => setPreviewSize(sz)}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all border cursor-pointer ${
-                            previewSize === sz
-                              ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300"
-                              : "bg-white/5 text-gray-400 hover:bg-white/10 border-white/10"
-                          }`}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all border cursor-pointer ${previewSize === sz
+                            ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300"
+                            : "bg-white/5 text-gray-400 hover:bg-white/10 border-white/10"
+                            }`}
                         >
                           {sz}
                         </button>
@@ -819,7 +815,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 {!isOutOfStock && (
                   <div className="flex items-center justify-between gap-4 p-2.5 bg-black/40 rounded-xl border border-white/10">
                     <span className="text-[11px] font-semibold text-gray-300">
-                      Jumlah Pesanan (Pcs):
+                      Jumlah Pembelian (Pcs):
                     </span>
                     <div className="flex items-center border border-white/20 rounded-lg bg-black/60 overflow-hidden shrink-0 h-8">
                       <button
@@ -850,7 +846,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     return (
                       <div className="space-y-1 p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[10px]">
                         <div className="font-semibold text-emerald-400 flex items-center gap-1">
-                          <Check className="w-3.5 h-3.5 text-emerald-400" /> Sudah dalam Pesanan:
+                          <Check className="w-3.5 h-3.5 text-emerald-400" /> Sudah dalam Pembelian:
                         </div>
                         <div className="space-y-0.5">
                           {itemsInCart.map((ci) => (
@@ -899,7 +895,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     onClick={handleAddFromPreview}
                     className="w-2/3 bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs cursor-pointer"
                   >
-                    <Check className="w-4 h-4 mr-1 inline" /> Tambahkan ke Pesanan
+                    <Check className="w-4 h-4 mr-1 inline" /> Tambahkan ke Pembelian
                   </Button>
                 )}
               </div>
@@ -934,7 +930,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             <h3 className="text-xs sm:text-sm font-bold text-[#D4AF37] border-b border-white/5 pb-2.5 flex items-center gap-1.5">
               <Church className="w-4 h-4 text-[#D4AF37]" /> Data Lengkap Pemesan
             </h3>
-            
+
             {/* Field: Nama Pemesan */}
             <div className="space-y-1.5">
               <Label htmlFor="merch-name" className="text-xs font-bold text-gray-300 block">
@@ -953,28 +949,26 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between gap-3 pb-1 border-b border-white/5">
                 <span className="text-xs font-bold text-gray-300">Asal Jemaat / Gereja *</span>
-                
+
                 {/* Modern Pill Toggle */}
                 <div className="flex p-0.5 bg-black/60 rounded-xl border border-white/10 shrink-0">
                   <button
                     type="button"
                     onClick={() => setIsGpibMember(true)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      isGpibMember
-                        ? "bg-[#D4AF37] text-black shadow-md"
-                        : "text-gray-400 hover:text-white"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${isGpibMember
+                      ? "bg-[#D4AF37] text-black shadow-md"
+                      : "text-gray-400 hover:text-white"
+                      }`}
                   >
                     GPIB
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsGpibMember(false)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      !isGpibMember
-                        ? "bg-[#D4AF37] text-black shadow-md"
-                        : "text-gray-400 hover:text-white"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${!isGpibMember
+                      ? "bg-[#D4AF37] text-black shadow-md"
+                      : "text-gray-400 hover:text-white"
+                      }`}
                   >
                     Umum
                   </button>
@@ -1083,16 +1077,15 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     <div
                       key={p.id}
                       onClick={() => setPreviewProduct(p)}
-                      className={`group relative flex flex-col rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer ${
-                        isOutOfStock
-                          ? "border-red-500/25 bg-black/40 opacity-60 hover:border-red-500/40"
-                          : isSelected
+                      className={`group relative flex flex-col rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer ${isOutOfStock
+                        ? "border-red-500/25 bg-black/40 opacity-60 hover:border-red-500/40"
+                        : isSelected
                           ? "border-[#D4AF37] bg-[#D4AF37]/5 shadow-[0_0_20px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/50"
                           : "border-white/10 bg-black/40 hover:border-[#D4AF37]/40 hover:bg-black/60 shadow-lg"
-                      }`}
+                        }`}
                     >
                       {/* Floating Checkbox */}
-                      <div 
+                      <div
                         className="absolute top-2.5 left-2.5 z-20 cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1100,13 +1093,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                         }}
                       >
                         <div
-                          className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors shadow-md ${
-                            isOutOfStock
-                              ? "border-gray-600 bg-gray-800"
-                              : isSelected
+                          className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors shadow-md ${isOutOfStock
+                            ? "border-gray-600 bg-gray-800"
+                            : isSelected
                               ? "bg-[#D4AF37] border-[#D4AF37] text-black"
                               : "border-white/40 bg-black/60 hover:border-[#D4AF37]"
-                          }`}
+                            }`}
                         >
                           {isSelected && !isOutOfStock && <Check className="w-4 h-4 stroke-[3]" />}
                         </div>
@@ -1138,7 +1130,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                             {p.price > 0 ? `Rp ${p.price.toLocaleString("id-ID")}` : "Cenderamata"}
                           </span>
                         </div>
-                        
+
                         <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1.5 border-t border-white/5">
                           <div className="flex items-center gap-1">
                             {/* Stock Badge */}
@@ -1148,11 +1140,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                               </span>
                             ) : (
                               <span
-                                className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded border ${
-                                  p.stock <= 10
-                                    ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
-                                    : "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
-                                }`}
+                                className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded border ${p.stock <= 10
+                                  ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                                  : "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                                  }`}
                               >
                                 {p.stock} Pcs
                               </span>
@@ -1164,7 +1155,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                               </span>
                             )}
                           </div>
-                          
+
                           <span className="text-[9px] text-gray-400 flex items-center gap-0.5 group-hover:text-[#D4AF37] transition-colors font-medium">
                             <Info className="w-3 h-3" /> Detail
                           </span>
@@ -1241,11 +1232,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                                     key={sz}
                                     type="button"
                                     onClick={() => updateCartSize(cartItem.cartItemId, sz)}
-                                    className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border cursor-pointer ${
-                                      cartItem.size === sz
-                                        ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300"
-                                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
-                                    }`}
+                                    className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border cursor-pointer ${cartItem.size === sz
+                                      ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300"
+                                      : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
+                                      }`}
                                   >
                                     {sz}
                                   </button>
@@ -1325,13 +1315,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               <h3 className="text-xs font-bold text-[#D4AF37] border-b border-white/10 pb-1 flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-[#D4AF37]" /> Informasi Pembayaran
               </h3>
-              
+
               <div className="rounded-lg bg-[#D4AF37]/10 p-3.5 border border-[#D4AF37]/30 text-xs leading-relaxed space-y-1">
-                <span className="text-gray-300 block">Silakan transfer biaya pesanan Anda ke rekening panitia:</span>
+                <span className="text-gray-300 block">Silakan transfer biaya pembelian Anda ke rekening panitia:</span>
                 <div className="flex items-center gap-2 my-1.5 bg-black/40 p-2 rounded w-fit border border-[#D4AF37]/20">
                   <span className="font-mono text-[#D4AF37] font-semibold text-xs">Bank BTN 00179-01-88-000447-9</span>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => {
                       navigator.clipboard.writeText("0017901880004479");
                       toast.success("Nomor rekening berhasil disalin!");
@@ -1342,7 +1332,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     <Copy className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                Atas nama: <strong>Panitia MUPEL GPIB BEKASI</strong><br/>
+                Atas nama: <strong>Panitia MUPEL GPIB BEKASI</strong><br />
                 Total Tagihan: <strong className="text-emerald-400 font-mono">Rp {grandTotalPrice.toLocaleString("id-ID")}</strong>
               </div>
 
@@ -1367,7 +1357,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 <Label className="text-xs font-semibold text-gray-200">
                   Unggah Bukti Bayar (Format: JPG, PNG, WEBP, Maks 5MB) *
                 </Label>
-                
+
                 <input
                   type="file"
                   accept="image/*"
@@ -1462,21 +1452,21 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="w-5 h-5 animate-spin shrink-0" />
-                <span>Memproses Pesanan...</span>
+                <span>Memproses Pembelian...</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <Send className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                <span>Kirim Pesanan ({grandTotalQty} Pcs • Rp {grandTotalPrice.toLocaleString("id-ID")})</span>
+                <span>Kirim Pembelian ({grandTotalQty} Pcs • Rp {grandTotalPrice.toLocaleString("id-ID")})</span>
               </span>
             )}
           </Button>
         </form>
       </div>
-      
+
       {/* 3. FULLSCREEN IMAGE LIGHTBOX */}
       {lightboxImage && mounted && createPortal(
-        <div 
+        <div
           onClick={() => setLightboxImage(null)}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md cursor-zoom-out animate-in fade-in duration-200"
         >
@@ -1488,7 +1478,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           >
             <X className="w-6 h-6" />
           </button>
-          
+
           <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center select-none">
             <img
               src={lightboxImage}
@@ -1523,7 +1513,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 Cek Status Pembelian
               </h3>
               <p className="text-[11px] text-gray-300 leading-normal">
-                Masukkan nomor WhatsApp Anda atau Kode Pesanan (Contoh: 89C571) untuk mengecek status pembelian merchandise Anda.
+                Masukkan nomor WhatsApp Anda atau Kode Pembelian (Contoh: 89C571) untuk mengecek status pembelian merchandise Anda.
               </p>
             </div>
 
@@ -1560,15 +1550,15 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   const orderCode = `MB-${order.id.slice(0, 6).toUpperCase()}`;
 
                   return (
-                    <div 
-                      key={order.id} 
+                    <div
+                      key={order.id}
                       id={`ticket-merch-${order.id}`}
                       className="rounded-xl border border-[#D4AF37]/45 bg-[#0B0904] p-4 sm:p-5 space-y-5 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden"
                     >
                       {/* Ticket Header */}
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-3.5 gap-3">
                         <div>
-                          <span className="text-[9px] uppercase tracking-wider text-gray-400 block mb-0.5">Kode Pesanan</span>
+                          <span className="text-[9px] uppercase tracking-wider text-gray-400 block mb-0.5">Kode Pembelian</span>
                           <h2 className="text-xl font-black text-[#D4AF37] font-mono tracking-wider">#{orderCode}</h2>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
@@ -1635,10 +1625,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                       {/* QR Code and Save Button (Exactly styled like registration check status) */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-3.5 border-t border-white/10 no-export">
                         <div className="flex flex-col items-center justify-center p-3 bg-white rounded-xl text-black space-y-1">
-                          <QRCodeSVG 
-                            value={`${window.location.origin}/cek?merch_id=${order.id}`} 
-                            size={95} 
-                            level="H" 
+                          <QRCodeSVG
+                            value={`${window.location.origin}/cek?merch_id=${order.id}`}
+                            size={95}
+                            level="H"
                           />
                           <p className="text-[9px] font-bold text-gray-600 text-center tracking-tight uppercase">Status Verifikasi</p>
                         </div>

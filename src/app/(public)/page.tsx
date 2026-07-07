@@ -73,16 +73,16 @@ const servicesData = [
     ]
   },
   {
-    title: "Pemesanan Merchandise",
+    title: "Pembelian Merchandise",
     subtitle: "Souvenir & Atribut Resmi",
     desc: "Miliki kaos edisi khusus, topi, pin logam, mug, dan goodie bag souvenir eksklusif sebagai kenang-kenangan perayaan HUT ke-16.",
     href: "/merch",
     badge: "Souvenir",
-    btnText: "Pesan Merchandise",
+    btnText: "Beli Merchandise",
     specs: [
       { label: "Pilihan Produk", value: "Kaos Eksklusif, Mug, Topi, Goodie Bag, Pin" },
       { label: "Bahan Pakaian", value: "Premium Cotton Combed 30s" },
-      { label: "Sistem Pemesanan", value: "Pre-order online dengan konfirmasi WA" },
+      { label: "Sistem Pembelian", value: "Pre-order online dengan konfirmasi WA" },
       { label: "Distribusi", value: "Pengambilan di lokasi acara / jasa kurir" }
     ]
   },
@@ -112,8 +112,8 @@ const faqData = [
     answer: "Tidak. Perayaan HUT ke-16 Pelkat PKLU GPIB tingkat nasional ini terbuka untuk seluruh pengurus, anggota, jemaat, dan simpatisan Pelkat PKLU GPIB dari seluruh jemaat Mupel di Indonesia."
   },
   {
-    question: "Bagaimana cara memesan merchandise resmi dan kapan pengambilannya?",
-    answer: "Pemesanan dapat dilakukan melalui menu Merchandise pada website ini. Anda dapat memilih item, mengisi form pesanan, dan melakukan transfer pembayaran. Souvenir dapat diambil di lokasi acara (Bekasi Convention Center) saat registrasi ulang pada tanggal 12 Oktober 2026."
+    question: "Bagaimana cara membeli merchandise resmi dan kapan pengambilannya?",
+    answer: "Pembelian dapat dilakukan melalui menu Merchandise pada website ini. Anda dapat memilih item, mengisi form pembelian, dan melakukan transfer pembayaran. Souvenir dapat diambil di lokasi acara (Bekasi Convention Center) saat registrasi ulang pada tanggal 12 Oktober 2026."
   },
   {
     question: "Bagaimana jika ingin berpartisipasi memberikan dukungan kasih (sponsorship/donasi)?",

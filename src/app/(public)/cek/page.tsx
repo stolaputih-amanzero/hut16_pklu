@@ -100,7 +100,7 @@ function CheckContent() {
   // Check if we are checking merchandise or registration
   const isMerchMode = !!initialMerchId || (merchResults && merchResults.length > 0 && (!results || results.length === 0));
 
-  const titleText = isMerchMode ? "Cek Status Pemesanan Merchandise" : "Cek Status Pendaftaran";
+  const titleText = isMerchMode ? "Cek Status Pembelian Merchandise" : "Cek Status Pendaftaran";
   const subtext = isMerchMode 
     ? "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status pesanan merchandise."
     : "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status.";

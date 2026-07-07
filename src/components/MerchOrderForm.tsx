@@ -676,11 +676,11 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   <MessageSquare className="w-3.5 h-3.5 shrink-0" /> Contact Person Seksi Dana Panitia
                 </span>
                 <p className="font-bold text-white text-base">Marsya Theresia</p>
-                <p className="text-xs text-emerald-300 leading-relaxed">Hubungi panitia untuk pertanyaan seputar pemesanan &amp; konfirmasi kontribusi merchandise.</p>
+                <p className="text-xs text-emerald-300 leading-relaxed">Hubungi panitia untuk pertanyaan seputar pembelian &amp; konfirmasi kontribusi merchandise.</p>
               </div>
 
               <a
-                href="https://wa.me/6281219964142?text=Halo%20Marsya%20Theresia%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pemesanan%20merchandise"
+                href="https://wa.me/6281219964142?text=Halo%20Marsya%20Theresia%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pembelian%20merchandise"
                 target="_blank"
                 rel="noreferrer"
                 className="w-full sm:w-auto shrink-0"
@@ -709,7 +709,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 PERHATIAN PENTING:
               </div>
               <p>
-                Formulir ini <strong>KHUSUS untuk Pemesanan Merchandise Tambahan (Cenderamata Opsional)</strong>. Ini BUKAN untuk Kaos Seragam Resmi Acara yang ukurannya sudah diisi saat pendaftaran.
+                Formulir ini <strong>KHUSUS untuk Pembelian Merchandise Tambahan (Cenderamata Opsional)</strong>. Ini BUKAN untuk Kaos Seragam Resmi Acara yang ukurannya sudah diisi saat pendaftaran.
               </p>
             </div>
           </div>

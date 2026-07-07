@@ -100,7 +100,7 @@ export function Sidebar({ fullName, role }: SidebarProps) {
   const navItems = [
     { name: "Dashboard Overview", path: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Data Pendaftaran", path: "/admin/registrations", icon: Users },
-    { name: "Pesanan Merchandise", path: "/admin/merch", icon: ShoppingBag },
+    { name: "Pembelian Merchandise", path: "/admin/merch", icon: ShoppingBag },
     { name: "Buku Tamu Moderasi", path: "/admin/guestbook", icon: MessageSquareQuote },
     { name: "Proposal & Laporan", path: "/admin/daftar-proposal", icon: FileSpreadsheet },
   ];
@@ -142,9 +142,8 @@ export function Sidebar({ fullName, role }: SidebarProps) {
 
       {/* 3. Main Sidebar Container (Desktop static + Mobile drawer) */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 w-64 bg-[#022c22]/95 backdrop-blur-xl border-r border-[#D4AF37]/20 pt-20 md:pt-6 pb-6 px-4 z-40 flex flex-col justify-between shadow-[4px_0_30px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out md:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 bottom-0 left-0 w-64 bg-[#022c22]/95 backdrop-blur-xl border-r border-[#D4AF37]/20 pt-20 md:pt-6 pb-6 px-4 z-40 flex flex-col justify-between shadow-[4px_0_30px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="space-y-6">
           {/* Header Brand (Desktop Only) */}
@@ -173,11 +172,10 @@ export function Sidebar({ fullName, role }: SidebarProps) {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 border ${
-                    isActive
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 border ${isActive
                       ? "bg-[#D4AF37] text-black font-bold border-[#D4AF37]/40 shadow-[0_0_15px_rgba(212,175,55,0.25)]"
                       : "text-[#FDFBF7]/70 hover:text-white hover:bg-white/5 border-transparent"
-                  }`}
+                    }`}
                 >
                   <Icon className="h-4.5 w-4.5 shrink-0" />
                   <span>{item.name}</span>
@@ -189,11 +187,10 @@ export function Sidebar({ fullName, role }: SidebarProps) {
             {role === "super_user" && (
               <Link
                 href="/admin/users"
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 border ${
-                  pathname === "/admin/users"
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 border ${pathname === "/admin/users"
                     ? "bg-[#D4AF37] text-black font-bold border-[#D4AF37]/40 shadow-[0_0_15px_rgba(212,175,55,0.25)]"
                     : "text-[#FDFBF7]/70 hover:text-white hover:bg-white/5 border-transparent"
-                }`}
+                  }`}
               >
                 <UserCog className="h-4.5 w-4.5 shrink-0" />
                 <span>Manage Users</span>
@@ -223,11 +220,10 @@ export function Sidebar({ fullName, role }: SidebarProps) {
                 </button>
               </div>
               <span
-                className={`inline-block text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md mt-1 ${
-                  role === "super_user"
+                className={`inline-block text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md mt-1 ${role === "super_user"
                     ? "bg-red-500/10 text-red-400 border border-red-500/20"
                     : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                }`}
+                  }`}
               >
                 {role === "super_user" ? "Super User" : "Admin"}
               </span>

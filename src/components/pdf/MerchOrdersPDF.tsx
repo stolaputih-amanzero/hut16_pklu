@@ -109,15 +109,15 @@ const styles = StyleSheet.create({
     tableColItems: { width: '26%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
     tableColAmount: { width: '10%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
     tableColStatus: { width: '10%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    
+
     tableCellHeader: { margin: 4, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#ffffff', textAlign: 'center' },
     tableCell: { margin: 4, fontSize: 6.5, color: '#1f2937' },
     tableCellRight: { margin: 4, fontSize: 6.5, color: '#1f2937', textAlign: 'right' },
     tableCellCenter: { margin: 4, fontSize: 6.5, color: '#1f2937', textAlign: 'center' },
     tableCellBold: { margin: 4, fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: '#022c22' },
-    
+
     emptyState: { padding: 15, textAlign: 'center', fontSize: 8, color: '#6b7280', borderBottom: '1pt solid #022c22', borderRight: '1pt solid #022c22' },
-    
+
     tableFooterRow: {
         flexDirection: 'row',
         backgroundColor: '#f1f5f9',
@@ -209,9 +209,9 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                 {/* Header */}
                 <View style={styles.header}>
                     <Image src={logoUrl} style={styles.logo} />
-                    <Text style={styles.title}>Laporan Rekapitulasi Pesanan Souvenir</Text>
+                    <Text style={styles.title}>Laporan Rekapitulasi Pembelian Souvenir</Text>
                     <Text style={styles.subtitle}>HUT ke-16 Pelayanan Kategorial Lanjut Usia (PKLU) GPIB</Text>
-                    <Text style={styles.organization}>Rincian Penjualan &amp; Pembayaran Souvenir HUT 16 PKLU</Text>
+                    <Text style={styles.organization}>Rincian Pembelian &amp; Pembayaran Souvenir HUT 16 PKLU</Text>
                 </View>
 
                 {/* Summary Section */}
@@ -219,8 +219,8 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                 <View style={styles.summaryContainer}>
                     <View style={styles.summaryBox}>
                         <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Total Form Pesanan Souvenir</Text>
-                            <Text style={styles.summaryValue}>{stats.totalOrders} Pesanan</Text>
+                            <Text style={styles.summaryLabel}>Total Form Pembelian Souvenir</Text>
+                            <Text style={styles.summaryValue}>{stats.totalOrders} Pembelian</Text>
                         </View>
                         <View style={styles.summaryRow}>
                             <Text style={styles.summaryLabel}>Total Realisasi Lunas (Verified)</Text>
@@ -242,7 +242,7 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                             <Text style={[styles.summaryValue, { color: '#dc2626' }]}>{formatRupiah(stats.rejectedRevenue)}</Text>
                         </View>
                         <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Total Keseluruhan Omzet Pesanan</Text>
+                            <Text style={styles.summaryLabel}>Total Keseluruhan Omzet Pembelian</Text>
                             <Text style={styles.summaryValue}>{formatRupiah(stats.totalRevenue)}</Text>
                         </View>
                     </View>
@@ -250,11 +250,11 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
 
                 {/* Table Section */}
                 <View break>
-                    <Text style={styles.sectionTitle}>Daftar Rincian Pesanan Souvenir</Text>
+                    <Text style={styles.sectionTitle}>Daftar Rincian Pembelian Souvenir</Text>
                     <View style={styles.table}>
                         <View style={styles.tableHeaderRow}>
                             <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
-                            <View style={styles.tableColCode}><Text style={styles.tableCellHeader}>Kode Pesanan</Text></View>
+                            <View style={styles.tableColCode}><Text style={styles.tableCellHeader}>Kode Pembelian</Text></View>
                             <View style={styles.tableColBuyer}><Text style={styles.tableCellHeader}>Nama Pembeli</Text></View>
                             <View style={styles.tableColChurch}><Text style={styles.tableCellHeader}>Asal Jemaat / Kota</Text></View>
                             <View style={styles.tableColItems}><Text style={styles.tableCellHeader}>Daftar Item Souvenir (Ukuran &amp; Qty)</Text></View>
@@ -263,7 +263,7 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                         </View>
 
                         {orders.length === 0 ? (
-                            <Text style={styles.emptyState}>Tidak ada data pesanan souvenir.</Text>
+                            <Text style={styles.emptyState}>Tidak ada data pembelian souvenir.</Text>
                         ) : (
                             orders.map((o: any, idx: number) => {
                                 const buyer = o.buyer_name || '-'
@@ -271,11 +271,11 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                                 const items = o.item_type || '-'
                                 const statusLabel = o.payment_status === 'verified' ? 'LUNAS' : o.payment_status === 'rejected' ? 'DITOLAK' : 'PENDING'
                                 const statusColor = o.payment_status === 'verified' ? '#047857' : o.payment_status === 'rejected' ? '#dc2626' : '#d97706'
-                                
+
                                 return (
                                     <View style={styles.tableRow} key={o.id || idx}>
                                         <View style={styles.tableColNo}><Text style={styles.tableCellCenter}>{idx + 1}</Text></View>
-                                        <View style={styles.tableColCode}><Text style={styles.tableCellBold}>{o.order_code || `#MB-${o.id.substring(0,6).toUpperCase()}`}</Text></View>
+                                        <View style={styles.tableColCode}><Text style={styles.tableCellBold}>{o.order_code || `#MB-${o.id.substring(0, 6).toUpperCase()}`}</Text></View>
                                         <View style={styles.tableColBuyer}><Text style={styles.tableCellBold}>{buyer}</Text></View>
                                         <View style={styles.tableColChurch}><Text style={styles.tableCell}>{church}</Text></View>
                                         <View style={styles.tableColItems}><Text style={styles.tableCell}>{items}</Text></View>

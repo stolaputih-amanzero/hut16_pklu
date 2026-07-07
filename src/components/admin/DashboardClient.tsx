@@ -360,7 +360,7 @@ export default function DashboardClient({
             Dashboard Overview
           </h1>
           <p className="text-xs text-gray-300 mt-1.5 font-montserrat">
-            Ringkasan performa keuangan, pendaftaran, proposal, dan pesanan merchandise.
+            Ringkasan performa keuangan, pendaftaran, proposal, dan pembelian merchandise.
           </p>
         </div>
 
@@ -374,11 +374,10 @@ export default function DashboardClient({
             <button
               key={item.id}
               onClick={() => setDateFilter(item.id as any)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                dateFilter === item.id
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${dateFilter === item.id
                   ? "bg-[#D4AF37] text-black shadow-lg"
                   : "text-gray-300 hover:text-white"
-              }`}
+                }`}
             >
               {item.label}
             </button>
@@ -458,21 +457,19 @@ export default function DashboardClient({
           <div className="flex items-center gap-1.5 bg-black/50 border border-white/15 p-1 rounded-xl">
             <button
               onClick={() => setTrendType("revenue")}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                trendType === "revenue"
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${trendType === "revenue"
                   ? "bg-[#D4AF37] text-black"
                   : "text-gray-300 hover:text-white"
-              }`}
+                }`}
             >
               Pendapatan (Rp)
             </button>
             <button
               onClick={() => setTrendType("volume")}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                trendType === "volume"
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${trendType === "volume"
                   ? "bg-[#D4AF37] text-black"
                   : "text-gray-300 hover:text-white"
-              }`}
+                }`}
             >
               Volume Transaksi
             </button>
@@ -693,7 +690,7 @@ export default function DashboardClient({
 
           <div className="h-[180px] w-full flex items-center justify-center">
             {merchPopularityData.length === 0 ? (
-              <span className="text-xs text-gray-500 font-mono">Belum ada pesanan</span>
+              <span className="text-xs text-gray-500 font-mono">Belum ada pembelian</span>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={merchPopularityData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>

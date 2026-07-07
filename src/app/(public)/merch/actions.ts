@@ -118,7 +118,7 @@ export async function submitMerchOrder(formData: FormData) {
     try {
       const ext = paymentProofFile.name.split(".").pop() || "jpg";
       const fileName = `merch_receipts/receipt_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-      
+
       const arrayBuffer = await paymentProofFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
@@ -164,7 +164,7 @@ export async function submitMerchOrder(formData: FormData) {
 
     if (error) {
       console.error("Insert Merch Order Error:", error);
-      return { success: false, error: `Gagal menyimpan pesanan: ${error.message}` };
+      return { success: false, error: `Gagal menyimpan pembelian: ${error.message}` };
     }
 
     revalidatePath("/merch");
@@ -177,7 +177,7 @@ export async function submitMerchOrder(formData: FormData) {
         totalPrice,
         itemsList: items,
       },
-      notice: "Pesanan Merchandise Tambahan Anda telah berhasil dicatat! Harap diingat bahwa pesanan ini TERPISAH dari paket pendaftaran acara Anda.",
+      notice: "Pembelian Merchandise Tambahan Anda telah berhasil dicatat! Harap diingat bahwa pembelian ini TERPISAH dari paket pendaftaran acara Anda.",
     };
   } catch (err: any) {
     return { success: false, error: err.message || "Terjadi kesalahan server" };

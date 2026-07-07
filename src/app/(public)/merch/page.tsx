@@ -4,7 +4,7 @@ import { ShoppingBag } from "lucide-react";
 
 export const metadata = {
   title: "Merchandise - HUT ke-16 PKLU GPIB",
-  description: "Pesan souvenir dan merchandise cenderamata edisi khusus HUT ke-16 Pelayanan Kategorial Lanjut Usia (PKLU) GPIB 2026.",
+  description: "Pembelian souvenir dan merchandise cenderamata edisi khusus HUT ke-16 Persekutuan Kaum Lanjut Usia (PKLU) GPIB 2026.",
 };
 
 export const revalidate = 60;

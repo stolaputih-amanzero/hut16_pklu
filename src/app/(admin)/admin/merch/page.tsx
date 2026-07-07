@@ -5,21 +5,21 @@ import { fetchMerchProducts, saveMerchProduct, deleteMerchProduct, fetchMerchOrd
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  ShoppingBag, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  RefreshCw, 
-  Image as ImageIcon, 
-  Shirt, 
-  X, 
-  Tag, 
-  ListFilter, 
-  Search, 
-  Phone, 
-  Calendar, 
-  Package, 
+import {
+  ShoppingBag,
+  Plus,
+  Edit3,
+  Trash2,
+  RefreshCw,
+  Image as ImageIcon,
+  Shirt,
+  X,
+  Tag,
+  ListFilter,
+  Search,
+  Phone,
+  Calendar,
+  Package,
   Users,
   Eye,
   FileText
@@ -229,7 +229,7 @@ export default function AdminMerchPage() {
   };
 
   const handleDeleteOrder = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus pesanan ini?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus pembelian ini?")) return;
     const res = await deleteMerchOrder(id);
     if (res.success) {
       loadOrders();
@@ -259,7 +259,7 @@ export default function AdminMerchPage() {
             Manajemen Merchandise &amp; Souvenir
           </h1>
           <p className="text-xs text-gray-300">
-            Kelola katalog foto produk dan rekap seluruh pesanan merchandise cenderamata tambahan dari pemesan.
+            Kelola katalog foto produk dan rekap seluruh pembelian merchandise cenderamata tambahan dari pemesan.
           </p>
         </div>
 
@@ -267,23 +267,21 @@ export default function AdminMerchPage() {
         <div className="flex items-center gap-2 bg-black/60 p-1.5 rounded-xl border border-white/10">
           <button
             onClick={() => setActiveTab("catalog")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === "catalog"
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === "catalog"
                 ? "bg-[#D4AF37] text-black shadow"
                 : "text-gray-300 hover:text-white"
-            }`}
+              }`}
           >
             <Package className="w-3.5 h-3.5" /> Katalog Produk ({products.length})
           </button>
           <button
             onClick={() => setActiveTab("orders")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === "orders"
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === "orders"
                 ? "bg-[#D4AF37] text-black shadow"
                 : "text-gray-300 hover:text-white"
-            }`}
+              }`}
           >
-            <ListFilter className="w-3.5 h-3.5" /> Rekap Pesanan ({orders.length})
+            <ListFilter className="w-3.5 h-3.5" /> Rekap Pembelian ({orders.length})
           </button>
         </div>
       </div>
@@ -334,7 +332,7 @@ export default function AdminMerchPage() {
                   className="rounded-2xl border border-white/10 bg-black/50 overflow-hidden backdrop-blur-md shadow-lg flex flex-col justify-between group hover:border-[#D4AF37]/50 transition-all text-xs"
                 >
                   <div className="space-y-3">
-                    <div 
+                    <div
                       onClick={() => setPreviewProduct(item)}
                       className="relative h-48 w-full bg-black/60 overflow-hidden cursor-pointer"
                     >
@@ -345,11 +343,10 @@ export default function AdminMerchPage() {
                       />
                       <div className="absolute top-2 right-2">
                         <span
-                          className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur border ${
-                            item.is_active
+                          className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur border ${item.is_active
                               ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
                               : "bg-red-500/20 text-red-300 border-red-500/40"
-                          }`}
+                            }`}
                         >
                           {item.is_active ? "Aktif" : "Non-Aktif"}
                         </span>
@@ -358,7 +355,7 @@ export default function AdminMerchPage() {
 
                     <div className="p-4 space-y-2">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 
+                        <h3
                           onClick={() => setPreviewProduct(item)}
                           className="font-bold text-white text-sm leading-snug cursor-pointer hover:text-[#D4AF37] transition-colors"
                         >
@@ -428,14 +425,14 @@ export default function AdminMerchPage() {
         </div>
       )}
 
-      {/* TAB 2: REKAP PESANAN MERCH */}
+      {/* TAB 2: REKAP PEMBELIAN MERCH */}
       {activeTab === "orders" && (
         <div className="space-y-4">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 bg-black/60 rounded-xl border border-[#D4AF37]/30 flex items-center justify-between text-xs">
               <div>
-                <p className="text-gray-400">Total Transaksi Pesanan</p>
+                <p className="text-gray-400">Total Pembelian</p>
                 <p className="text-2xl font-black text-white font-mono">{orders.length}</p>
               </div>
               <div className="p-3 bg-[#D4AF37]/10 rounded-xl text-[#D4AF37]">
@@ -445,7 +442,7 @@ export default function AdminMerchPage() {
 
             <div className="p-4 bg-black/60 rounded-xl border border-[#D4AF37]/30 flex items-center justify-between text-xs">
               <div>
-                <p className="text-gray-400">Total Item Pcs Dipesan</p>
+                <p className="text-gray-400">Total Item Pcs Dibeli</p>
                 <p className="text-2xl font-black text-[#D4AF37] font-mono">{totalQuantitySum} Pcs</p>
               </div>
               <div className="p-3 bg-[#D4AF37]/10 rounded-xl text-[#D4AF37]">
@@ -496,11 +493,11 @@ export default function AdminMerchPage() {
           {loadingOrders ? (
             <div className="p-12 text-center text-gray-400 bg-black/40 rounded-xl border border-white/10 text-xs">
               <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#D4AF37]" />
-              Memuat data pesanan merchandise...
+              Memuat data pembelian merchandise...
             </div>
           ) : filteredOrders.length === 0 ? (
             <div className="p-12 text-center text-gray-400 bg-black/40 rounded-xl border border-white/10 text-xs">
-              Belum ada data pesanan merchandise yang sesuai.
+              Belum ada data pembelian merchandise yang sesuai.
             </div>
           ) : (
             <div className="space-y-4">
@@ -562,11 +559,11 @@ export default function AdminMerchPage() {
                                 const sizeUpper = sizeVal.toUpperCase();
                                 const isSmallMed = ["S", "M", "XS"].some(s => sizeUpper.includes(s)) && !sizeUpper.includes("XL") && !sizeUpper.includes("XXL");
                                 const isLarge = sizeUpper === "L" || (sizeUpper.includes("L") && !sizeUpper.includes("X"));
-                                const displayColor = isSmallMed 
+                                const displayColor = isSmallMed
                                   ? "bg-blue-500/20 text-blue-300 border-blue-500/40"
                                   : isLarge
-                                  ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40"
-                                  : "bg-red-500/20 text-red-300 border-red-500/40";
+                                    ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40"
+                                    : "bg-red-500/20 text-red-300 border-red-500/40";
                                 return (
                                   <span className={`inline-block px-2.5 py-0.5 rounded font-mono font-black text-xs border ${displayColor}`}>
                                     {sizeVal}
@@ -578,11 +575,10 @@ export default function AdminMerchPage() {
                             )}
                           </td>
                           <td className="p-3 text-center">
-                            <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full font-bold font-mono text-xs border ${
-                              o.quantity > 1
+                            <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full font-bold font-mono text-xs border ${o.quantity > 1
                                 ? "bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
                                 : "bg-white/5 text-gray-300 border-white/10"
-                            }`}>
+                              }`}>
                               {o.quantity} Pcs
                             </span>
                           </td>
@@ -891,12 +887,12 @@ export default function AdminMerchPage() {
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
           <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-4 sm:p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[92vh] md:max-h-[85vh] overflow-y-auto">
-            
+
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
-                Detail Pesanan Merchandise
+                Detail Pembelian Merchandise
               </h2>
               <button
                 onClick={() => setSelectedOrder(null)}
@@ -908,7 +904,7 @@ export default function AdminMerchPage() {
 
             {/* Content */}
             <div className="space-y-4 text-xs">
-              
+
               {/* Buyer Info */}
               <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -948,7 +944,7 @@ export default function AdminMerchPage() {
 
               {/* Order Item Info */}
               <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
-                <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Rincian Item Dipesan</div>
+                <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Rincian Item Dibeli</div>
                 <div className="space-y-3 divide-y divide-white/5">
                   {(() => {
                     const parsedItems = parseOrderItems(selectedOrder.item_type);
@@ -961,7 +957,7 @@ export default function AdminMerchPage() {
                           return (
                             <div key={idx} className={`pt-2.5 first:pt-0 flex items-start gap-3 text-xs`}>
                               {/* Product Image Thumbnail */}
-                              <div 
+                              <div
                                 className="relative h-12 w-12 rounded-lg overflow-hidden border border-white/20 bg-black shrink-0 cursor-zoom-in"
                                 onClick={() => {
                                   if (item.product?.image_url) {
@@ -1031,7 +1027,7 @@ export default function AdminMerchPage() {
               {/* Order Meta */}
               <div className="flex items-center gap-1.5 px-1 text-[10px] text-gray-400">
                 <Calendar className="w-3.5 h-3.5 shrink-0" />
-                <span>Dipesan pada:</span>
+                <span>Dibeli pada:</span>
                 <span className="font-mono font-bold">
                   {new Date(selectedOrder.created_at).toLocaleString("id-ID", {
                     dateStyle: "medium",
@@ -1052,7 +1048,7 @@ export default function AdminMerchPage() {
                   <div className="space-y-1.5">
                     <span className="text-[11px] text-gray-400 block font-semibold">Bukti Transfer Pendaftar:</span>
                     <div className="flex gap-3 items-center">
-                      <div 
+                      <div
                         className="relative h-20 w-20 rounded-lg overflow-hidden border border-white/20 bg-black cursor-zoom-in group shrink-0"
                         onClick={() => setLightboxImage(selectedOrder.payment_proof_url || null)}
                       >
@@ -1065,9 +1061,9 @@ export default function AdminMerchPage() {
                         <p className="text-[11px] text-gray-300">
                           Tanggal Transfer: <strong className="text-white">{selectedOrder.payment_date ? new Date(selectedOrder.payment_date).toLocaleDateString("id-ID", { dateStyle: "medium" }) : "-"}</strong>
                         </p>
-                        <a 
-                          href={selectedOrder.payment_proof_url} 
-                          target="_blank" 
+                        <a
+                          href={selectedOrder.payment_proof_url}
+                          target="_blank"
                           rel="noreferrer"
                           className="inline-flex text-[10px] text-blue-400 hover:text-blue-300 underline font-semibold"
                         >
@@ -1114,7 +1110,7 @@ export default function AdminMerchPage() {
                     const res = await updateMerchOrderStatus(selectedOrder.id, adminPaymentStatus, adminNotesText);
                     setSavingStatus(false);
                     if (res.success) {
-                      alert("Status pesanan berhasil diperbarui!");
+                      alert("Status pembelian berhasil diperbarui!");
                       loadOrders();
                       setSelectedOrder((prev) => prev ? { ...prev, payment_status: adminPaymentStatus, admin_notes: adminNotesText } : null);
                     } else {
@@ -1146,7 +1142,7 @@ export default function AdminMerchPage() {
                 type="button"
                 variant="ghost"
                 onClick={() => {
-                  if (confirm("Apakah Anda yakin ingin menghapus pesanan ini?")) {
+                  if (confirm("Apakah Anda yakin ingin menghapus pembelian ini?")) {
                     handleDeleteOrder(selectedOrder.id);
                     setSelectedOrder(null);
                   }
@@ -1187,7 +1183,7 @@ export default function AdminMerchPage() {
             </div>
 
             {/* Photo */}
-            <div 
+            <div
               onClick={() => setLightboxImage(previewProduct.image_url)}
               className="relative h-60 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black cursor-zoom-in group/img"
             >
@@ -1209,11 +1205,10 @@ export default function AdminMerchPage() {
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-white leading-tight">{previewProduct.name}</h3>
                   <div className="flex flex-wrap gap-1.5 pt-0.5">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                      previewProduct.is_active 
-                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" 
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${previewProduct.is_active
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
                         : "bg-red-500/20 text-red-300 border-red-500/30"
-                    }`}>
+                      }`}>
                       {previewProduct.is_active ? "Aktif di Publik" : "Disembunyikan"}
                     </span>
                     <span className="text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded">
@@ -1225,13 +1220,12 @@ export default function AdminMerchPage() {
                   <span className="text-lg font-mono font-black text-[#D4AF37] block">
                     Rp {previewProduct.price.toLocaleString("id-ID")}
                   </span>
-                  <span className={`inline-block text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border mt-1 ${
-                    previewProduct.stock <= 0 
-                      ? "bg-red-500/20 text-red-300 border-red-500/30" 
+                  <span className={`inline-block text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border mt-1 ${previewProduct.stock <= 0
+                      ? "bg-red-500/20 text-red-300 border-red-500/30"
                       : previewProduct.stock <= 10
-                      ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                      : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                  }`}>
+                        ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                        : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                    }`}>
                     Stok: {previewProduct.stock} pcs
                   </span>
                 </div>
@@ -1273,7 +1267,7 @@ export default function AdminMerchPage() {
 
       {/* Fullscreen Image Lightbox */}
       {lightboxImage && (
-        <div 
+        <div
           onClick={() => setLightboxImage(null)}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md cursor-zoom-out animate-in fade-in duration-200"
         >
@@ -1285,7 +1279,7 @@ export default function AdminMerchPage() {
           >
             <X className="w-6 h-6" />
           </button>
-          
+
           <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center select-none">
             <img
               src={lightboxImage}

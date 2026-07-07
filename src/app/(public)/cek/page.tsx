@@ -29,7 +29,7 @@ function CheckContent() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 150));
       const { toPng } = await import("html-to-image");
-      
+
       const dataUrl = await toPng(element, {
         cacheBust: true,
         backgroundColor: "#0B0904",
@@ -44,7 +44,7 @@ function CheckContent() {
           return true;
         }
       });
-      
+
       const link = document.createElement("a");
       link.download = `PKLU-Registration-${code}.png`;
       link.href = dataUrl;
@@ -76,7 +76,7 @@ function CheckContent() {
         setResults(res.registrations);
         hasReg = true;
       }
-      
+
       const resMerch = await getMerchOrderByCodeOrWa(q);
       if (resMerch.success && resMerch.data && resMerch.data.length > 0) {
         setMerchResults(resMerch.data);
@@ -93,7 +93,7 @@ function CheckContent() {
     setLoading(false);
 
     if (!hasReg && !hasMerch) {
-      setErrorMsg("Data pendaftaran atau pesanan merchandise tidak ditemukan.");
+      setErrorMsg("Data pendaftaran atau pembelian merchandise tidak ditemukan.");
     }
   };
 
@@ -101,8 +101,8 @@ function CheckContent() {
   const isMerchMode = !!initialMerchId || (merchResults && merchResults.length > 0 && (!results || results.length === 0));
 
   const titleText = isMerchMode ? "Cek Status Pembelian Merchandise" : "Cek Status Pendaftaran";
-  const subtext = isMerchMode 
-    ? "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status pesanan merchandise."
+  const subtext = isMerchMode
+    ? "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status pembelian merchandise."
     : "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status.";
   const placeholderText = isMerchMode
     ? "Contoh: 08123456789 atau Kode Registrasi"
@@ -135,10 +135,10 @@ function CheckContent() {
 
         {/* Search Bar */}
         <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col sm:flex-row gap-3">
-          <Input 
+          <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={placeholderText} 
+            placeholder={placeholderText}
             className="bg-black/50 text-white border-[#D4AF37]/30 py-3.5 px-4 h-12 text-sm focus-visible:ring-1 focus-visible:ring-[#D4AF37]/50 rounded-xl"
           />
           <Button type="submit" disabled={loading} className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-12 py-3 px-6 shrink-0 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5">
@@ -158,10 +158,10 @@ function CheckContent() {
           <div className="space-y-6">
             {results.map((reg) => {
               const fullUrl = typeof window !== "undefined" ? `${window.location.origin}/cek?code=${reg.registration_code}` : reg.registration_code;
-              
+
               return (
-                <div 
-                  key={reg.id} 
+                <div
+                  key={reg.id}
                   id={`ticket-${reg.registration_code}`}
                   className="rounded-xl border border-[#D4AF37]/40 bg-[#0B0904] p-4 sm:p-6 space-y-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden"
                 >
@@ -263,13 +263,13 @@ function CheckContent() {
             })}
           </div>
         )}
-        
+
         {/* Merchandise Results */}
         {merchResults && merchResults.length > 0 && (
           <div className="space-y-6 pt-6 border-t border-[#D4AF37]/20">
             <h3 className="text-lg font-bold text-[#D4AF37] flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
-              Pesanan Souvenir / Merchandise
+              Pembelian Souvenir / Merchandise
             </h3>
             <div className="space-y-4">
               {merchResults.map((order) => {
@@ -278,13 +278,13 @@ function CheckContent() {
                 const isRejected = order.payment_status === "rejected";
 
                 return (
-                  <div 
-                    key={order.id} 
+                  <div
+                    key={order.id}
                     className="rounded-xl border border-[#D4AF37]/35 bg-[#0B0904]/80 p-4 sm:p-5 space-y-4 shadow-lg text-xs"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2.5">
                       <div>
-                        <span className="text-[10px] text-gray-400 block uppercase tracking-wider">No Pesanan</span>
+                        <span className="text-[10px] text-gray-400 block uppercase tracking-wider">No Pembelian</span>
                         <span className="font-mono text-sm font-black text-[#D4AF37] uppercase">#MB-{order.id.slice(0, 6).toUpperCase()}</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -357,9 +357,9 @@ function CheckContent() {
                       <div className="pt-2 border-t border-white/5">
                         <span className="text-gray-400 block mb-1.5 font-semibold">Bukti Pembayaran:</span>
                         <div className="flex items-center gap-3 bg-black/30 p-2.5 rounded-lg border border-white/5">
-                          <a 
-                            href={order.payment_proof_url} 
-                            target="_blank" 
+                          <a
+                            href={order.payment_proof_url}
+                            target="_blank"
                             rel="noreferrer"
                             className="inline-block relative h-14 w-14 rounded-lg overflow-hidden border border-white/10 bg-black hover:opacity-85 transition-opacity shrink-0"
                           >
@@ -367,9 +367,9 @@ function CheckContent() {
                           </a>
                           <div className="text-[10px] text-gray-400">
                             <p className="font-semibold text-white mb-0.5">Bukti transfer terunggah</p>
-                            <a 
-                              href={order.payment_proof_url} 
-                              target="_blank" 
+                            <a
+                              href={order.payment_proof_url}
+                              target="_blank"
                               rel="noreferrer"
                               className="text-[#D4AF37] hover:underline font-semibold"
                             >

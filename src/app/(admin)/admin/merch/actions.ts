@@ -182,7 +182,7 @@ export async function deleteMerchOrder(id: string) {
     revalidatePath("/admin/merch");
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err.message || "Gagal menghapus pesanan." };
+    return { success: false, error: err.message || "Gagal menghapus pembelian." };
   }
 }
 
@@ -191,7 +191,7 @@ export async function updateMerchOrderStatus(id: string, status: string, notes: 
     const cleanStatus = (status || "").trim();
     const cleanNotes = (notes || "").trim() || null;
 
-    if (!id) return { success: false, error: "ID pesanan tidak valid." };
+    if (!id) return { success: false, error: "ID pembelian tidak valid." };
     if (!["pending", "verified", "rejected"].includes(cleanStatus)) {
       return { success: false, error: "Status pembayaran tidak valid." };
     }
@@ -208,7 +208,7 @@ export async function updateMerchOrderStatus(id: string, status: string, notes: 
 
     if (error) {
       console.error("Update Merch Order Status Error:", error);
-      return { success: false, error: `Gagal mengupdate pesanan: ${error.message}` };
+      return { success: false, error: `Gagal mengupdate pembelian: ${error.message}` };
     }
 
     revalidatePath("/admin/merch");

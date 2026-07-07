@@ -259,7 +259,7 @@ export default function AdminMerchPage() {
             Manajemen Merchandise &amp; Souvenir
           </h1>
           <p className="text-xs text-gray-300">
-            Kelola katalog foto produk dan rekap seluruh pembelian merchandise cenderamata tambahan dari pemesan.
+            Kelola katalog foto produk dan rekap seluruh pembelian merchandise cenderamata tambahan dari pembeli.
           </p>
         </div>
 
@@ -458,7 +458,7 @@ export default function AdminMerchPage() {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari pemesan, jemaat, WA, item..."
+                placeholder="Cari pembeli, jemaat, WA, item..."
                 className="pl-9 bg-black/50 border-white/20 text-white text-xs h-10"
               />
             </div>
@@ -507,7 +507,7 @@ export default function AdminMerchPage() {
                   <thead className="bg-white/5 text-[11px] uppercase tracking-wider text-gray-400 border-b border-white/10">
                     <tr>
                       <th className="p-3">Waktu</th>
-                      <th className="p-3">Nama Pemesan</th>
+                      <th className="p-3">Nama Pembeli</th>
                       <th className="p-3">Asal Jemaat</th>
                       <th className="p-3">WhatsApp</th>
                       <th className="p-3">Item Merch</th>
@@ -909,7 +909,7 @@ export default function AdminMerchPage() {
               <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Nama Pemesan</div>
+                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Nama Pembeli</div>
                     <div className="text-sm font-extrabold text-white">{selectedOrder.buyer_name}</div>
                   </div>
                   <div>

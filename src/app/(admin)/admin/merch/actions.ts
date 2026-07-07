@@ -25,7 +25,15 @@ export async function fetchMerchProducts(onlyActive = false) {
       console.error("Fetch merch products error:", error);
       return { success: false, data: [] };
     }
-    return { success: true, data: data || [] };
+    const cleaned = (data || []).map((p: any) => ({
+      ...p,
+      name: p.name
+        ?.replaceAll("&amp;", "&")
+        .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+        .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+      description: p.description?.replaceAll("&amp;", "&"),
+    }));
+    return { success: true, data: cleaned };
   } catch (err) {
     return { success: false, data: [] };
   }
@@ -142,7 +150,21 @@ export async function fetchMerchOrders() {
       console.error("Fetch merch orders error:", error);
       return { success: false, data: [] };
     }
-    return { success: true, data: data || [] };
+    const cleaned = (data || []).map((o: any) => ({
+      ...o,
+      buyer_name: o.buyer_name?.replaceAll("&amp;", "&"),
+      church_city: o.church_city?.replaceAll("&amp;", "&"),
+      item_type: o.item_type
+        ?.replaceAll("&amp;", "&")
+        .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+        .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+      size: o.size
+        ?.replaceAll("&amp;", "&")
+        .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+        .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+      notes: o.notes?.replaceAll("&amp;", "&"),
+    }));
+    return { success: true, data: cleaned };
   } catch (err) {
     return { success: false, data: [] };
   }

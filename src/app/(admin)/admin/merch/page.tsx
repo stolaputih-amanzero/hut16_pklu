@@ -79,7 +79,15 @@ export default function AdminMerchPage() {
     setLoadingProducts(true);
     const res = await fetchMerchProducts(false);
     if (res.success) {
-      setProducts(res.data);
+      const cleaned = res.data.map((p: any) => ({
+        ...p,
+        name: p.name
+          ?.replaceAll("&amp;", "&")
+          .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+          .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+        description: p.description?.replaceAll("&amp;", "&"),
+      }));
+      setProducts(cleaned);
     }
     setLoadingProducts(false);
   };
@@ -88,7 +96,21 @@ export default function AdminMerchPage() {
     setLoadingOrders(true);
     const res = await fetchMerchOrders();
     if (res.success) {
-      setOrders(res.data);
+      const cleaned = res.data.map((o: any) => ({
+        ...o,
+        buyer_name: o.buyer_name?.replaceAll("&amp;", "&"),
+        church_city: o.church_city?.replaceAll("&amp;", "&"),
+        item_type: o.item_type
+          ?.replaceAll("&amp;", "&")
+          .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+          .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+        size: o.size
+          ?.replaceAll("&amp;", "&")
+          .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+          .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+        notes: o.notes?.replaceAll("&amp;", "&"),
+      }));
+      setOrders(cleaned);
     }
     setLoadingOrders(false);
   };
@@ -452,7 +474,7 @@ export default function AdminMerchPage() {
                             )}
                           </td>
                           <td className="p-3 font-semibold text-[#D4AF37] whitespace-nowrap">
-                            {o.item_type?.replace("Pouch & Goodie Bag Edisi Spesial", "Pouch & Googie Bag Edisi Spesial")}
+                            {o.item_type}
                           </td>
                           <td className="p-3">
                             {o.size ? (
@@ -533,7 +555,7 @@ export default function AdminMerchPage() {
 
                       <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
                         <span className="font-semibold text-[#D4AF37] text-xs">
-                          {o.item_type?.replace("Pouch & Goodie Bag Edisi Spesial", "Pouch & Googie Bag Edisi Spesial")}
+                          {o.item_type}
                         </span>
                         {o.size && (
                           <span className="px-1.5 py-0.5 rounded font-mono font-black text-[10px] bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
@@ -820,7 +842,7 @@ export default function AdminMerchPage() {
                   <div className="space-y-1">
                     <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Item Merchandise</div>
                     <div className="text-xs font-bold text-[#D4AF37]">
-                      {selectedOrder.item_type?.replace("Pouch & Goodie Bag Edisi Spesial", "Pouch & Googie Bag Edisi Spesial")}
+                      {selectedOrder.item_type}
                     </div>
                   </div>
                   <div className="text-right space-y-1">

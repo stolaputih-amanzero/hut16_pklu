@@ -60,10 +60,26 @@ export default async function DashboardPage() {
     if (productRes.error) throw productRes.error;
 
     registrations = regRes.data || [];
-    merchOrders = merchRes.data || [];
+    merchOrders = (merchRes.data || []).map((o: any) => ({
+      ...o,
+      buyer_name: o.buyer_name?.replaceAll("&amp;", "&"),
+      church_city: o.church_city?.replaceAll("&amp;", "&"),
+      item_type: o.item_type
+        ?.replaceAll("&amp;", "&")
+        .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+        .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+      notes: o.notes?.replaceAll("&amp;", "&"),
+    }));
     guestbookCount = guestbookRes.count || 0;
     proposals = proposalRes.data || [];
-    merchProducts = productRes.data || [];
+    merchProducts = (productRes.data || []).map((p: any) => ({
+      ...p,
+      name: p.name
+        ?.replaceAll("&amp;", "&")
+        .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+        .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+      description: p.description?.replaceAll("&amp;", "&"),
+    }));
   } catch (error) {
     console.error("Dashboard stats parallel fetch error:", error);
     hasError = true;

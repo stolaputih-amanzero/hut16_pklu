@@ -332,7 +332,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
   // SUCCESS STATE VIEW
   if (successData) {
-    const waMessage = `Halo%20Ibu%20Vicora%20Tulende%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20${encodeURIComponent(successData.buyer_name)}%20(${encodeURIComponent(successData.church_city)})%20sudah%20memesan%20Merchandise%20(${encodeURIComponent(successData.item_type)}).%20Total:%20Rp%20${(successData.totalPrice || 0).toLocaleString("id-ID")}.%20Mohon%20informasi%20pembayaran.`;
+    const waMessage = `Halo%20Marsya%20Theresia%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20${encodeURIComponent(successData.buyer_name)}%20(${encodeURIComponent(successData.church_city)})%20sudah%20memesan%20Merchandise%20(${encodeURIComponent(successData.item_type)}).%20Total:%20Rp%20${(successData.totalPrice || 0).toLocaleString("id-ID")}.%20Mohon%20informasi%20pembayaran.`;
 
     return (
       <div className="space-y-6 rounded-2xl border-2 border-emerald-500/40 bg-black/60 p-6 md:p-8 backdrop-blur-xl text-[#FDFBF7] shadow-[0_0_30px_rgba(16,185,129,0.15)] animate-in fade-in">
@@ -405,17 +405,17 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           )}
         </div>
 
-        {/* Action Buttons to CP Vicora Tulende */}
+        {/* Action Buttons to CP Marsya Theresia */}
         <div className="space-y-3 pt-2">
           <a
-            href={`https://wa.me/6281284212250?text=${waMessage}`}
+            href={`https://wa.me/6281219964142?text=${waMessage}`}
             target="_blank"
             rel="noreferrer"
             className="block w-full"
           >
             <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-5 text-sm rounded-xl transition-all shadow-lg">
               <MessageSquare className="w-4 h-4 mr-2" />
-              Konfirmasi Pesanan ke Ibu Vicora Tulende (Seksi Dana)
+              Konfirmasi Pesanan ke Marsya Theresia (Seksi Dana)
             </Button>
           </a>
 
@@ -466,18 +466,18 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
                   <MessageSquare className="w-3.5 h-3.5" /> Contact Person Seksi Dana Panitia
                 </span>
-                <p className="font-bold text-white text-base">Ibu Vicora Tulende</p>
+                <p className="font-bold text-white text-base">Marsya Theresia</p>
                 <p className="text-xs text-emerald-300">Hubungi panitia untuk pertanyaan seputar pemesanan &amp; konfirmasi kontribusi merchandise.</p>
               </div>
 
               <a
-                href="https://wa.me/6281284212250?text=Halo%20Ibu%20Vicora%20Tulende%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pemesanan%20merchandise"
+                href="https://wa.me/6281219964142?text=Halo%20Marsya%20Theresia%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pemesanan%20merchandise"
                 target="_blank"
                 rel="noreferrer"
                 className="w-full sm:w-auto shrink-0"
               >
                 <Button type="button" size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
-                  <MessageSquare className="w-3.5 h-3.5 mr-1.5" /> Chat WA (081284212250)
+                  <MessageSquare className="w-3.5 h-3.5 mr-1.5" /> Chat WA (081219964142)
                 </Button>
               </a>
             </div>

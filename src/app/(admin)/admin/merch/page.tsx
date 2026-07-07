@@ -268,8 +268,8 @@ export default function AdminMerchPage() {
           <button
             onClick={() => setActiveTab("catalog")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === "catalog"
-                ? "bg-[#D4AF37] text-black shadow"
-                : "text-gray-300 hover:text-white"
+              ? "bg-[#D4AF37] text-black shadow"
+              : "text-gray-300 hover:text-white"
               }`}
           >
             <Package className="w-3.5 h-3.5" /> Katalog Produk ({products.length})
@@ -277,8 +277,8 @@ export default function AdminMerchPage() {
           <button
             onClick={() => setActiveTab("orders")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === "orders"
-                ? "bg-[#D4AF37] text-black shadow"
-                : "text-gray-300 hover:text-white"
+              ? "bg-[#D4AF37] text-black shadow"
+              : "text-gray-300 hover:text-white"
               }`}
           >
             <ListFilter className="w-3.5 h-3.5" /> Rekap Pembelian ({orders.length})
@@ -344,8 +344,8 @@ export default function AdminMerchPage() {
                       <div className="absolute top-2 right-2">
                         <span
                           className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur border ${item.is_active
-                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                              : "bg-red-500/20 text-red-300 border-red-500/40"
+                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                            : "bg-red-500/20 text-red-300 border-red-500/40"
                             }`}
                         >
                           {item.is_active ? "Aktif" : "Non-Aktif"}
@@ -576,8 +576,8 @@ export default function AdminMerchPage() {
                           </td>
                           <td className="p-3 text-center">
                             <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full font-bold font-mono text-xs border ${o.quantity > 1
-                                ? "bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
-                                : "bg-white/5 text-gray-300 border-white/10"
+                              ? "bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                              : "bg-white/5 text-gray-300 border-white/10"
                               }`}>
                               {o.quantity} Pcs
                             </span>
@@ -1206,8 +1206,8 @@ export default function AdminMerchPage() {
                   <h3 className="text-lg font-bold text-white leading-tight">{previewProduct.name}</h3>
                   <div className="flex flex-wrap gap-1.5 pt-0.5">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${previewProduct.is_active
-                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                        : "bg-red-500/20 text-red-300 border-red-500/30"
+                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                      : "bg-red-500/20 text-red-300 border-red-500/30"
                       }`}>
                       {previewProduct.is_active ? "Aktif di Publik" : "Disembunyikan"}
                     </span>
@@ -1221,10 +1221,10 @@ export default function AdminMerchPage() {
                     Rp {previewProduct.price.toLocaleString("id-ID")}
                   </span>
                   <span className={`inline-block text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border mt-1 ${previewProduct.stock <= 0
-                      ? "bg-red-500/20 text-red-300 border-red-500/30"
-                      : previewProduct.stock <= 10
-                        ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                        : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                    ? "bg-red-500/20 text-red-300 border-red-500/30"
+                    : previewProduct.stock <= 10
+                      ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                      : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
                     }`}>
                     Stok: {previewProduct.stock} pcs
                   </span>

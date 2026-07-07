@@ -42,7 +42,7 @@ import {
 } from "lucide-react";
 
 export const merchSchema = z.object({
-  buyer_name: z.string().min(2, "Nama pemesan minimal 2 karakter").max(100, "Maksimal 100 karakter"),
+  buyer_name: z.string().min(2, "Nama pembeli minimal 2 karakter").max(100, "Maksimal 100 karakter"),
   church_city: z.string().min(2, "Asal Jemaat / Kota wajib diisi").max(100, "Maksimal 100 karakter"),
   whatsapp: z.string().min(8, "Nomor WhatsApp minimal 8 digit").max(20, "Nomor WhatsApp maksimal 20 digit"),
   notes: z.string().optional(),
@@ -501,7 +501,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               <span>CATATAN PENGAMBILAN MERCHANDISE:</span>
             </div>
             <p>
-              Seluruh Merchandise yang Anda beli dapat diambil di <strong>Meja Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>) dengan menunjukkan bukti QR Code / Nama Pemesan.
+              Seluruh Merchandise yang Anda beli dapat diambil di <strong>Meja Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>) dengan menunjukkan bukti QR Code / Nama Pembeli.
             </p>
           </div>
 
@@ -523,7 +523,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="text-gray-400 block">Nama Pemesan:</span>
+                <span className="text-gray-400 block">Nama Pembeli:</span>
                 <span className="font-bold text-white">{successData.buyer_name}</span>
               </div>
               <div>
@@ -912,7 +912,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             <Plus className="w-5 h-5 text-[#D4AF37]" />
             Pembelian Merchandise
           </h2>
-          <p className="text-xs text-gray-300">Isi identitas pemesan dan pilih beberapa item/ukuran souvenir di bawah ini.</p>
+          <p className="text-xs text-gray-300">Isi identitas pembeli dan pilih beberapa item/ukuran souvenir di bawah ini.</p>
         </div>
 
         {errorMsg && (
@@ -925,20 +925,20 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
 
-          {/* Section: Data Pemesan */}
+          {/* Section: Data Pembeli */}
           <div className="space-y-4 p-5 md:p-6 bg-black/45 rounded-2xl border border-white/10 shadow-lg">
             <h3 className="text-xs sm:text-sm font-bold text-[#D4AF37] border-b border-white/5 pb-2.5 flex items-center gap-1.5">
-              <Church className="w-4 h-4 text-[#D4AF37]" /> Data Lengkap Pemesan
+              <Church className="w-4 h-4 text-[#D4AF37]" /> Data Lengkap Pembeli
             </h3>
 
-            {/* Field: Nama Pemesan */}
+            {/* Field: Nama Pembeli */}
             <div className="space-y-1.5">
               <Label htmlFor="merch-name" className="text-xs font-bold text-gray-300 block">
-                Nama Lengkap Pemesan *
+                Nama Lengkap Pembeli *
               </Label>
               <Input
                 id="merch-name"
-                placeholder="Masukkan nama pemesan"
+                placeholder="Masukkan nama pembeli"
                 className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs sm:text-sm h-11 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/40 focus-visible:border-[#D4AF37]/40 rounded-xl transition-all"
                 {...register("buyer_name")}
               />
@@ -1039,7 +1039,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             {/* Field: WhatsApp */}
             <div className="space-y-1.5 pt-2">
               <Label htmlFor="merch-wa" className="text-xs font-bold text-gray-300 block">
-                Nomor WhatsApp Pemesan *
+                Nomor WhatsApp Pembeli *
               </Label>
               <Input
                 id="merch-wa"
@@ -1583,7 +1583,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                       {/* Details Grid (exactly matching registrations display details / cek style) */}
                       <div className="space-y-2.5 text-[11px] sm:text-xs">
                         <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
-                          <span className="text-gray-400 shrink-0">Nama Pemesan:</span>
+                          <span className="text-gray-400 shrink-0">Nama Pembeli:</span>
                           <span className="font-semibold text-white text-right">{order.buyer_name}</span>
                         </div>
                         <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">

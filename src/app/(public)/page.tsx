@@ -134,6 +134,56 @@ export default function Home() {
   const [activeServiceTab, setActiveServiceTab] = useState<number>(0)
   const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null)
 
+  // Scroll-Spy sections definition
+  const sections = [
+    { id: 'hero', label: 'Beranda' },
+    { id: 'pendahuluan', label: 'Introduksi' },
+    { id: 'layanan', label: 'Ekosistem Layanan' },
+    { id: 'tujuan', label: 'Visi & Misi' },
+    { id: 'tuan-rumah', label: 'Tuan Rumah' },
+    { id: 'kegiatan', label: 'Rangkaian Kegiatan' },
+    { id: 'waktu-tempat', label: 'Waktu & Lokasi' },
+    { id: 'rundown', label: 'Rundown Acara' },
+    { id: 'ucapan-selamat', label: 'Buku Tamu' },
+    { id: 'faq', label: 'FAQ' },
+    { id: 'dukungan', label: 'Saluran Berkat' }
+  ]
+
+  const [activeSection, setActiveSection] = useState('hero')
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // 1. Calculate scroll progress
+      const winScroll = window.scrollY
+      const height = document.documentElement.scrollHeight - window.innerHeight
+      if (height > 0) {
+        setScrollProgress((winScroll / height) * 100)
+      }
+
+      // 2. Detect active section
+      // We offset the check line slightly (1/3 of the viewport height) to transition early
+      const scrollPosition = winScroll + window.innerHeight / 3
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i]
+        const el = document.getElementById(section.id)
+        if (el) {
+          const offsetTop = el.offsetTop
+          if (scrollPosition >= offsetTop) {
+            setActiveSection(section.id)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    // Initial call to set active section
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   useEffect(() => {
     const fetchWishes = async () => {
       try {
@@ -284,7 +334,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative w-full">
+    <div id="hero" className="relative w-full">
       {/* Ambient Background & Grid/Noise */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#022c22]" />
@@ -325,14 +375,55 @@ export default function Home() {
         <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24 flex flex-col items-center">
+      {/* Sticky Mobile Sub-header & Progress Tracker */}
+      <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-[#022c22]/90 backdrop-blur-md border-b border-[#D4AF37]/15 py-2 px-6 flex items-center justify-between transition-all duration-300">
+        <span className="text-[10px] font-bold text-[#D4AF37] tracking-[0.2em] uppercase truncate pr-4">
+          {sections.find(s => s.id === activeSection)?.label || 'Beranda'}
+        </span>
+        <span className="text-[9px] font-mono text-gray-400 select-none shrink-0">
+          {sections.findIndex(s => s.id === activeSection) + 1} / {sections.length}
+        </span>
+        <div 
+          className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#F3E5AB] via-[#D4AF37] to-[#B8860B] transition-all duration-100" 
+          style={{ width: `${scrollProgress}%` }} 
+        />
+      </div>
+
+      {/* Desktop Vertical Dot Navigation */}
+      <div className="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 flex-col gap-3.5 z-45 select-none">
+        {sections.map((section) => {
+          const isActive = activeSection === section.id
+          return (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' })
+              }}
+              className="group relative flex items-center justify-end"
+            >
+              <span className={`absolute right-6 text-[10px] tracking-wider uppercase bg-[#022c22]/95 border border-[#D4AF37]/35 text-[#D4AF37] px-2 py-1 rounded backdrop-blur-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap font-medium font-sans ${isActive ? 'opacity-100 translate-x-0 border-[#D4AF37]' : ''}`}>
+                {section.label}
+              </span>
+              <div className={`w-2.5 h-2.5 rounded-full border transition-all duration-300 ${
+                isActive 
+                  ? 'bg-[#D4AF37] border-[#D4AF37] scale-125 shadow-[0_0_8px_#D4AF37]' 
+                  : 'border-gray-500 bg-transparent group-hover:border-[#D4AF37] group-hover:scale-110'
+              }`} />
+            </a>
+          )
+        })}
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-24 flex flex-col items-center">
         
         {/* Floating Token Image */}
         <motion.div 
           initial={{ opacity: 0, y: 40, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-96 md:h-96 mb-12 gpu-accelerated will-change-transform"
+          className="relative w-48 h-48 xs:w-64 xs:h-64 sm:w-72 sm:h-72 md:w-96 md:h-96 mb-8 sm:mb-12 gpu-accelerated will-change-transform"
         >
           {/* Subtle gold glow behind the token */}
           <div className="absolute inset-0 bg-radial-gradient from-[#D4AF37]/25 to-transparent blur-2xl rounded-full scale-75 opacity-80" />
@@ -346,7 +437,7 @@ export default function Home() {
               src="/logo_hut16_pklu.png"
               alt="Logo Resmi HUT 16 PKLU GPIB"
               fill
-              sizes="(max-width: 768px) 288px, 384px"
+              sizes="(max-width: 768px) 192px, 384px"
               className="object-contain relative z-10 drop-shadow-[0_25px_35px_rgba(0,0,0,0.6)]"
               priority
             />
@@ -358,15 +449,15 @@ export default function Home() {
           variants={staggerContainer}
           initial="initial"
           animate="animate"
-          className="w-full text-center space-y-8 mb-16 max-w-4xl"
+          className="w-full text-center space-y-6 sm:space-y-8 mb-12 sm:mb-16 max-w-4xl px-2"
         >
-          <motion.p variants={fadeIn} className="text-[#D4AF37] font-bold tracking-[0.25em] uppercase text-xs md:text-sm">
+          <motion.p variants={fadeIn} className="text-[#D4AF37] font-bold tracking-[0.15em] sm:tracking-[0.25em] uppercase text-[10px] sm:text-xs md:text-sm">
             Perayaan & Ibadah Syukur Nasional
           </motion.p>
           
           <motion.h1 
             variants={fadeIn} 
-            className={`text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-b from-[#FDFBF7] to-[#FDFBF7]/60 leading-tight tracking-tight ${playfair.className}`}
+            className={`text-4xl xs:text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-b from-[#FDFBF7] to-[#FDFBF7]/60 leading-[1.1] md:leading-tight tracking-tight ${playfair.className}`}
           >
             HUT ke-16 <br />
             <span className="bg-gradient-to-r from-[#F3E5AB] via-[#D4AF37] to-[#B8860B] bg-clip-text text-transparent font-bold">
@@ -374,27 +465,34 @@ export default function Home() {
             </span>
           </motion.h1>
 
-          <motion.div variants={fadeIn} className="flex items-center justify-center gap-6 py-4 opacity-90">
-            <div className="h-[1px] w-12 md:w-24 bg-gradient-to-r from-transparent to-[#D4AF37]" />
-            <span className={`text-2xl md:text-4xl text-[#D4AF37] ${playfair.className} italic font-light`}>
+          <motion.div variants={fadeIn} className="flex items-center justify-center gap-3 sm:gap-6 py-2 sm:py-4 opacity-90">
+            <div className="h-[1px] w-8 xs:w-12 md:w-24 bg-gradient-to-r from-transparent to-[#D4AF37]" />
+            <span className={`text-xl sm:text-2xl md:text-4xl text-[#D4AF37] ${playfair.className} italic font-light whitespace-nowrap`}>
               "Teruskan Baktimu!"
             </span>
-            <div className="h-[1px] w-12 md:w-24 bg-gradient-to-l from-transparent to-[#D4AF37]" />
+            <div className="h-[1px] w-8 xs:w-12 md:w-24 bg-gradient-to-l from-transparent to-[#D4AF37]" />
           </motion.div>
 
-          <motion.div variants={fadeIn} className="space-y-3">
-            <p className="text-[#FDFBF7]/90 text-lg md:text-2xl font-light tracking-wide">
-              Bertumbuh Dalam Keselamatan <span className="text-[#D4AF37] text-sm md:text-base opacity-75 ml-2 font-medium tracking-normal">(1 Petrus 2:2)</span>
+          <motion.div variants={fadeIn} className="space-y-3 px-4">
+            <p className="text-[#FDFBF7]/90 text-base sm:text-lg md:text-2xl font-light tracking-wide">
+              Bertumbuh Dalam Keselamatan 
+              <span className="block xs:inline-block text-[#D4AF37] text-xs sm:text-sm md:text-base opacity-75 xs:ml-2 font-medium tracking-normal italic mt-1 xs:mt-0">
+                (1 Petrus 2:2)
+              </span>
             </p>
-            <p className={`text-[#FDFBF7]/70 text-base md:text-xl max-w-2xl mx-auto ${playfair.className} italic`}>
+            <p className={`text-[#FDFBF7]/70 text-sm sm:text-base md:text-xl max-w-2xl mx-auto ${playfair.className} italic leading-relaxed`}>
               Lansia Teladan dalam Iman, Karya, dan Pelayanan
             </p>
           </motion.div>
 
           {/* Tagline Ribbon */}
-          <motion.div variants={fadeIn} className="mt-8 py-4 border-y border-[#D4AF37]/20 w-3/4 mx-auto backdrop-blur-sm bg-[#022c22]/10 rounded-lg">
-            <p className="text-[#FDFBF7]/95 text-[10px] md:text-xs tracking-[0.3em] uppercase text-center font-semibold">
-              Untuk Lansia <span className="text-[#D4AF37] mx-3">•</span> Oleh Lansia <span className="text-[#D4AF37] mx-3">•</span> Bersama PKLU GPIB
+          <motion.div variants={fadeIn} className="mt-6 sm:mt-8 py-3 sm:py-4 border-y border-[#D4AF37]/20 w-[90%] sm:w-3/4 mx-auto backdrop-blur-sm bg-[#022c22]/10 rounded-lg">
+            <p className="text-[#FDFBF7]/95 text-[9px] sm:text-[10px] md:text-xs tracking-[0.15em] sm:tracking-[0.3em] uppercase text-center font-semibold flex flex-wrap justify-center items-center gap-y-1">
+              <span>Untuk Lansia</span> 
+              <span className="text-[#D4AF37] mx-2 sm:mx-3">•</span> 
+              <span>Oleh Lansia</span> 
+              <span className="text-[#D4AF37] mx-2 sm:mx-3">•</span> 
+              <span>Bersama PKLU GPIB</span>
             </p>
           </motion.div>
         </motion.div>
@@ -423,20 +521,23 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-4xl mb-24 text-center space-y-8"
+          className="w-full max-w-4xl mb-16 md:mb-24 text-center space-y-6 sm:space-y-8 px-4"
         >
-          <div className="flex justify-center mb-6">
-            <Quote className="w-12 h-12 text-[#D4AF37] opacity-65" />
+          <div className="flex justify-center mb-4">
+            <Quote className="w-10 h-10 text-[#D4AF37] opacity-65" />
           </div>
-          <h2 className={`text-4xl md:text-5xl text-[#D4AF37] tracking-tight ${playfair.className}`}>Pendahuluan</h2>
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block">01. INTRODUKSI</span>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] tracking-tight font-medium italic ${playfair.className}`}>Pendahuluan</h2>
+          </div>
           
-          <div className="relative p-8 md:p-12 rounded-[2rem] bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
-            <p className={`text-xl md:text-2xl text-[#FDFBF7] font-light italic leading-relaxed mb-8 ${playfair.className}`}>
+          <div className="relative p-5 sm:p-12 rounded-[2rem] bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
+            <p className={`text-lg sm:text-xl md:text-2xl text-[#FDFBF7] font-light italic leading-relaxed mb-6 sm:mb-8 px-2 ${playfair.className}`}>
               "Hiasan orang muda ialah kekuatannya, dan keindahan orang tua ialah uban."
-              <br/><span className="text-sm not-italic font-sans text-[#D4AF37] mt-4 block uppercase tracking-widest font-bold">Amsal 20:29</span>
+              <br/><span className="text-xs sm:text-sm not-italic font-sans text-[#D4AF37] mt-4 block uppercase tracking-widest font-bold">Amsal 20:29</span>
             </p>
             
-            <div className="space-y-6 text-[#FDFBF7]/85 text-base md:text-lg leading-relaxed text-justify md:text-center font-light">
+            <div className="space-y-4 sm:space-y-6 text-[#FDFBF7]/85 text-sm sm:text-base md:text-lg leading-relaxed text-center sm:text-justify md:text-center font-light px-2 sm:px-4">
               <p>
                 Uban di kepala adalah mahkota kemuliaan; tanda kesetiaan, pengalaman hidup, dan kasih Tuhan yang terus menyertai. Usia lanjut bukanlah akhir dari karya dan pelayanan, melainkan kesempatan untuk tetap menjadi berkat, menghadirkan hikmat, keteduhan, dan teladan iman bagi keluarga, gereja, dan masyarakat.
               </p>
@@ -453,7 +554,7 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="w-full max-w-5xl mb-24 grid grid-cols-2 lg:grid-cols-4 gap-4 px-4"
+          className="w-full max-w-5xl mb-16 md:mb-24 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 px-4"
         >
           {[
             { value: "16", label: "Tahun Syukur", desc: "Berkarya & Melayani" },
@@ -461,29 +562,30 @@ export default function Home() {
             { value: "600+", label: "Peserta & Undangan", desc: "Tingkat Nasional" },
             { value: "4", label: "Layanan Utama", desc: "Akses Partisipasi" }
           ].map((stat, idx) => (
-            <div key={idx} className="bg-black/30 backdrop-blur-md border border-white/5 hover:border-[#D4AF37]/35 transition-all duration-500 p-6 rounded-2xl text-center group">
-              <div className="font-heading text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FDFBF7] to-[#D4AF37] bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-500">
+            <div key={idx} className="bg-black/30 backdrop-blur-md border border-white/5 hover:border-[#D4AF37]/35 transition-all duration-500 p-4 sm:p-6 rounded-2xl text-center group">
+              <div className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FDFBF7] to-[#D4AF37] bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-500">
                 {stat.value}
               </div>
-              <div className="text-[#D4AF37] text-xs font-bold uppercase tracking-widest mt-2">{stat.label}</div>
-              <div className="text-gray-400 text-[10px] md:text-xs mt-1 font-light">{stat.desc}</div>
+              <div className="text-[#D4AF37] text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest mt-2">{stat.label}</div>
+              <div className="text-gray-400 text-[9px] md:text-xs mt-1 font-light leading-snug">{stat.desc}</div>
             </div>
           ))}
         </motion.div>
 
         {/* Interactive Feature Ecosystem Section */}
         <motion.div
+          id="layanan"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="w-full max-w-5xl mb-28 space-y-10"
+          className="w-full max-w-5xl mb-20 md:mb-28 space-y-8 sm:space-y-10"
         >
-          <div className="text-center space-y-3">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-bold flex items-center justify-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-[#D4AF37] animate-pulse" /> Layanan &amp; Partisipasi Publik
+          <div className="text-center space-y-2 px-4">
+            <span className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#D4AF37] font-semibold flex items-center justify-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" /> 02. EKOSISTEM LAYANAN
             </span>
-            <h2 className={`text-3xl md:text-5xl text-white ${playfair.className}`}>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-white ${playfair.className} font-medium italic leading-tight`}>
               Pintu Gerbang Partisipasi Acara
             </h2>
             <p className="text-xs md:text-sm text-gray-300 max-w-lg mx-auto font-light">
@@ -492,7 +594,7 @@ export default function Home() {
           </div>
 
           {/* Tabbed Explorer layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start px-4">
             {/* Left Column Tabs Selector */}
             <div className="lg:col-span-4 flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible gap-2 pb-2 lg:pb-0 border-b lg:border-b-0 lg:border-l border-white/5 scrollbar-thin scrollbar-thumb-[#D4AF37]/30">
               {servicesData.map((service, idx) => {
@@ -501,7 +603,7 @@ export default function Home() {
                   <button
                     key={idx}
                     onClick={() => setActiveServiceTab(idx)}
-                    className={`flex items-center gap-4 text-left px-5 py-4 rounded-xl transition-all duration-300 w-full whitespace-nowrap lg:whitespace-normal cursor-pointer select-none group border lg:border-0 ${
+                    className={`flex items-center gap-3 sm:gap-4 text-left px-4 sm:px-5 py-3 sm:py-4 rounded-xl transition-all duration-300 w-auto lg:w-full shrink-0 lg:shrink whitespace-nowrap lg:whitespace-normal cursor-pointer select-none group border lg:border-0 ${
                       isActive 
                         ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 lg:border-l-2 lg:border-[#D4AF37] lg:rounded-l-none text-[#D4AF37]' 
                         : 'border-white/5 text-gray-400 hover:text-white hover:bg-white/5'
@@ -525,20 +627,20 @@ export default function Home() {
             </div>
 
             {/* Right Column Content Panel */}
-            <div className="lg:col-span-8 bg-black/40 border border-white/10 backdrop-blur-xl rounded-[2rem] p-6 md:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+            <div className="lg:col-span-8 bg-black/40 border border-white/10 backdrop-blur-xl rounded-[2rem] p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl relative overflow-hidden">
               {/* Subtle visual glow inside card */}
               <div className="absolute -top-16 -right-16 w-36 h-36 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
 
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-4">
                 <div>
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] bg-[#D4AF37]/10 border border-[#D4AF37]/35 text-[#D4AF37] px-2.5 py-0.5 rounded-full">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] bg-[#D4AF37]/10 border border-[#D4AF37]/35 text-[#D4AF37] px-2.5 py-0.5 rounded-full animate-pulse">
                     {servicesData[activeServiceTab].badge}
                   </span>
                   <h3 className={`text-2xl font-bold text-white mt-2 ${playfair.className}`}>
                     {servicesData[activeServiceTab].title}
                   </h3>
                 </div>
-                <div className="text-[10px] text-gray-500 uppercase font-mono tracking-widest">
+                <div className="text-[10px] text-gray-500 uppercase font-mono tracking-widest hidden sm:block">
                   PORTAL SPECIFICATIONS
                 </div>
               </div>
@@ -549,15 +651,15 @@ export default function Home() {
 
               {/* Specs Table like Amanloka specifications */}
               <div className="bg-black/30 border border-white/5 rounded-xl overflow-hidden text-xs">
-                <div className="grid grid-cols-12 bg-white/5 px-4 py-2 text-gray-400 font-bold border-b border-white/5 uppercase tracking-wider text-[9px]">
-                  <div className="col-span-5">Ketentuan/Fitur</div>
-                  <div className="col-span-7">Detail Spesifikasi</div>
+                <div className="flex bg-white/5 px-4 py-2 text-gray-400 font-bold border-b border-white/5 uppercase tracking-wider text-[9px]">
+                  <div className="w-[40%] sm:w-[35%]">Ketentuan/Fitur</div>
+                  <div className="w-[60%] sm:w-[65%]">Detail Spesifikasi</div>
                 </div>
                 <div className="divide-y divide-white/5">
                   {servicesData[activeServiceTab].specs.map((spec, specIdx) => (
-                    <div key={specIdx} className="grid grid-cols-12 px-4 py-3 items-center hover:bg-white-[0.02] transition-colors">
-                      <div className="col-span-5 text-[#D4AF37] font-semibold">{spec.label}</div>
-                      <div className="col-span-7 text-[#FDFBF7]/90 font-light">{spec.value}</div>
+                    <div key={specIdx} className="flex px-4 py-3 items-start sm:items-center hover:bg-white-[0.02] transition-colors text-[11px] sm:text-xs">
+                      <div className="w-[40%] sm:w-[35%] text-[#D4AF37] font-semibold pr-2 shrink-0">{spec.label}</div>
+                      <div className="w-[60%] sm:w-[65%] text-[#FDFBF7]/90 font-light leading-normal">{spec.value}</div>
                     </div>
                   ))}
                 </div>
@@ -590,14 +692,15 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl mb-24"
+          className="w-full max-w-4xl mb-16 md:mb-24 px-4"
         >
-          <div className="text-center mb-10">
-            <h2 className={`text-3xl md:text-4xl text-[#D4AF37] ${playfair.className}`}>Maksud & Tujuan</h2>
-            <div className="w-16 h-0.5 bg-[#D4AF37]/50 mx-auto mt-4 rounded-full" />
+          <div className="text-center mb-8 sm:mb-10">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">03. VISI &amp; MISI</span>
+            <h2 className={`text-2xl sm:text-3xl md:text-4xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Maksud &amp; Tujuan</h2>
+            <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {[
               "Mendukung terselenggaranya ibadah syukur dan perayaan HUT ke-16 Pelkat PKLU GPIB.",
               "Mempererat kebersamaan Pelkat PKLU GPIB dari berbagai jemaat di Indonesia.",
@@ -606,11 +709,11 @@ export default function Home() {
               "Mengapresiasi karya, talenta, pengalaman, dan kesaksian kaum lansia.",
               "Menguatkan semangat lansia teladan dalam iman, karya, dan pelayanan."
             ].map((tujuan, index) => (
-              <div key={index} className="flex gap-4 items-center bg-black/40 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-5 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/40 transition-all duration-300 group shadow-lg">
-                <div className="w-8 h-8 rounded-full bg-[#022c22] border border-[#D4AF37]/35 flex items-center justify-center text-[#D4AF37] text-xs font-bold flex-shrink-0 group-hover:border-[#D4AF37] transition-all">
+              <div key={index} className="flex gap-4 items-center bg-black/40 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-4 sm:p-5 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/40 transition-all duration-300 group shadow-lg">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#022c22] border border-[#D4AF37]/35 flex items-center justify-center text-[#D4AF37] text-xs font-bold flex-shrink-0 group-hover:border-[#D4AF37] transition-all">
                   {index + 1}
                 </div>
-                <p className="text-[#FDFBF7]/90 text-sm leading-relaxed font-light group-hover:text-white transition-colors">
+                <p className="text-[#FDFBF7]/90 text-xs sm:text-sm leading-relaxed font-light group-hover:text-white transition-colors">
                   {tujuan}
                 </p>
               </div>
@@ -625,15 +728,16 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl mb-24"
+          className="w-full max-w-4xl mb-16 md:mb-24 px-4"
         >
-          <div className="text-center mb-10">
-            <h2 className={`text-4xl text-[#D4AF37] ${playfair.className}`}>Tuan Rumah Kegiatan</h2>
-            <p className="text-sm text-[#FDFBF7]/70 mt-2 font-light">Musyawarah Pelayanan (Mupel) GPIB Bekasi</p>
-            <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <div className="text-center mb-8 sm:mb-10 px-4">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">04. PENYELENGGARA</span>
+            <h2 className={`text-2xl sm:text-3xl md:text-4xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Tuan Rumah Kegiatan</h2>
+            <p className="text-xs sm:text-sm text-[#D4AF37]/80 mt-2 font-light">Musyawarah Pelayanan (Mupel) GPIB Bekasi</p>
+            <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="bg-black/40 backdrop-blur-md border border-white/5 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden">
+          <div className="bg-black/40 backdrop-blur-md border border-white/5 rounded-[2rem] p-5 sm:p-8 shadow-2xl relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
             
              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
@@ -660,10 +764,10 @@ export default function Home() {
                </div>
 
               {/* Right Side: Congregation List Card with Custom Gold Scrollbar */}
-              <div className="lg:col-span-5 bg-black/60 border border-[#D4AF37]/25 rounded-2xl p-5 space-y-4 flex flex-col justify-between max-h-[600px]">
+              <div className="lg:col-span-5 bg-black/60 border border-[#D4AF37]/25 rounded-2xl p-4 sm:p-5 space-y-4 flex flex-col justify-between max-h-[500px] lg:max-h-[600px]">
                 <div className="border-b border-[#D4AF37]/20 pb-3 flex-shrink-0">
-                  <h3 className={`text-xl text-[#D4AF37] font-semibold ${playfair.className}`}>Mupel GPIB Bekasi</h3>
-                  <p className="text-[9px] text-[#FDFBF7]/50 uppercase tracking-widest mt-1">Struktur & Cakupan Wilayah</p>
+                  <h3 className={`text-lg sm:text-xl text-[#D4AF37] font-semibold ${playfair.className}`}>Mupel GPIB Bekasi</h3>
+                  <p className="text-[9px] text-[#FDFBF7]/50 uppercase tracking-widest mt-1">Struktur &amp; Cakupan Wilayah</p>
                 </div>
                 
                 <div className="space-y-3 text-xs flex-shrink-0">
@@ -720,35 +824,36 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-5xl mb-24"
+          className="w-full max-w-5xl mb-16 md:mb-24 px-4"
         >
-          <div className="text-center mb-12">
-            <h2 className={`text-4xl md:text-5xl text-[#D4AF37] ${playfair.className}`}>Rangkaian Kegiatan</h2>
-            <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <div className="text-center mb-8 sm:mb-12">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">05. AGENDA KERJA</span>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Rangkaian Kegiatan</h2>
+            <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
           
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5 sm:gap-6">
             {/* Pra-Kegiatan */}
             <div className="rounded-[2rem] p-[1px] bg-gradient-to-r from-[#D4AF37]/30 via-[#D4AF37]/10 to-transparent">
-              <div className="bg-black/40 backdrop-blur-xl rounded-[calc(2rem-1px)] p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
-                  <Star className="w-8 h-8 text-[#D4AF37]" />
+              <div className="bg-black/40 backdrop-blur-xl rounded-[calc(2rem-1px)] p-5 sm:p-10 flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
+                <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
+                  <Star className="w-6 h-6 sm:w-8 sm:h-8 text-[#D4AF37]" />
                 </div>
                 <div>
-                  <h3 className={`text-2xl text-[#FDFBF7] mb-2 ${playfair.className}`}>Pra-Kegiatan</h3>
-                  <p className="text-[#D4AF37] uppercase tracking-widest text-xs font-bold mb-6">Beragam Lomba & Webinar</p>
-                  <ul className="space-y-4">
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-5 h-5 text-[#D4AF37]/75 flex-shrink-0 mt-1" />
-                      <p className="text-[#FDFBF7]/80 font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Lomba Puisi:</strong> Kategori ulasan iman dan ekspresi hidup kaum lanjut usia.</p>
+                  <h3 className={`text-xl sm:text-2xl text-[#FDFBF7] mb-1 sm:mb-2 ${playfair.className}`}>Pra-Kegiatan</h3>
+                  <p className="text-[#D4AF37] uppercase tracking-widest text-[10px] sm:text-xs font-bold mb-4 sm:mb-6">Beragam Lomba &amp; Webinar</p>
+                  <ul className="space-y-3 sm:space-y-4 text-left">
+                    <li className="flex items-start gap-3 sm:gap-4">
+                      <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#D4AF37]/75 flex-shrink-0 mt-0.5 sm:mt-1" />
+                      <p className="text-[#FDFBF7]/80 text-xs sm:text-sm font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Lomba Puisi:</strong> Kategori ulasan iman dan ekspresi hidup kaum lanjut usia.</p>
                     </li>
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-5 h-5 text-[#D4AF37]/75 flex-shrink-0 mt-1" />
-                      <p className="text-[#FDFBF7]/80 font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Lomba Artikel & Video Singkat:</strong> Tema: Lansia Teladan dalam pelayanan dan karya inspiratif.</p>
+                    <li className="flex items-start gap-3 sm:gap-4">
+                      <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#D4AF37]/75 flex-shrink-0 mt-0.5 sm:mt-1" />
+                      <p className="text-[#FDFBF7]/80 text-xs sm:text-sm font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Lomba Artikel &amp; Video Singkat:</strong> Tema: Lansia Teladan dalam pelayanan dan karya inspiratif.</p>
                     </li>
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-5 h-5 text-[#D4AF37]/75 flex-shrink-0 mt-1" />
-                      <p className="text-[#FDFBF7]/80 font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Webinar Lansia:</strong> Persiapan finansial di usia emas dan bijak mengelola berkat.</p>
+                    <li className="flex items-start gap-3 sm:gap-4">
+                      <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#D4AF37]/75 flex-shrink-0 mt-0.5 sm:mt-1" />
+                      <p className="text-[#FDFBF7]/80 text-xs sm:text-sm font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Webinar Lansia:</strong> Persiapan finansial di usia emas dan bijak mengelola berkat.</p>
                     </li>
                   </ul>
                 </div>
@@ -757,25 +862,25 @@ export default function Home() {
 
             {/* Puncak Acara */}
             <div className="rounded-[2rem] p-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/10 to-[#D4AF37]/30">
-              <div className="bg-black/40 backdrop-blur-xl rounded-[calc(2rem-1px)] p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
-                  <Star className="w-8 h-8 text-[#D4AF37] fill-[#D4AF37]/20" />
+              <div className="bg-black/40 backdrop-blur-xl rounded-[calc(2rem-1px)] p-5 sm:p-10 flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
+                <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
+                  <Star className="w-6 h-6 sm:w-8 sm:h-8 text-[#D4AF37] fill-[#D4AF37]/20" />
                 </div>
                 <div>
-                  <h3 className={`text-2xl text-[#FDFBF7] mb-2 ${playfair.className}`}>Puncak Acara (12 Okt 2026)</h3>
-                  <p className="text-[#D4AF37] uppercase tracking-widest text-xs font-bold mb-6">Ibadah Syukur & Seremonial</p>
-                  <ul className="space-y-4">
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-5 h-5 text-[#D4AF37]/75 flex-shrink-0 mt-1" />
-                      <p className="text-[#FDFBF7]/80 font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Ibadah Syukur Agung:</strong> Pusat perayaan rohani dan ungkapan syukur nasional.</p>
+                  <h3 className={`text-xl sm:text-2xl text-[#FDFBF7] mb-1 sm:mb-2 ${playfair.className}`}>Puncak Acara (12 Okt 2026)</h3>
+                  <p className="text-[#D4AF37] uppercase tracking-widest text-[10px] sm:text-xs font-bold mb-4 sm:mb-6">Ibadah Syukur &amp; Seremonial</p>
+                  <ul className="space-y-3 sm:space-y-4 text-left">
+                    <li className="flex items-start gap-3 sm:gap-4">
+                      <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#D4AF37]/75 flex-shrink-0 mt-0.5 sm:mt-1" />
+                      <p className="text-[#FDFBF7]/80 text-xs sm:text-sm font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Ibadah Syukur Agung:</strong> Pusat perayaan rohani dan ungkapan syukur nasional.</p>
                     </li>
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-5 h-5 text-[#D4AF37]/75 flex-shrink-0 mt-1" />
-                      <p className="text-[#FDFBF7]/80 font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Apresiasi & Seni:</strong> Pagelaran seni lansia nusantara, lilin syukur, dan pemenang lomba.</p>
+                    <li className="flex items-start gap-3 sm:gap-4">
+                      <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#D4AF37]/75 flex-shrink-0 mt-0.5 sm:mt-1" />
+                      <p className="text-[#FDFBF7]/80 text-xs sm:text-sm font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Apresiasi &amp; Seni:</strong> Pagelaran seni lansia nusantara, lilin syukur, dan pemenang lomba.</p>
                     </li>
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-5 h-5 text-[#D4AF37]/75 flex-shrink-0 mt-1" />
-                      <p className="text-[#FDFBF7]/80 font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Estimasi Kehadiran:</strong> ±600 orang utusan pengurus dan jemaat PKLU dari seluruh Indonesia.</p>
+                    <li className="flex items-start gap-3 sm:gap-4">
+                      <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#D4AF37]/75 flex-shrink-0 mt-0.5 sm:mt-1" />
+                      <p className="text-[#FDFBF7]/80 text-xs sm:text-sm font-light leading-relaxed"><strong className="text-[#FDFBF7] font-medium block md:inline mr-2">Estimasi Kehadiran:</strong> ±600 orang utusan pengurus dan jemaat PKLU dari seluruh Indonesia.</p>
                     </li>
                   </ul>
                 </div>
@@ -791,13 +896,14 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-5xl rounded-[2rem] p-[1px] bg-gradient-to-b from-[#D4AF37]/45 via-[#D4AF37]/10 to-transparent mb-12"
+          className="w-full max-w-5xl rounded-[2rem] p-[1px] bg-gradient-to-b from-[#D4AF37]/45 via-[#D4AF37]/10 to-transparent mb-12 px-4"
         >
-          <div className="w-full bg-black/40 backdrop-blur-3xl rounded-[calc(2rem-1px)] p-6 md:p-12 overflow-hidden">
+          <div className="w-full bg-black/40 backdrop-blur-3xl rounded-[calc(2rem-1px)] p-5 sm:p-12 overflow-hidden">
             
-            <div className="text-center mb-10">
-              <h2 className={`text-4xl text-[#D4AF37] ${playfair.className}`}>Waktu & Tempat</h2>
-              <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+            <div className="text-center mb-8 sm:mb-10">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">06. LOKASI ACARA</span>
+              <h2 className={`text-2xl sm:text-3xl md:text-4xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Waktu &amp; Tempat</h2>
+              <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
             </div>
 
             <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
@@ -842,11 +948,12 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl mb-24 mt-12"
+          className="w-full max-w-4xl mb-16 md:mb-24 mt-8 sm:mt-12 px-4"
         >
-          <div className="text-center mb-12">
-            <h2 className={`text-4xl md:text-5xl text-[#D4AF37] ${playfair.className}`}>Rundown Acara</h2>
-            <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <div className="text-center mb-8 sm:mb-12">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">07. RUNDOWN HARIAN</span>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Rundown Acara</h2>
+            <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
 
           {/* Tabs Selector */}
@@ -896,7 +1003,7 @@ export default function Home() {
                       </div>
                       
                       {/* content */}
-                      <div className="p-6 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
+                      <div className="p-5 sm:p-6 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
                         <div className="md:hidden text-xs text-[#D4AF37] font-semibold mb-2 flex items-center gap-2">
                           <span>{item.time}</span>
                           <span className="opacity-40">•</span>
@@ -932,7 +1039,7 @@ export default function Home() {
                       </div>
                       
                       {/* content */}
-                      <div className="p-6 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
+                      <div className="p-5 sm:p-6 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
                         <div className="md:hidden text-xs text-[#D4AF37] font-semibold mb-2 leading-tight">
                           {item.period}
                         </div>
@@ -958,13 +1065,13 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-5xl mb-24 mt-12 px-4"
+          className="w-full max-w-5xl mb-16 md:mb-24 mt-8 sm:mt-12 px-4"
         >
-          <div className="text-center mb-12 space-y-2 select-none">
-            <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold flex items-center justify-center gap-1.5">
-              <MessageSquare className="w-4 h-4 text-[#D4AF37]" /> Buku Tamu Sukacita
+          <div className="text-center mb-8 sm:mb-12 space-y-2 select-none">
+            <span className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#D4AF37] font-semibold flex items-center justify-center gap-1.5">
+              <MessageSquare className="w-3.5 h-3.5 text-[#D4AF37]" /> 08. BUKU TAMU DIGITAL
             </span>
-            <h2 className={`text-3xl md:text-5xl text-[#FDFBF7] ${playfair.className}`}>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>
               Gema Doa &amp; Ucapan Selamat
             </h2>
           </div>
@@ -987,7 +1094,7 @@ export default function Home() {
           ) : (
             <div className="space-y-12">
               {/* Premium Slider Container */}
-              <div className="relative min-h-[280px] flex flex-col items-center justify-center text-center px-6 md:px-16 py-10 bg-black/40 border border-white/10 rounded-[2.5rem] backdrop-blur-xl shadow-2xl overflow-hidden">
+              <div className="relative min-h-[260px] sm:min-h-[280px] flex flex-col items-center justify-center text-center px-5 sm:px-16 py-8 sm:py-10 bg-black/40 border border-white/10 rounded-[2.5rem] backdrop-blur-xl shadow-2xl overflow-hidden">
                 {/* Visual glow backdrop decoration */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-[90px] pointer-events-none" />
 
@@ -998,7 +1105,7 @@ export default function Home() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="space-y-8 max-w-3xl w-full relative z-10"
+                    className="space-y-6 sm:space-y-8 max-w-3xl w-full relative z-10"
                   >
                     {/* Badge Category Tag */}
                     <div className="flex items-center justify-center gap-2 text-[10px] tracking-[0.2em] font-bold text-[#D4AF37] uppercase select-none">
@@ -1007,7 +1114,7 @@ export default function Home() {
                     </div>
 
                     {/* Testimonial Quote text */}
-                    <p className={`text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-light leading-relaxed select-text italic ${playfair.className}`}>
+                    <p className={`text-base sm:text-xl md:text-2xl lg:text-3xl text-white font-light leading-relaxed select-text italic ${playfair.className}`}>
                       "{wishes[currentSlide].message}"
                     </p>
 
@@ -1089,19 +1196,19 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl mb-24 mt-12 px-4"
+          className="w-full max-w-4xl mb-16 md:mb-24 mt-8 sm:mt-12 px-4"
         >
-          <div className="text-center mb-12 space-y-2">
-            <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">
-              Klarifikasi & Informasi
+          <div className="text-center mb-8 sm:mb-12 space-y-2">
+            <span className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block">
+              09. INFORMASI TAMBAHAN
             </span>
-            <h2 className={`text-3xl md:text-5xl text-white ${playfair.className}`}>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>
               Pertanyaan Umum (FAQ)
             </h2>
-            <div className="w-16 h-0.5 bg-[#D4AF37]/50 mx-auto mt-4 rounded-full" />
+            <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
 
-          <div className="bg-black/40 border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl divide-y divide-white/5">
+          <div className="bg-black/40 border border-white/5 rounded-3xl p-5 sm:p-10 shadow-2xl divide-y divide-white/5">
             {faqData.map((faq, idx) => {
               const isOpen = activeFaqIndex === idx;
               return (
@@ -1110,7 +1217,7 @@ export default function Home() {
                     onClick={() => setActiveFaqIndex(isOpen ? null : idx)}
                     className="w-full flex items-center justify-between text-left focus:outline-none group cursor-pointer"
                   >
-                    <span className="text-base md:text-lg font-light text-white group-hover:text-[#D4AF37] transition-colors pr-4">
+                    <span className="text-sm sm:text-base md:text-lg font-light text-white group-hover:text-[#D4AF37] transition-colors pr-4">
                       {faq.question}
                     </span>
                     <span className="text-[#D4AF37]/60 group-hover:text-[#D4AF37] transition-all flex-shrink-0">
@@ -1150,29 +1257,30 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl mb-24 mt-12 text-center"
+          className="w-full max-w-4xl mb-16 md:mb-24 mt-8 sm:mt-12 text-center px-4"
         >
-          <div className="text-center mb-12">
-            <h2 className={`text-4xl md:text-5xl text-[#D4AF37] ${playfair.className}`}>Dukungan Kasih</h2>
-            <div className="w-24 h-1 bg-[#D4AF37]/50 mx-auto mt-6 rounded-full" />
+          <div className="text-center mb-8 sm:mb-12">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">10. SALURAN BERKAT</span>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Dukungan Kasih</h2>
+            <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
           
-          <div className="relative p-8 md:p-12 rounded-[2rem] bg-gradient-to-br from-[#033B2B]/60 to-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/35 shadow-2xl">
+          <div className="relative p-5 sm:p-12 rounded-[2rem] bg-gradient-to-br from-[#033B2B]/60 to-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/35 shadow-2xl">
             {/* Soft background glow */}
             <div className="absolute -top-12 -left-12 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-[#047857]/10 rounded-full blur-3xl pointer-events-none" />
             
-            <h2 className={`text-3xl md:text-4xl text-[#D4AF37] mb-6 ${playfair.className} font-semibold`}>
+            <h2 className={`text-xl sm:text-3xl md:text-4xl text-[#D4AF37] mb-4 sm:mb-6 ${playfair.className} font-semibold`}>
               Mari Menjadi Saluran Berkat
             </h2>
             
-            <div className="space-y-6 text-[#FDFBF7]/90 text-base md:text-lg leading-relaxed text-center font-light max-w-3xl mx-auto mb-10">
+            <div className="space-y-6 text-[#FDFBF7]/90 text-sm sm:text-base md:text-lg leading-relaxed text-center font-light max-w-3xl mx-auto mb-10 px-2">
               <p>
                 Setiap dukungan dan persembahan kasih yang Anda salurkan merupakan wujud nyata kepedulian bagi pelayanan kaum lanjut usia Pelkat PKLU GPIB. Mari bersama-sama kita sokong perayaan syukur HUT ke-16 ini agar para orang tua kita senantiasa dikuatkan untuk terus berkarya, menjadi teladan iman, serta saksi kasih Kristus yang hidup.
               </p>
-              <p className={`text-[#D4AF37] ${playfair.className} italic font-medium text-lg md:text-xl`}>
+              <p className={`text-[#D4AF37] ${playfair.className} italic font-medium text-base sm:text-lg md:text-xl leading-relaxed`}>
                 "Sampai masa tuamu Aku tetap Dia dan sampai masa putih rambutmu Aku menggendong kamu." <br/>
-                <span className="text-xs not-italic font-sans text-[#FDFBF7]/60 block mt-2 uppercase tracking-widest font-semibold">— Yesaya 46:4</span>
+                <span className="text-[10px] sm:text-xs not-italic font-sans text-[#FDFBF7]/60 block mt-2 uppercase tracking-widest font-semibold">— Yesaya 46:4</span>
               </p>
             </div>
             

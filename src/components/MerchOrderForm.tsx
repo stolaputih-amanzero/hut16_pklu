@@ -413,9 +413,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             rel="noreferrer"
             className="block w-full"
           >
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-5 text-sm rounded-xl transition-all shadow-lg">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Konfirmasi Pesanan ke Marsya Theresia (Seksi Dana)
+            <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-auto py-4 px-4 text-sm sm:text-base whitespace-normal rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+              <MessageSquare className="w-5 h-5 shrink-0" />
+              <span>Konfirmasi via WhatsApp</span>
             </Button>
           </a>
 
@@ -423,10 +423,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             type="button"
             variant="outline"
             onClick={handleResetForm}
-            className="w-full border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 py-5 text-xs font-semibold rounded-xl"
+            className="w-full border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 h-auto py-4 px-4 text-xs sm:text-sm font-semibold rounded-xl whitespace-normal flex items-center justify-center gap-2"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Buat Pesanan Merchandise Lainnya
+            <RefreshCw className="w-4 h-4 mr-2 shrink-0" />
+            <span>Buat Pesanan Baru</span>
           </Button>
         </div>
       </div>
@@ -620,34 +620,34 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             {errors.buyer_name && <p className="text-xs text-red-400">{errors.buyer_name.message}</p>}
           </div>
 
-          {/* Field: Asal Jemaat / Mupel (GPIB vs Non-GPIB / Umum) */}
+          {/* Field: Asal Jemaat / Mupel (GPIB vs Umum) */}
           <div className="space-y-3 p-4 bg-black/60 rounded-xl border border-white/10">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-2">
               <Label className="text-xs font-semibold text-[#D4AF37] flex items-center gap-1.5">
                 <Church className="w-4 h-4 text-[#D4AF37]" /> Asal Jemaat / Gereja *
               </Label>
-              <div className="flex gap-2 text-xs">
+              <div className="flex gap-2 text-xs w-full sm:w-auto justify-end">
                 <button
                   type="button"
                   onClick={() => setIsGpibMember(true)}
-                  className={`px-2.5 py-1 rounded-lg border font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
                     isGpibMember
                       ? "bg-[#D4AF37] text-black border-[#D4AF37]"
                       : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
                   }`}
                 >
-                  Jemaat GPIB
+                  GPIB
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsGpibMember(false)}
-                  className={`px-2.5 py-1 rounded-lg border font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
                     !isGpibMember
                       ? "bg-[#D4AF37] text-black border-[#D4AF37]"
                       : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
                   }`}
                 >
-                  Umum / Non-GPIB
+                  Umum
                 </button>
               </div>
             </div>
@@ -993,15 +993,17 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting || cartItems.length === 0}
-            className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold py-6 text-base rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all disabled:opacity-50"
+            className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-auto py-4 px-4 text-sm sm:text-base whitespace-normal rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all disabled:opacity-50 flex items-center justify-center"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" /> Memproses Pesanan...
+                <Loader2 className="w-5 h-5 animate-spin shrink-0" />
+                <span>Memproses Pesanan...</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                <Send className="w-5 h-5" /> Kirim Pesanan ({grandTotalQty} Pcs - Rp {grandTotalPrice.toLocaleString("id-ID")})
+                <Send className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                <span>Kirim Pesanan ({grandTotalQty} Pcs • Rp {grandTotalPrice.toLocaleString("id-ID")})</span>
               </span>
             )}
           </Button>

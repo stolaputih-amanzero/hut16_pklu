@@ -66,7 +66,7 @@ const servicesData = [
     badge: "Kampanye",
     btnText: "Buat Bingkai Amanaura",
     specs: [
-      { label: "Jenis Produk", value: "Twibbon Resmi Digital" },
+      { label: "Jenis Produk", value: "Amanaura Resmi Digital" },
       { label: "Kualitas Gambar", value: "High Definition (HD PNG)" },
       { label: "Teks Pendukung", value: "Caption & Hashtag Otomatis" },
       { label: "Proses Unduh", value: "Instan langsung ke perangkat Anda" }
@@ -248,7 +248,7 @@ export default function Home() {
 
     try {
       setSubmitting(true)
-      
+
       // 1. Fetch first active committee member for database foreign key compliance
       const { data: comms } = await supabase
         .from('committees')
@@ -300,11 +300,11 @@ export default function Home() {
 
       // 4. Construct WA message and redirect
       const waMessage = `Halo Ibu Anastasia Christine Dolo,\n\nSaya tertarik untuk mendukung perayaan HUT ke-16 Pelkat PKLU GPIB sebagai *${modalForm.type === 'donatur' ? 'Donatur' : 'Sponsor'}*.\n\nBerikut identitas saya:\n- Nama: ${modalForm.name}\n- No. WhatsApp: ${modalForm.phone}\n- No. Registrasi: ${number}\n\nMohon untuk dapat difollowup lebih lanjut. Terima kasih!`
-      
+
       const waUrl = `https://wa.me/6281291451945?text=${encodeURIComponent(waMessage)}`
-      
+
       toast.success('Dukungan Anda berhasil dicatat! Mengalihkan ke WhatsApp...')
-      
+
       // Open WA link
       window.open(waUrl, '_blank')
 
@@ -338,9 +338,9 @@ export default function Home() {
       {/* Ambient Background & Grid/Noise */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#022c22]" />
-        
+
         {/* Animated Gold light orb */}
-        <motion.div 
+        <motion.div
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.12, 0.18, 0.12],
@@ -348,9 +348,9 @@ export default function Home() {
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-[#D4AF37] rounded-full blur-[150px] md:blur-[220px] gpu-accelerated will-change-transform"
         />
-        
+
         {/* Animated Emerald light orb */}
-        <motion.div 
+        <motion.div
           animate={{
             scale: [1.1, 0.95, 1.1],
             opacity: [0.15, 0.25, 0.15],
@@ -363,7 +363,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-60" />
 
         {/* Noise overlay */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.025] mix-blend-overlay pointer-events-none"
           style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
         />
@@ -383,9 +383,9 @@ export default function Home() {
         <span className="text-[9px] font-mono text-gray-400 select-none shrink-0">
           {sections.findIndex(s => s.id === activeSection) + 1} / {sections.length}
         </span>
-        <div 
-          className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#F3E5AB] via-[#D4AF37] to-[#B8860B] transition-all duration-100" 
-          style={{ width: `${scrollProgress}%` }} 
+        <div
+          className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#F3E5AB] via-[#D4AF37] to-[#B8860B] transition-all duration-100"
+          style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
@@ -406,20 +406,19 @@ export default function Home() {
               <span className={`absolute right-6 text-[10px] tracking-wider uppercase bg-[#022c22]/95 border border-[#D4AF37]/35 text-[#D4AF37] px-2 py-1 rounded backdrop-blur-md opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap font-medium font-sans ${isActive ? 'opacity-100 translate-x-0 border-[#D4AF37]' : ''}`}>
                 {section.label}
               </span>
-              <div className={`w-2.5 h-2.5 rounded-full border transition-all duration-300 ${
-                isActive 
-                  ? 'bg-[#D4AF37] border-[#D4AF37] scale-125 shadow-[0_0_8px_#D4AF37]' 
+              <div className={`w-2.5 h-2.5 rounded-full border transition-all duration-300 ${isActive
+                  ? 'bg-[#D4AF37] border-[#D4AF37] scale-125 shadow-[0_0_8px_#D4AF37]'
                   : 'border-gray-500 bg-transparent group-hover:border-[#D4AF37] group-hover:scale-110'
-              }`} />
+                }`} />
             </a>
           )
         })}
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-24 flex flex-col items-center">
-        
+
         {/* Floating Token Image */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
@@ -427,7 +426,7 @@ export default function Home() {
         >
           {/* Subtle gold glow behind the token */}
           <div className="absolute inset-0 bg-radial-gradient from-[#D4AF37]/25 to-transparent blur-2xl rounded-full scale-75 opacity-80" />
-          
+
           <motion.div
             animate={{ y: [-8, 8, -8] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -454,9 +453,9 @@ export default function Home() {
           <motion.p variants={fadeIn} className="text-[#D4AF37] font-bold tracking-[0.15em] sm:tracking-[0.25em] uppercase text-[10px] sm:text-xs md:text-sm">
             Perayaan & Ibadah Syukur Nasional
           </motion.p>
-          
-          <motion.h1 
-            variants={fadeIn} 
+
+          <motion.h1
+            variants={fadeIn}
             className={`text-4xl xs:text-5xl md:text-7xl lg:text-8xl text-transparent bg-clip-text bg-gradient-to-b from-[#FDFBF7] to-[#FDFBF7]/60 leading-[1.1] md:leading-tight tracking-tight ${playfair.className}`}
           >
             HUT ke-16 <br />
@@ -475,7 +474,7 @@ export default function Home() {
 
           <motion.div variants={fadeIn} className="space-y-3 px-4">
             <p className="text-[#FDFBF7]/90 text-base sm:text-lg md:text-2xl font-light tracking-wide">
-              Bertumbuh Dalam Keselamatan 
+              Bertumbuh Dalam Keselamatan
               <span className="block xs:inline-block text-[#D4AF37] text-xs sm:text-sm md:text-base opacity-75 xs:ml-2 font-medium tracking-normal italic mt-1 xs:mt-0">
                 (1 Petrus 2:2)
               </span>
@@ -488,10 +487,10 @@ export default function Home() {
           {/* Tagline Ribbon */}
           <motion.div variants={fadeIn} className="mt-6 sm:mt-8 py-3 sm:py-4 border-y border-[#D4AF37]/20 w-[90%] sm:w-3/4 mx-auto backdrop-blur-sm bg-[#022c22]/10 rounded-lg">
             <p className="text-[#FDFBF7]/95 text-[9px] sm:text-[10px] md:text-xs tracking-[0.15em] sm:tracking-[0.3em] uppercase text-center font-semibold flex flex-wrap justify-center items-center gap-y-1">
-              <span>Untuk Lansia</span> 
-              <span className="text-[#D4AF37] mx-2 sm:mx-3">•</span> 
-              <span>Oleh Lansia</span> 
-              <span className="text-[#D4AF37] mx-2 sm:mx-3">•</span> 
+              <span>Untuk Lansia</span>
+              <span className="text-[#D4AF37] mx-2 sm:mx-3">•</span>
+              <span>Oleh Lansia</span>
+              <span className="text-[#D4AF37] mx-2 sm:mx-3">•</span>
               <span>Bersama PKLU GPIB</span>
             </p>
           </motion.div>
@@ -530,13 +529,13 @@ export default function Home() {
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block">01. INTRODUKSI</span>
             <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] tracking-tight font-medium italic ${playfair.className}`}>Pendahuluan</h2>
           </div>
-          
+
           <div className="relative p-5 sm:p-12 rounded-[2rem] bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
             <p className={`text-lg sm:text-xl md:text-2xl text-[#FDFBF7] font-light italic leading-relaxed mb-6 sm:mb-8 px-2 ${playfair.className}`}>
               "Hiasan orang muda ialah kekuatannya, dan keindahan orang tua ialah uban."
-              <br/><span className="text-xs sm:text-sm not-italic font-sans text-[#D4AF37] mt-4 block uppercase tracking-widest font-bold">Amsal 20:29</span>
+              <br /><span className="text-xs sm:text-sm not-italic font-sans text-[#D4AF37] mt-4 block uppercase tracking-widest font-bold">Amsal 20:29</span>
             </p>
-            
+
             <div className="space-y-4 sm:space-y-6 text-[#FDFBF7]/85 text-sm sm:text-base md:text-lg leading-relaxed text-center sm:text-justify md:text-center font-light px-2 sm:px-4">
               <p>
                 Uban di kepala adalah mahkota kemuliaan; tanda kesetiaan, pengalaman hidup, dan kasih Tuhan yang terus menyertai. Usia lanjut bukanlah akhir dari karya dan pelayanan, melainkan kesempatan untuk tetap menjadi berkat, menghadirkan hikmat, keteduhan, dan teladan iman bagi keluarga, gereja, dan masyarakat.
@@ -603,15 +602,13 @@ export default function Home() {
                   <button
                     key={idx}
                     onClick={() => setActiveServiceTab(idx)}
-                    className={`flex items-center gap-3 sm:gap-4 text-left px-4 sm:px-5 py-3 sm:py-4 rounded-xl transition-all duration-300 w-auto lg:w-full shrink-0 lg:shrink whitespace-nowrap lg:whitespace-normal cursor-pointer select-none group border lg:border-0 ${
-                      isActive 
-                        ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 lg:border-l-2 lg:border-[#D4AF37] lg:rounded-l-none text-[#D4AF37]' 
+                    className={`flex items-center gap-3 sm:gap-4 text-left px-4 sm:px-5 py-3 sm:py-4 rounded-xl transition-all duration-300 w-auto lg:w-full shrink-0 lg:shrink whitespace-nowrap lg:whitespace-normal cursor-pointer select-none group border lg:border-0 ${isActive
+                        ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 lg:border-l-2 lg:border-[#D4AF37] lg:rounded-l-none text-[#D4AF37]'
                         : 'border-white/5 text-gray-400 hover:text-white hover:bg-white/5'
-                    }`}
+                      }`}
                   >
-                    <div className={`p-2.5 rounded-lg border transition-all ${
-                      isActive ? 'border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]' : 'border-white/10 bg-black/40 text-gray-400 group-hover:text-white'
-                    }`}>
+                    <div className={`p-2.5 rounded-lg border transition-all ${isActive ? 'border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]' : 'border-white/10 bg-black/40 text-gray-400 group-hover:text-white'
+                      }`}>
                       {idx === 0 && <UserCheck className="w-5 h-5" />}
                       {idx === 1 && <Sparkles className="w-5 h-5" />}
                       {idx === 2 && <ShoppingBag className="w-5 h-5" />}
@@ -699,7 +696,7 @@ export default function Home() {
             <h2 className={`text-2xl sm:text-3xl md:text-4xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Maksud &amp; Tujuan</h2>
             <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {[
               "Mendukung terselenggaranya ibadah syukur dan perayaan HUT ke-16 Pelkat PKLU GPIB.",
@@ -739,29 +736,29 @@ export default function Home() {
 
           <div className="bg-black/40 backdrop-blur-md border border-white/5 rounded-[2rem] p-5 sm:p-8 shadow-2xl relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
-            
-             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-               {/* Left Side: Profile & Map */}
-               <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
-                 <div className="space-y-4">
-                   <p className="text-[#FDFBF7]/85 text-sm md:text-base leading-relaxed font-light text-justify">
-                      <strong>Musyawarah Pelayanan (Mupel) GPIB Bekasi</strong> merupakan persekutuan pelayanan, kesaksian, dan wadah misioner lintas jemaat di bawah naungan Gereja Protestan di Indonesia bagian Barat (GPIB) untuk wilayah Bekasi Kota dan Kabupaten.
-                   </p>
-                   <p className="text-[#FDFBF7]/85 text-sm md:text-base leading-relaxed font-light text-justify">
-                     Sebagai tuan rumah perayaan dan ibadah syukur HUT ke-16 Pelkat PKLU GPIB tingkat nasional tahun 2026, Mupel Bekasi mengoordinasikan seluruh persiapan demi kelancaran dan kenyamanan para lansia teladan dari penjuru Nusantara.
-                   </p>
-                 </div>
-  
-                 {/* Map Section */}
-                 <div className="flex-grow flex flex-col space-y-3">
-                   <h3 className={`text-lg text-[#D4AF37] font-semibold ${playfair.className} text-center md:text-left`}>
-                     Peta Sebaran Jemaat Mupel Bekasi
-                   </h3>
-                   <div className="w-full flex-grow rounded-2xl overflow-hidden relative min-h-[300px] md:min-h-[350px] lg:h-0">
-                     <MupelMap />
-                   </div>
-                 </div>
-               </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+              {/* Left Side: Profile & Map */}
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <p className="text-[#FDFBF7]/85 text-sm md:text-base leading-relaxed font-light text-justify">
+                    <strong>Musyawarah Pelayanan (Mupel) GPIB Bekasi</strong> merupakan persekutuan pelayanan, kesaksian, dan wadah misioner lintas jemaat di bawah naungan Gereja Protestan di Indonesia bagian Barat (GPIB) untuk wilayah Bekasi Kota dan Kabupaten.
+                  </p>
+                  <p className="text-[#FDFBF7]/85 text-sm md:text-base leading-relaxed font-light text-justify">
+                    Sebagai tuan rumah perayaan dan ibadah syukur HUT ke-16 Pelkat PKLU GPIB tingkat nasional tahun 2026, Mupel Bekasi mengoordinasikan seluruh persiapan demi kelancaran dan kenyamanan para lansia teladan dari penjuru Nusantara.
+                  </p>
+                </div>
+
+                {/* Map Section */}
+                <div className="flex-grow flex flex-col space-y-3">
+                  <h3 className={`text-lg text-[#D4AF37] font-semibold ${playfair.className} text-center md:text-left`}>
+                    Peta Sebaran Jemaat Mupel Bekasi
+                  </h3>
+                  <div className="w-full flex-grow rounded-2xl overflow-hidden relative min-h-[300px] md:min-h-[350px] lg:h-0">
+                    <MupelMap />
+                  </div>
+                </div>
+              </div>
 
               {/* Right Side: Congregation List Card with Custom Gold Scrollbar */}
               <div className="lg:col-span-5 bg-black/60 border border-[#D4AF37]/25 rounded-2xl p-4 sm:p-5 space-y-4 flex flex-col justify-between max-h-[500px] lg:max-h-[600px]">
@@ -769,7 +766,7 @@ export default function Home() {
                   <h3 className={`text-lg sm:text-xl text-[#D4AF37] font-semibold ${playfair.className}`}>Mupel GPIB Bekasi</h3>
                   <p className="text-[9px] text-[#FDFBF7]/50 uppercase tracking-widest mt-1">Struktur &amp; Cakupan Wilayah</p>
                 </div>
-                
+
                 <div className="space-y-3 text-xs flex-shrink-0">
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-[#FDFBF7]/60">BP Mupel:</span>
@@ -800,8 +797,8 @@ export default function Home() {
                     { name: 'Pilar Asih', loc: 'Bojong Rawalumbu' },
                     { name: 'Pondok Ungu', loc: 'Pondok Ungu Permai' }
                   ].map((j, i) => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       id={`jemaat-${j.name.toLowerCase().replace(/\s+/g, '-')}`}
                       className="flex gap-2 py-1.5 border-b border-white/5 last:border-b-0 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/35 border border-transparent px-3 rounded-lg transition-all duration-300"
                     >
@@ -831,7 +828,7 @@ export default function Home() {
             <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Rangkaian Kegiatan</h2>
             <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
-          
+
           <div className="flex flex-col gap-5 sm:gap-6">
             {/* Pra-Kegiatan */}
             <div className="rounded-[2rem] p-[1px] bg-gradient-to-r from-[#D4AF37]/30 via-[#D4AF37]/10 to-transparent">
@@ -899,7 +896,7 @@ export default function Home() {
           className="w-full max-w-5xl rounded-[2rem] p-[1px] bg-gradient-to-b from-[#D4AF37]/45 via-[#D4AF37]/10 to-transparent mb-12 px-4"
         >
           <div className="w-full bg-black/40 backdrop-blur-3xl rounded-[calc(2rem-1px)] p-5 sm:p-12 overflow-hidden">
-            
+
             <div className="text-center mb-8 sm:mb-10">
               <span className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37] font-semibold block mb-2">06. LOKASI ACARA</span>
               <h2 className={`text-2xl sm:text-3xl md:text-4xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Waktu &amp; Tempat</h2>
@@ -907,7 +904,7 @@ export default function Home() {
             </div>
 
             <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-              
+
               <div className="flex gap-6 items-start">
                 <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/30">
                   <Calendar className="w-6 h-6 text-[#D4AF37]" strokeWidth={1.5} />
@@ -920,7 +917,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-6 items-start">
                 <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/30">
                   <MapPin className="w-6 h-6 text-[#D4AF37]" strokeWidth={1.5} />
@@ -928,7 +925,7 @@ export default function Home() {
                 <div>
                   <h3 className={`font-semibold text-[#FDFBF7] text-xl md:text-2xl mb-2 ${playfair.className}`}>Bekasi Convention Center</h3>
                   <p className="text-[#FDFBF7]/85 tracking-wide font-light leading-relaxed mb-4 text-sm md:text-base">
-                    Hotel Santika Mega Mall Bekasi <br/>
+                    Hotel Santika Mega Mall Bekasi <br />
                     <span className="opacity-70 text-xs md:text-sm">Jl. Ahmad Yani No.1, Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi, Jawa Barat 17141</span>
                   </p>
                   <a href="https://www.google.com/maps/search/?api=1&query=Bekasi+Convention+Center" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#F3E5AB] transition-colors text-xs md:text-sm font-semibold border-b border-transparent hover:border-[#F3E5AB] pb-0.5">
@@ -960,21 +957,19 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mb-12 px-4">
             <button
               onClick={() => setActiveRundown('pra')}
-              className={`relative w-full sm:w-auto text-center px-6 py-3 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase transition-all duration-300 cursor-pointer ${
-                activeRundown === 'pra'
+              className={`relative w-full sm:w-auto text-center px-6 py-3 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase transition-all duration-300 cursor-pointer ${activeRundown === 'pra'
                   ? 'text-[#022c22] bg-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
                   : 'text-gray-400 border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-white'
-              }`}
+                }`}
             >
               Pra-Kegiatan (Lomba & Webinar)
             </button>
             <button
               onClick={() => setActiveRundown('puncak')}
-              className={`relative w-full sm:w-auto text-center px-6 py-3 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase transition-all duration-300 cursor-pointer ${
-                activeRundown === 'puncak'
+              className={`relative w-full sm:w-auto text-center px-6 py-3 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase transition-all duration-300 cursor-pointer ${activeRundown === 'puncak'
                   ? 'text-[#022c22] bg-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
                   : 'text-gray-400 border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-white'
-              }`}
+                }`}
             >
               Acara Puncak (12 Okt)
             </button>
@@ -995,13 +990,13 @@ export default function Home() {
                     <div key={idx} className="relative group">
                       {/* dot */}
                       <div className="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-[#022c22] border-2 border-[#D4AF37] group-hover:bg-[#D4AF37] transition-all duration-300 shadow-[0_0_5px_rgba(212,175,55,0.4)]" />
-                      
+
                       {/* time on left */}
                       <div className="hidden md:block md:absolute md:-left-44 md:top-1 md:w-32 md:text-right font-semibold text-[#D4AF37] text-sm md:text-base">
                         <div>{item.time}</div>
                         <div className="text-[10px] text-[#FDFBF7]/50 font-normal mt-0.5">Durasi: {item.duration}</div>
                       </div>
-                      
+
                       {/* content */}
                       <div className="p-5 sm:p-6 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
                         <div className="md:hidden text-xs text-[#D4AF37] font-semibold mb-2 flex items-center gap-2">
@@ -1032,12 +1027,12 @@ export default function Home() {
                     <div key={idx} className="relative group">
                       {/* dot */}
                       <div className="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-[#022c22] border-2 border-[#D4AF37] group-hover:bg-[#D4AF37] transition-all duration-300 shadow-[0_0_5px_rgba(212,175,55,0.4)]" />
-                      
+
                       {/* period on left */}
                       <div className="hidden md:block md:absolute md:-left-44 md:top-1 md:w-32 md:text-right font-semibold text-[#D4AF37] text-sm md:text-base leading-tight">
                         <div>{item.period}</div>
                       </div>
-                      
+
                       {/* content */}
                       <div className="p-5 sm:p-6 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/5 transition-all duration-300 shadow-md">
                         <div className="md:hidden text-xs text-[#D4AF37] font-semibold mb-2 leading-tight">
@@ -1150,9 +1145,8 @@ export default function Home() {
                         key={index}
                         onClick={() => setCurrentSlide(index)}
                         aria-label={`Go to slide ${index + 1}`}
-                        className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                          currentSlide === index ? "w-6 bg-[#D4AF37]" : "w-2 bg-[#D4AF37]/30 hover:bg-[#D4AF37]/60"
-                        }`}
+                        className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${currentSlide === index ? "w-6 bg-[#D4AF37]" : "w-2 bg-[#D4AF37]/30 hover:bg-[#D4AF37]/60"
+                          }`}
                       />
                     ))}
                   </div>
@@ -1264,37 +1258,37 @@ export default function Home() {
             <h2 className={`text-2xl sm:text-3xl md:text-5xl text-[#FDFBF7] font-medium italic ${playfair.className}`}>Dukungan Kasih</h2>
             <div className="w-16 h-0.5 bg-[#D4AF37]/30 mx-auto mt-4 rounded-full" />
           </div>
-          
+
           <div className="relative p-5 sm:p-12 rounded-[2rem] bg-gradient-to-br from-[#033B2B]/60 to-[#022c22]/40 backdrop-blur-md border border-[#D4AF37]/35 shadow-2xl">
             {/* Soft background glow */}
             <div className="absolute -top-12 -left-12 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-[#047857]/10 rounded-full blur-3xl pointer-events-none" />
-            
+
             <h2 className={`text-xl sm:text-3xl md:text-4xl text-[#D4AF37] mb-4 sm:mb-6 ${playfair.className} font-semibold`}>
               Mari Menjadi Saluran Berkat
             </h2>
-            
+
             <div className="space-y-6 text-[#FDFBF7]/90 text-sm sm:text-base md:text-lg leading-relaxed text-center font-light max-w-3xl mx-auto mb-10 px-2">
               <p>
                 Setiap dukungan dan persembahan kasih yang Anda salurkan merupakan wujud nyata kepedulian bagi pelayanan kaum lanjut usia Pelkat PKLU GPIB. Mari bersama-sama kita sokong perayaan syukur HUT ke-16 ini agar para orang tua kita senantiasa dikuatkan untuk terus berkarya, menjadi teladan iman, serta saksi kasih Kristus yang hidup.
               </p>
               <p className={`text-[#D4AF37] ${playfair.className} italic font-medium text-base sm:text-lg md:text-xl leading-relaxed`}>
-                "Sampai masa tuamu Aku tetap Dia dan sampai masa putih rambutmu Aku menggendong kamu." <br/>
+                "Sampai masa tuamu Aku tetap Dia dan sampai masa putih rambutmu Aku menggendong kamu." <br />
                 <span className="text-[10px] sm:text-xs not-italic font-sans text-[#FDFBF7]/60 block mt-2 uppercase tracking-widest font-semibold">— Yesaya 46:4</span>
               </p>
             </div>
-            
+
             <div className="flex justify-center">
-              <button 
+              <button
                 onClick={() => setIsOpenModal(true)}
                 className="group relative overflow-hidden rounded-full px-6 py-3 transition-all hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(212,175,55,0.25)] cursor-pointer bg-transparent"
               >
                 {/* Button Background Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#B8860B] opacity-90 transition-opacity group-hover:opacity-100" />
-                
+
                 {/* Shimmer Effect */}
                 <div className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-[#FDFBF7]/40 to-transparent transition-transform duration-1000 group-hover:translate-x-[100%]" />
-                
+
                 <div className="relative flex items-center justify-center gap-2">
                   <span className="font-bold text-[#022c22] text-xs md:text-sm tracking-wider uppercase">
                     Salurkan Dukungan Kasih
@@ -1321,9 +1315,9 @@ export default function Home() {
             >
               {/* Gold light effects inside modal */}
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-2xl pointer-events-none" />
-              
+
               {/* Close Button */}
-              <button 
+              <button
                 type="button"
                 onClick={() => {
                   if (!submitting) {
@@ -1352,7 +1346,7 @@ export default function Home() {
                   <span className="text-[#D4AF37] font-semibold uppercase tracking-wider">Rekening Transfer Panitia</span>
                   <span className="text-[10px] text-emerald-400 font-medium">Bank Resmi</span>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2 text-[#FDFBF7]">
                   <div>
                     <span className="text-white/50 block text-[10px] uppercase">Bank</span>
@@ -1425,11 +1419,10 @@ export default function Home() {
                       type="button"
                       disabled={submitting}
                       onClick={() => setModalForm(prev => ({ ...prev, type: 'donatur' }))}
-                      className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${
-                        modalForm.type === 'donatur'
+                      className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${modalForm.type === 'donatur'
                           ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
                           : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
-                      }`}
+                        }`}
                     >
                       <div className="text-xs uppercase tracking-wider">Donasi</div>
                       <div className="text-[10px] opacity-60 mt-0.5">Sebagai Donatur</div>
@@ -1438,11 +1431,10 @@ export default function Home() {
                       type="button"
                       disabled={submitting}
                       onClick={() => setModalForm(prev => ({ ...prev, type: 'sponsorship' }))}
-                      className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${
-                        modalForm.type === 'sponsorship'
+                      className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${modalForm.type === 'sponsorship'
                           ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
                           : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
-                      }`}
+                        }`}
                     >
                       <div className="text-xs uppercase tracking-wider">Sponsor</div>
                       <div className="text-[10px] opacity-60 mt-0.5">Sponsorship Paket</div>

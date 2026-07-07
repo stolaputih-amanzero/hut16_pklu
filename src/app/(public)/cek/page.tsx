@@ -285,7 +285,7 @@ function CheckContent() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2.5">
                       <div>
                         <span className="text-[10px] text-gray-400 block uppercase tracking-wider">No Pesanan</span>
-                        <span className="font-mono text-sm font-black text-[#D4AF37] uppercase">#MB-{order.id.slice(0, 8).toUpperCase()}</span>
+                        <span className="font-mono text-sm font-black text-[#D4AF37] uppercase">#MB-{order.id.slice(0, 6).toUpperCase()}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {isPending && (

@@ -451,7 +451,9 @@ export default function AdminMerchPage() {
                               o.whatsapp
                             )}
                           </td>
-                          <td className="p-3 font-semibold text-[#D4AF37] whitespace-nowrap">{o.item_type}</td>
+                          <td className="p-3 font-semibold text-[#D4AF37] whitespace-nowrap">
+                            {o.item_type?.replace("Pouch & Goodie Bag Edisi Spesial", "Pouch & Googie Bag Edisi Spesial")}
+                          </td>
                           <td className="p-3">
                             {o.size ? (
                               (() => {
@@ -531,7 +533,7 @@ export default function AdminMerchPage() {
 
                       <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
                         <span className="font-semibold text-[#D4AF37] text-xs">
-                          {o.item_type}
+                          {o.item_type?.replace("Pouch & Goodie Bag Edisi Spesial", "Pouch & Googie Bag Edisi Spesial")}
                         </span>
                         {o.size && (
                           <span className="px-1.5 py-0.5 rounded font-mono font-black text-[10px] bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
@@ -817,7 +819,9 @@ export default function AdminMerchPage() {
                 <div className="flex justify-between items-start gap-4">
                   <div className="space-y-1">
                     <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Item Merchandise</div>
-                    <div className="text-xs font-bold text-[#D4AF37]">{selectedOrder.item_type}</div>
+                    <div className="text-xs font-bold text-[#D4AF37]">
+                      {selectedOrder.item_type?.replace("Pouch & Goodie Bag Edisi Spesial", "Pouch & Googie Bag Edisi Spesial")}
+                    </div>
                   </div>
                   <div className="text-right space-y-1">
                     <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Jumlah (Qty)</div>

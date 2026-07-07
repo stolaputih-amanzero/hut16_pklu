@@ -290,12 +290,12 @@ function CheckContent() {
                       <div className="flex items-center gap-2">
                         {isPending && (
                           <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider">
-                            Menunggu Verifikasi
+                            Tercatat, Menunggu Konfirmasi
                           </span>
                         )}
                         {isVerified && (
                           <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider">
-                            Lunas &amp; Terverifikasi
+                            Confirmed (Lunas &amp; Terverifikasi)
                           </span>
                         )}
                         {isRejected && (

@@ -186,29 +186,33 @@ export async function submitMerchOrder(formData: FormData) {
 
 export async function getMerchOrderByCodeOrWa(query: string) {
   try {
-    const clean = query.trim();
+    const clean = query.trim().toUpperCase();
     if (!clean) return { success: false, data: [] };
 
-    let queryBuilder = supabaseAdmin
+    const { data: allOrders, error } = await supabaseAdmin
       .from("merch_orders")
-      .select("*");
-
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean);
-
-    if (isUuid) {
-      queryBuilder = queryBuilder.eq("id", clean);
-    } else {
-      queryBuilder = queryBuilder.or(`registration_code.ilike.${clean},whatsapp.eq.${clean}`);
-    }
-
-    const { data, error } = await queryBuilder.order("created_at", { ascending: false });
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Fetch Merch Order Error:", error);
       return { success: false, data: [] };
     }
 
-    return { success: true, data: data || [] };
+    const cleanQuery = clean.replace("#", "").replace("MB-", "");
+
+    const filtered = (allOrders || []).filter((order) => {
+      const orderIdShort = order.id.slice(0, 6).toUpperCase();
+      const orderIdFull = order.id.toUpperCase();
+      const matchesId = orderIdShort === cleanQuery || orderIdFull === cleanQuery;
+
+      const matchesWa = order.whatsapp === cleanQuery || (order.whatsapp || "").replace(/^0/, "62") === cleanQuery;
+      const matchesRegCode = order.registration_code?.toUpperCase() === cleanQuery;
+
+      return matchesId || matchesWa || matchesRegCode;
+    });
+
+    return { success: true, data: filtered };
   } catch (err) {
     return { success: false, data: [] };
   }

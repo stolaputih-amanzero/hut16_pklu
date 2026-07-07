@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
+import { toPng } from "html-to-image";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchMerchProducts } from "@/app/(admin)/admin/merch/actions";
-import { submitMerchOrder, CartItemInput, lookupRegistrationForMerch } from "@/app/(public)/merch/actions";
+import { submitMerchOrder, CartItemInput, getMerchOrderByCodeOrWa } from "@/app/(public)/merch/actions";
 import { QRCodeSVG } from "qrcode.react";
 import { 
   AlertTriangle, 
@@ -32,7 +34,11 @@ import {
   Minus,
   Trash2,
   ShoppingCart,
-  ChevronDown
+  ChevronDown,
+  Download,
+  Camera,
+  Copy,
+  Search
 } from "lucide-react";
 
 export const merchSchema = z.object({
@@ -86,42 +92,61 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const [errorMsg, setErrorMsg] = useState("");
   const [isGuideOpen, setIsGuideOpen] = useState(true);
 
-  // Lookup Registration State
-  const [registrationCode, setRegistrationCode] = useState("");
-  const [lookupLoading, setLookupLoading] = useState(false);
-  const [lookupSuccess, setLookupSuccess] = useState(false);
-  const [lookupError, setLookupError] = useState("");
+  // Status check modal states
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusSearchQuery, setStatusSearchQuery] = useState("");
+  const [statusLookupLoading, setStatusLookupLoading] = useState(false);
+  const [statusLookupResults, setStatusLookupResults] = useState<any[] | null>(null);
+  const [statusLookupError, setStatusLookupError] = useState("");
+
+  const handleStatusSearch = async () => {
+    const q = statusSearchQuery.trim();
+    if (!q) return;
+    setStatusLookupLoading(true);
+    setStatusLookupError("");
+    setStatusLookupResults(null);
+
+    const res = await getMerchOrderByCodeOrWa(q);
+    setStatusLookupLoading(false);
+
+    if (res.success && res.data && res.data.length > 0) {
+      setStatusLookupResults(res.data);
+    } else {
+      setStatusLookupError("Pesanan tidak ditemukan. Periksa kembali No WhatsApp atau Kode Pesanan Anda.");
+    }
+  };
+
+  // Ref & State for Receipt Downloader
+  const receiptRef = useRef<HTMLDivElement>(null);
+  const [downloadingImage, setDownloadingImage] = useState(false);
+
+  const handleDownloadReceipt = async () => {
+    if (!receiptRef.current || !successData) return;
+    try {
+      setDownloadingImage(true);
+      const dataUrl = await toPng(receiptRef.current, {
+        cacheBust: true,
+        backgroundColor: "#011c15",
+        style: {
+          transform: "scale(1)",
+        }
+      });
+      const link = document.createElement("a");
+      link.download = `Bukti-Pesanan-Merch-${successData.id.slice(0, 6).toUpperCase()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Gagal menyimpan bukti:", err);
+      toast.error("Gagal menyimpan gambar bukti pesanan. Silakan lakukan screenshot pada layar Anda.");
+    } finally {
+      setDownloadingImage(false);
+    }
+  };
 
   // Payment states
   const [paymentDate, setPaymentDate] = useState("");
   const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
   const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
-
-  const handleLookup = async () => {
-    if (!registrationCode.trim()) return;
-    setLookupLoading(true);
-    setLookupError("");
-    setLookupSuccess(false);
-
-    const res = await lookupRegistrationForMerch(registrationCode);
-    setLookupLoading(false);
-
-    if (res.success && res.data) {
-      setLookupSuccess(true);
-      setValue("buyer_name", res.data.name);
-      setValue("whatsapp", res.data.whatsapp);
-      if (res.data.church_name) {
-        setIsGpibMember(true);
-        setSelectedMupel(res.data.mupel);
-        setSelectedJemaat(res.data.church_name);
-      } else {
-        setIsGpibMember(false);
-        setCustomChurch(res.data.church_name || "");
-      }
-    } else {
-      setLookupError("Kode registrasi tidak ditemukan. Silakan isi form secara manual.");
-    }
-  };
 
   const [mounted, setMounted] = useState(false);
 
@@ -398,9 +423,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     fd.append("buyer_name", data.buyer_name);
     fd.append("church_city", data.church_city);
     fd.append("whatsapp", data.whatsapp);
-    if (registrationCode && lookupSuccess) {
-      fd.append("registration_code", registrationCode);
-    }
+
     fd.append("items", JSON.stringify(payloadItems));
     if (data.notes) {
       fd.append("notes", data.notes);
@@ -426,9 +449,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setSelectedMupel("");
     setSelectedJemaat("");
     setCustomChurch("");
-    setRegistrationCode("");
-    setLookupSuccess(false);
-    setLookupError("");
+
     setPaymentDate("");
     setPaymentProofFile(null);
     setPaymentProofPreview(null);
@@ -459,108 +480,131 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
     return (
       <div className="space-y-6 rounded-2xl border-2 border-emerald-500/40 bg-black/60 p-6 md:p-8 backdrop-blur-xl text-[#FDFBF7] shadow-[0_0_30px_rgba(16,185,129,0.15)] animate-in fade-in">
-        <div className="text-center space-y-2">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">
-            <PackageCheck className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-extrabold text-emerald-400">Pesanan Merchandise Berhasil Dicatat!</h2>
-          <p className="text-xs text-gray-300">Terima kasih atas pesanan souvenir Anda.</p>
-        </div>
-
-        {/* 📍 VENUE CLAIM NOTICE BOX IN SUCCESS VIEW */}
-        <div className="rounded-xl border border-amber-500/50 bg-amber-500/15 p-4 text-amber-200 text-xs leading-relaxed space-y-1">
-          <div className="flex items-center gap-1.5 font-bold text-amber-300">
-            <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-            📌 CATATAN PENGAMBILAN MERCHANDISE:
-          </div>
-          <p>
-            Seluruh barang merchandise/cenderamata yang Anda pesan dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>) dengan menunjukkan bukti WhatsApp / Nama Pemesan.
-          </p>
-        </div>
-
-        {/* Explicit Separation Notice Box */}
-        <div className="rounded-xl border border-blue-500/40 bg-blue-500/10 p-3.5 text-blue-200 text-xs leading-relaxed">
-          <p>{successData.notice}</p>
-        </div>
-
-        {/* Order Details Summary Card */}
-        <div className="space-y-4 bg-black/50 p-4 md:p-5 rounded-xl border border-white/10 text-xs">
-          <h3 className="font-bold text-[#D4AF37] border-b border-white/10 pb-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <ShoppingBag className="w-4 h-4 text-[#D4AF37]" /> Ringkasan Pesanan #MB-{successData.id.slice(0, 6).toUpperCase()}
-            </span>
-            <span className="font-mono text-emerald-400 font-bold text-sm">
-              Total: Rp {(successData.totalPrice || 0).toLocaleString("id-ID")}
-            </span>
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <span className="text-gray-400 block">Nama Pemesan:</span>
-              <span className="font-bold text-white text-sm">{successData.buyer_name}</span>
+        
+        {/* Printable Receipt Card Container */}
+        <div 
+          ref={receiptRef}
+          className="p-5 md:p-6 rounded-xl border border-[#D4AF37]/35 bg-[#011c15] text-[#FDFBF7] space-y-4 shadow-inner"
+        >
+          <div className="text-center space-y-2 pb-4 border-b border-white/10">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">
+              <PackageCheck className="w-6 h-6" />
             </div>
-            <div>
-              <span className="text-gray-400 block">Asal Jemaat / Kota:</span>
-              <span className="font-semibold text-emerald-300">{successData.church_city}</span>
-            </div>
-            <div>
-              <span className="text-gray-400 block">WhatsApp:</span>
-              <span className="font-mono text-white">{successData.whatsapp}</span>
-            </div>
-            <div>
-              <span className="text-gray-400 block">Total Qty Pcs:</span>
-              <span className="font-bold text-white font-mono">{successData.quantity} Pcs</span>
-            </div>
+            <h2 className="text-xl font-extrabold text-emerald-400 leading-tight">Bukti Pembelian Merchandise</h2>
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest">HUT 16 PKLU GPIB BEKASI</p>
           </div>
 
-          <div className="pt-2 border-t border-white/10 space-y-2">
-            <span className="text-gray-400 font-semibold block">Rincian Item yang Dipesan:</span>
-            <div className="bg-black/40 p-3 rounded-lg border border-white/10 space-y-1.5 font-mono text-xs text-gray-200">
-              {successData.item_type?.split(", ").map((item: string, idx: number) => (
-                <div key={idx} className="flex items-start gap-1.5">
-                  <span className="text-[#D4AF37] shrink-0">•</span>
-                  <span className="text-white font-semibold">{item}</span>
-                </div>
-              ))}
+          {/* 📍 VENUE CLAIM NOTICE BOX IN SUCCESS VIEW */}
+          <div className="rounded-xl border border-amber-500/45 bg-amber-500/10 p-3.5 text-amber-200 text-[11px] leading-relaxed space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-amber-300">
+              <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>CATATAN PENGAMBILAN SOUVENIR:</span>
             </div>
-          </div>
-
-          {successData.notes && (
-            <div className="pt-2 border-t border-white/10">
-              <span className="text-gray-400 block">Catatan Tambahan:</span>
-              <p className="italic text-gray-200">{successData.notes}</p>
-            </div>
-          )}
-        </div>
-
-        {/* QR Code Status Check Section */}
-        <div className="bg-[#0B0904] p-5 rounded-xl border border-[#D4AF37]/45 flex flex-col items-center justify-center space-y-3 text-center">
-          <div className="bg-white p-3 rounded-lg flex items-center justify-center">
-            <QRCodeSVG 
-              value={`${window.location.origin}/cek?merch_id=${successData.id}`} 
-              size={135} 
-              level="H" 
-            />
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs font-bold text-[#D4AF37]">QR Code Status Pesanan</p>
-            <p className="text-[10px] text-gray-400 max-w-xs leading-normal">
-              Scan atau simpan QR Code di atas untuk memantau status persetujuan pembayaran dan notes/catatan dari panitia.
+            <p>
+              Seluruh cenderamata yang Anda pesan dapat diambil di <strong>Meja Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>) dengan menunjukkan bukti QR Code / Nama Pemesan.
             </p>
-            <div className="pt-2">
-              <a 
-                href={`/cek?merch_id=${successData.id}`} 
-                target="_blank" 
-                className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 underline"
-              >
-                Cek Status Pesanan Langsung →
-              </a>
+          </div>
+
+          {/* Explicit Separation Notice Box */}
+          <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-blue-200 text-[11px] leading-relaxed">
+            <p>{successData.notice}</p>
+          </div>
+
+          {/* Order Summary Details */}
+          <div className="space-y-4 bg-black/40 p-4 rounded-xl border border-white/5 text-[11px]">
+            <h3 className="font-bold text-[#D4AF37] border-b border-white/10 pb-2 flex items-center justify-between">
+              <span className="flex items-center gap-1.5 font-bold">
+                <ShoppingBag className="w-3.5 h-3.5 text-[#D4AF37]" /> Ringkasan Pesanan #MB-{successData.id.slice(0, 6).toUpperCase()}
+              </span>
+              <span className="font-mono text-emerald-400 font-bold text-xs">
+                Total: Rp {(successData.totalPrice || 0).toLocaleString("id-ID")}
+              </span>
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <span className="text-gray-400 block">Nama Pemesan:</span>
+                <span className="font-bold text-white">{successData.buyer_name}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block">Asal Jemaat / Kota:</span>
+                <span className="font-semibold text-emerald-300">{successData.church_city}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block">WhatsApp:</span>
+                <span className="font-mono text-white">{successData.whatsapp}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block">Total Qty Pcs:</span>
+                <span className="font-bold text-white font-mono">{successData.quantity} Pcs</span>
+              </div>
+              <div className="col-span-2 pt-2 border-t border-white/5">
+                <span className="text-gray-400 block mb-1">Status Pembelian:</span>
+                <span className="inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider">
+                  Tercatat, Menunggu Konfirmasi
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-white/10 space-y-1.5">
+              <span className="text-gray-400 font-semibold block">Rincian Item yang Dipesan:</span>
+              <div className="bg-black/40 p-3 rounded-lg border border-white/5 space-y-1.5 font-mono text-[10px] text-gray-200">
+                {successData.item_type?.split(", ").map((item: string, idx: number) => (
+                  <div key={idx} className="flex items-start gap-1.5">
+                    <span className="text-[#D4AF37] shrink-0">•</span>
+                    <span className="text-white font-semibold">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {successData.notes && (
+              <div className="pt-2 border-t border-white/10">
+                <span className="text-gray-400 block">Catatan Tambahan:</span>
+                <p className="italic text-gray-200">{successData.notes}</p>
+              </div>
+            )}
+          </div>
+
+          {/* QR Code Status Check Section */}
+          <div className="bg-black/40 p-4 rounded-xl border border-[#D4AF37]/35 flex flex-col items-center justify-center space-y-2.5 text-center">
+            <div className="bg-white p-2.5 rounded-lg flex items-center justify-center">
+              <QRCodeSVG 
+                value={`${window.location.origin}/cek?merch_id=${successData.id}`} 
+                size={120} 
+                level="H" 
+              />
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-[#D4AF37]">QR Code Status Pesanan</p>
+              <p className="text-[9px] text-gray-400 max-w-xs leading-normal">
+                Scan atau simpan QR Code di atas untuk memantau status persetujuan pembayaran dan notes/catatan dari panitia.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons to CP Marsya Theresia */}
+        {/* Action Buttons */}
         <div className="space-y-3 pt-2">
+          <Button
+            type="button"
+            onClick={handleDownloadReceipt}
+            disabled={downloadingImage}
+            className="w-full bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 border border-[#D4AF37]/60 text-[#D4AF37] font-bold h-auto py-4 px-4 text-sm sm:text-base whitespace-normal rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {downloadingImage ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Menyiapkan Gambar Bukti...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-5 h-5" />
+                <span>Simpan Bukti sebagai Gambar</span>
+              </>
+            )}
+          </Button>
+
           <a
             href={`https://wa.me/6281219964142?text=${waMessage}`}
             target="_blank"
@@ -590,6 +634,17 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   // FORM INPUT VIEW
   return (
     <div className="space-y-6">
+      {/* Top Banner Status Button */}
+      <div className="text-center pb-2 border-b border-white/5">
+        <button 
+          type="button"
+          onClick={() => setIsStatusModalOpen(true)}
+          className="inline-flex items-center text-xs font-semibold text-[#D4AF37] hover:underline bg-[#D4AF37]/10 px-3 py-1.5 rounded-full border border-[#D4AF37]/30 transition-all hover:scale-[1.02] cursor-pointer"
+        >
+          Sudah pernah melakukan Pembelian? Cek Status / QR Code Pembelian →
+        </button>
+      </div>
+
       {/* Combined Collapsible Guidelines Block */}
       <div className="rounded-2xl border border-white/10 bg-black/45 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-lg">
         <button
@@ -859,7 +914,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         <div className="border-b border-white/10 pb-3">
           <h2 className="text-lg sm:text-xl font-bold text-[#D4AF37] flex items-center gap-2">
             <Plus className="w-5 h-5 text-[#D4AF37]" />
-            Pemesanan
+            Pembelian Merchandise
           </h2>
           <p className="text-xs text-gray-300">Isi identitas pemesan dan pilih beberapa item/ukuran souvenir di bawah ini.</p>
         </div>
@@ -872,42 +927,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Optional Registration Lookup */}
-          <div className="space-y-3 p-4 bg-black/45 rounded-2xl border border-white/10 shadow-lg">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="merch-reg-code" className="text-xs font-bold text-gray-200">
-                Kode Pemesanan <span className="text-gray-400 font-normal">(Opsional)</span>
-              </Label>
-              <span className="text-[10px] text-gray-400 leading-normal">Gunakan untuk mengisi formulir secara otomatis</span>
-            </div>
-            <div className="flex gap-2">
-              <Input
-                id="merch-reg-code"
-                placeholder="Contoh: PKLU-XXXXX"
-                value={registrationCode}
-                onChange={(e) => setRegistrationCode(e.target.value.toUpperCase())}
-                className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs h-10 uppercase focus-visible:ring-1 focus-visible:ring-[#D4AF37]/45 focus-visible:border-[#D4AF37]/45 rounded-xl transition-all"
-              />
-              <Button
-                type="button"
-                onClick={handleLookup}
-                disabled={lookupLoading || !registrationCode.trim()}
-                className="bg-[#D4AF37] hover:bg-[#B3932D] text-black text-xs h-10 font-bold px-4 rounded-xl shrink-0 transition-all active:scale-[0.98] shadow-md border-0 cursor-pointer"
-              >
-                {lookupLoading ? "Mencari..." : "Cari Kode"}
-              </Button>
-            </div>
-            {lookupSuccess && (
-              <p className="text-[11px] text-emerald-400 font-medium pt-0.5">
-                ✓ Profil Pendaftaran ditemukan! Data form berhasil diisi otomatis.
-              </p>
-            )}
-            {lookupError && (
-              <p className="text-[11px] text-amber-400 font-medium pt-0.5">
-                ⚠️ {lookupError}
-              </p>
-            )}
-          </div>
+
 
           {/* Section: Data Pemesan */}
           <div className="space-y-4 p-5 md:p-6 bg-black/45 rounded-2xl border border-white/10 shadow-lg">
@@ -1160,11 +1180,14 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           {/* 🛒 MULTI-SIZE & MULTI-ITEM CART CONFIGURATOR */}
           {groupedCartByProduct.length > 0 ? (
             <div className="p-4 md:p-5 bg-black/60 rounded-2xl border border-[#D4AF37]/50 space-y-4 shadow-xl animate-in fade-in">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex flex-col gap-1 border-b border-white/10 pb-3">
                 <h3 className="font-bold text-sm text-[#D4AF37] flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4 text-[#D4AF37]" />
-                  Rincian Keranjang ({grandTotalQty} Pcs Item Dipilih):
+                  Rincian Keranjang
                 </h3>
+                <span className="text-[11px] text-gray-400 pl-6">
+                  {grandTotalQty} Pcs Item Dipilih
+                </span>
               </div>
 
               {/* Grouped Products List */}
@@ -1243,8 +1266,8 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
-                              <span className="px-3.5 font-mono font-bold text-white text-xs h-full flex items-center justify-center">
-                                {cartItem.quantity} pcs
+                              <span className="px-3.5 font-mono font-bold text-white text-xs h-full flex items-center justify-center min-w-[32px] text-center">
+                                {cartItem.quantity}
                               </span>
                               <button
                                 type="button"
@@ -1311,12 +1334,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     type="button" 
                     onClick={() => {
                       navigator.clipboard.writeText("0017901880004479");
-                      alert("Nomor rekening berhasil disalin!");
+                      toast.success("Nomor rekening berhasil disalin!");
                     }}
                     className="p-1 hover:bg-[#D4AF37]/20 rounded text-[#D4AF37] transition-colors"
                     title="Copy Rekening"
                   >
-                    <Check className="w-3.5 h-3.5" />
+                    <Copy className="w-3.5 h-3.5" />
                   </button>
                 </div>
                 Atas nama: <strong>Panitia MUPEL GPIB BEKASI</strong><br/>
@@ -1355,7 +1378,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     const file = e.target.files?.[0];
                     if (file) {
                       if (file.size > 5 * 1024 * 1024) {
-                        alert("File maksimal 5MB.");
+                        toast.error("File maksimal 5MB.");
                         return;
                       }
                       setPaymentProofFile(file);
@@ -1473,6 +1496,184 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/10"
               onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
             />
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* 5. STATUS CHECK MODAL POPUP */}
+      {isStatusModalOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/45 p-5 md:p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[85vh] overflow-y-auto relative">
+            <button
+              onClick={() => {
+                setIsStatusModalOpen(false);
+                setStatusSearchQuery("");
+                setStatusLookupResults(null);
+                setStatusLookupError("");
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-1.5 pr-8 border-b border-white/10 pb-3">
+              <h3 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
+                Cek Status Pembelian
+              </h3>
+              <p className="text-[11px] text-gray-300 leading-normal">
+                Masukkan nomor WhatsApp Anda atau Kode Pesanan (Contoh: 89C571) untuk mengecek status pembelian merchandise Anda.
+              </p>
+            </div>
+
+            {/* Search Input Box */}
+            <form onSubmit={(e) => { e.preventDefault(); handleStatusSearch(); }} className="flex flex-col sm:flex-row gap-3">
+              <Input
+                placeholder="Contoh: 08123456789 atau 89C571"
+                value={statusSearchQuery}
+                onChange={(e) => setStatusSearchQuery(e.target.value)}
+                className="bg-black/50 text-white border-[#D4AF37]/30 py-3.5 px-4 h-11 text-xs focus-visible:ring-1 focus-visible:ring-[#D4AF37]/50 rounded-xl"
+              />
+              <Button
+                type="submit"
+                disabled={statusLookupLoading || !statusSearchQuery.trim()}
+                className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-11 py-2 px-5 shrink-0 rounded-xl transition-all active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5 cursor-pointer text-xs"
+              >
+                {statusLookupLoading ? "Mencari..." : <><Search className="w-4 h-4" /> Cari</>}
+              </Button>
+            </form>
+
+            {statusLookupError && (
+              <p className="text-xs text-amber-400 font-medium bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
+                ⚠️ {statusLookupError}
+              </p>
+            )}
+
+            {/* Results Block */}
+            {statusLookupResults && statusLookupResults.length > 0 && (
+              <div className="space-y-6 pt-1">
+                {statusLookupResults.map((order) => {
+                  const isPending = order.payment_status === "pending";
+                  const isVerified = order.payment_status === "verified";
+                  const isRejected = order.payment_status === "rejected";
+                  const orderCode = `MB-${order.id.slice(0, 6).toUpperCase()}`;
+
+                  return (
+                    <div 
+                      key={order.id} 
+                      id={`ticket-merch-${order.id}`}
+                      className="rounded-xl border border-[#D4AF37]/45 bg-[#0B0904] p-4 sm:p-5 space-y-5 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden"
+                    >
+                      {/* Ticket Header */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-3.5 gap-3">
+                        <div>
+                          <span className="text-[9px] uppercase tracking-wider text-gray-400 block mb-0.5">Kode Pesanan</span>
+                          <h2 className="text-xl font-black text-[#D4AF37] font-mono tracking-wider">#{orderCode}</h2>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {isPending && (
+                            <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full font-semibold text-[9px] uppercase tracking-wider">
+                              Tercatat, Menunggu Konfirmasi
+                            </span>
+                          )}
+                          {isVerified && (
+                            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold text-[9px] uppercase tracking-wider">
+                              Confirmed (Lunas &amp; Terverifikasi)
+                            </span>
+                          )}
+                          {isRejected && (
+                            <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-2.5 py-1 rounded-full font-semibold text-[9px] uppercase tracking-wider">
+                              Pembayaran Ditolak
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Details Grid (exactly matching registrations display details / cek style) */}
+                      <div className="space-y-2.5 text-[11px] sm:text-xs">
+                        <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                          <span className="text-gray-400 shrink-0">Nama Pemesan:</span>
+                          <span className="font-semibold text-white text-right">{order.buyer_name}</span>
+                        </div>
+                        <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                          <span className="text-gray-400 shrink-0">Asal Jemaat:</span>
+                          <span className="font-semibold text-emerald-300 text-right">{order.church_city}</span>
+                        </div>
+                        <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                          <span className="text-gray-400 shrink-0">No WhatsApp:</span>
+                          <span className="font-semibold text-white font-mono text-right">{order.whatsapp}</span>
+                        </div>
+                        <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                          <span className="text-gray-400 shrink-0">Tanggal Bayar:</span>
+                          <span className="font-semibold text-white text-right">
+                            {order.payment_date ? new Date(order.payment_date).toLocaleDateString("id-ID", { dateStyle: "long" }) : "-"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Rincian Item list */}
+                      <div className="pt-2 border-t border-white/5">
+                        <span className="text-gray-400 block mb-1.5 font-semibold text-[10px] uppercase tracking-wider">Rincian Item Pembelian:</span>
+                        <div className="bg-black/40 p-3 rounded-lg border border-white/5 space-y-1.5 font-mono text-[10px] text-gray-200">
+                          {order.item_type?.split(", ").map((item: string, idx: number) => (
+                            <div key={idx} className="flex items-start gap-1.5">
+                              <span className="text-[#D4AF37] shrink-0">•</span>
+                              <span className="text-white font-semibold">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {order.admin_notes && (
+                        <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 text-amber-200 italic text-[11px] leading-relaxed">
+                          <strong className="text-[#D4AF37] not-italic block mb-1 font-bold">Catatan Panitia:</strong>
+                          "{order.admin_notes}"
+                        </div>
+                      )}
+
+                      {/* QR Code and Save Button (Exactly styled like registration check status) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-3.5 border-t border-white/10 no-export">
+                        <div className="flex flex-col items-center justify-center p-3 bg-white rounded-xl text-black space-y-1">
+                          <QRCodeSVG 
+                            value={`${window.location.origin}/cek?merch_id=${order.id}`} 
+                            size={95} 
+                            level="H" 
+                          />
+                          <p className="text-[9px] font-bold text-gray-600 text-center tracking-tight uppercase">Status Verifikasi</p>
+                        </div>
+
+                        <Button
+                          type="button"
+                          onClick={async () => {
+                            const ticketEl = document.getElementById(`ticket-merch-${order.id}`);
+                            if (!ticketEl) return;
+                            try {
+                              const dataUrl = await toPng(ticketEl, {
+                                cacheBust: true,
+                                backgroundColor: "#0B0904",
+                                style: { transform: "scale(1)" }
+                              });
+                              const link = document.createElement("a");
+                              link.download = `Bukti-Pembelian-Merch-${orderCode}.png`;
+                              link.href = dataUrl;
+                              link.click();
+                            } catch (err) {
+                              console.error("Gagal menyimpan gambar:", err);
+                              toast.error("Gagal menyimpan gambar bukti pembelian.");
+                            }
+                          }}
+                          className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs h-10 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Download className="w-4 h-4" /> Simpan Gambar
+                        </Button>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>,
         document.body

@@ -308,7 +308,7 @@ function CheckContent() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 bg-black/40 p-4 rounded-xl border border-white/5 text-xs">
                       <div className="flex justify-between sm:block py-1 border-b border-white/5 sm:border-0 gap-2">
-                        <span className="text-gray-400 block">Nama Pemesan:</span>
+                        <span className="text-gray-400 block">Nama Pembeli:</span>
                         <span className="font-semibold text-white text-right sm:text-left">{order.buyer_name}</span>
                       </div>
                       <div className="flex justify-between sm:block py-1 border-b border-white/5 sm:border-0 gap-2">
@@ -341,7 +341,7 @@ function CheckContent() {
 
                     {order.notes && (
                       <div className="pt-2 border-t border-white/5">
-                        <span className="text-gray-400 block mb-1 font-semibold">Catatan Pemesan:</span>
+                        <span className="text-gray-400 block mb-1 font-semibold">Catatan Pembeli:</span>
                         <p className="italic text-gray-300 leading-relaxed bg-black/20 p-2.5 rounded-lg border border-white/5">{order.notes}</p>
                       </div>
                     )}

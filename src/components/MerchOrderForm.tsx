@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -122,7 +123,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     }
   };
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     if (window.innerWidth < 768) {
       setIsGuideOpen(false);
     }
@@ -595,7 +599,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         >
           <h2 className="text-sm sm:text-base font-bold flex items-center gap-2">
             <Info className="w-5 h-5 text-[#D4AF37] shrink-0 animate-pulse" />
-            Informasi Penting &amp; Panduan Pemesanan
+            Panduan
           </h2>
           <ChevronDown
             className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
@@ -660,27 +664,27 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
       {/* 1. MODAL DETAIL PRODUCT PREVIEW */}
       {previewProduct && (() => {
         const isOutOfStock = (previewProduct.stock ?? 100) <= 0;
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-            <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/50 p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
+        return mounted ? createPortal(
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in overflow-y-auto">
+            <div className="w-full max-w-md rounded-2xl bg-[#022c22] border border-[#D4AF37]/50 p-5 shadow-2xl space-y-4 text-[#FDFBF7] my-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                <h2 className="text-sm font-bold text-[#D4AF37] flex items-center gap-2">
+                  <ShoppingBag className="w-4.5 h-4.5 text-[#D4AF37]" />
                   Detail Spesifikasi Produk
                 </h2>
                 <button
                   type="button"
                   onClick={() => setPreviewProduct(null)}
-                  className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                  className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4.5 h-4.5" />
                 </button>
               </div>
 
               {/* Photo */}
               <div 
                 onClick={() => setLightboxImage(previewProduct.image_url)}
-                className="relative h-64 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black cursor-zoom-in group/img"
+                className="relative h-44 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black cursor-zoom-in group/img shrink-0"
               >
                 <Image
                   src={previewProduct.image_url}
@@ -690,8 +694,8 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   className="object-cover transition-transform duration-300 group-hover/img:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="bg-black/70 px-3 py-1.5 rounded-lg border border-[#D4AF37]/40 text-xs font-semibold text-[#D4AF37] flex items-center gap-1.5 shadow-lg">
-                    <Eye className="w-4 h-4" /> Lihat Gambar Penuh
+                  <span className="bg-black/70 px-3 py-1.5 rounded-lg border border-[#D4AF37]/40 text-[10px] font-semibold text-[#D4AF37] flex items-center gap-1.5 shadow-lg">
+                    <Eye className="w-3.5 h-3.5" /> Lihat Gambar Penuh
                   </span>
                 </div>
               </div>
@@ -700,15 +704,15 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-2">
                   <div className="space-y-1">
-                    <h3 className="text-xl font-bold text-white leading-tight">{previewProduct.name}</h3>
+                    <h3 className="text-base font-bold text-white leading-tight">{previewProduct.name}</h3>
                     <div className="flex items-center gap-2">
                       {isOutOfStock ? (
-                        <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">
+                        <span className="text-[9px] text-red-400 font-bold bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">
                           Habis
                         </span>
                       ) : (
                         <span
-                          className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded border ${
+                          className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded border ${
                             previewProduct.stock <= 10
                               ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
                               : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
@@ -719,23 +723,23 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                       )}
                     </div>
                   </div>
-                  <span className="text-lg font-mono font-black text-[#D4AF37] shrink-0">
+                  <span className="text-base font-mono font-black text-[#D4AF37] shrink-0">
                     {previewProduct.price > 0 ? `Rp ${previewProduct.price.toLocaleString("id-ID")}` : "Cenderamata"}
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-400">Deskripsi &amp; Bahan Spesifikasi:</p>
-                  <p className="text-xs text-gray-200 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/10 whitespace-pre-line">
+                  <p className="text-[11px] font-semibold text-gray-400">Deskripsi &amp; Bahan Spesifikasi:</p>
+                  <p className="text-[11px] text-gray-200 leading-relaxed bg-black/40 p-3 rounded-xl border border-white/10 whitespace-pre-line">
                     {previewProduct.description}
                   </p>
                 </div>
 
                 {/* Size Selector in Modal */}
                 {!isOutOfStock && previewProduct.has_size && (
-                  <div className="space-y-2 p-3 bg-purple-500/5 rounded-xl border border-purple-500/20">
-                    <span className="text-xs font-semibold text-purple-300 flex items-center gap-1.5">
-                      <Shirt className="w-4 h-4 text-purple-400 shrink-0" /> Pilih Ukuran Kaos:
+                  <div className="space-y-2 p-2.5 bg-purple-500/5 rounded-xl border border-purple-500/20">
+                    <span className="text-[11px] font-semibold text-purple-300 flex items-center gap-1.5">
+                      <Shirt className="w-3.5 h-3.5 text-purple-400 shrink-0" /> Pilih Ukuran Kaos:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {SHIRT_SIZES.map((sz) => (
@@ -743,10 +747,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                           key={sz}
                           type="button"
                           onClick={() => setPreviewSize(sz)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all border cursor-pointer ${
                             previewSize === sz
-                              ? "bg-purple-600 text-white shadow ring-1 ring-purple-300"
-                              : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10"
+                              ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300"
+                              : "bg-white/5 text-gray-400 hover:bg-white/10 border-white/10"
                           }`}
                         >
                           {sz}
@@ -758,25 +762,25 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
                 {/* Quantity Stepper in Modal */}
                 {!isOutOfStock && (
-                  <div className="flex items-center justify-between gap-4 p-3 bg-black/40 rounded-xl border border-white/10">
-                    <span className="text-xs font-semibold text-gray-300">
+                  <div className="flex items-center justify-between gap-4 p-2.5 bg-black/40 rounded-xl border border-white/10">
+                    <span className="text-[11px] font-semibold text-gray-300">
                       Jumlah Pesanan (Pcs):
                     </span>
-                    <div className="flex items-center border border-white/20 rounded-lg bg-black/60 overflow-hidden shrink-0">
+                    <div className="flex items-center border border-white/20 rounded-lg bg-black/60 overflow-hidden shrink-0 h-8">
                       <button
                         type="button"
                         onClick={() => setPreviewQty((q) => Math.max(1, q - 1))}
-                        className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+                        className="px-2.5 bg-white/5 hover:bg-white/10 text-white font-bold h-full flex items-center justify-center transition-colors cursor-pointer"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
-                      <span className="px-3.5 font-mono font-bold text-white text-xs min-w-[32px] text-center">
+                      <span className="px-3 font-mono font-bold text-white text-xs h-full flex items-center justify-center min-w-[28px] text-center">
                         {previewQty}
                       </span>
                       <button
                         type="button"
                         onClick={() => setPreviewQty((q) => Math.min(50, q + 1))}
-                        className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+                        className="px-2.5 bg-white/5 hover:bg-white/10 text-white font-bold h-full flex items-center justify-center transition-colors cursor-pointer"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -789,20 +793,20 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   const itemsInCart = cartItems.filter((ci) => ci.productId === previewProduct.id);
                   if (itemsInCart.length > 0) {
                     return (
-                      <div className="space-y-1.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-xs">
-                        <div className="font-semibold text-emerald-400 flex items-center gap-1.5">
-                          <Check className="w-4 h-4 text-emerald-400" /> Sudah dalam Pesanan:
+                      <div className="space-y-1 p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[10px]">
+                        <div className="font-semibold text-emerald-400 flex items-center gap-1">
+                          <Check className="w-3.5 h-3.5 text-emerald-400" /> Sudah dalam Pesanan:
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {itemsInCart.map((ci) => (
-                            <div key={ci.cartItemId} className="flex justify-between items-center text-gray-300 pl-5">
+                            <div key={ci.cartItemId} className="flex justify-between items-center text-gray-300 pl-4">
                               <span>
                                 {ci.has_size ? `Ukuran ${ci.size}` : "All Size"} x{ci.quantity} pcs
                               </span>
                               <button
                                 type="button"
                                 onClick={() => removeCartRow(ci.cartItemId)}
-                                className="text-red-400 hover:text-red-300 hover:underline text-[10px] ml-2"
+                                className="text-red-400 hover:text-red-300 hover:underline ml-2 cursor-pointer"
                               >
                                 Hapus
                               </button>
@@ -838,23 +842,24 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   <Button
                     type="button"
                     onClick={handleAddFromPreview}
-                    className="w-2/3 bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs"
+                    className="w-2/3 bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs cursor-pointer"
                   >
                     <Check className="w-4 h-4 mr-1 inline" /> Tambahkan ke Pesanan
                   </Button>
                 )}
               </div>
             </div>
-          </div>
-        );
+          </div>,
+          document.body
+        ) : null;
       })()}
 
       {/* 2. FORM INPUT CONTAINER */}
       <div className="space-y-6 text-[#FDFBF7]">
         <div className="border-b border-white/10 pb-3">
-          <h2 className="text-xl font-bold text-[#D4AF37] flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
-            Form Pemesanan Merchandise Tambahan
+          <h2 className="text-lg sm:text-xl font-bold text-[#D4AF37] flex items-center gap-2">
+            <Plus className="w-5 h-5 text-[#D4AF37]" />
+            Pemesanan
           </h2>
           <p className="text-xs text-gray-300">Isi identitas pemesan dan pilih beberapa item/ukuran souvenir di bawah ini.</p>
         </div>
@@ -871,7 +876,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           <div className="space-y-3 p-4 bg-black/45 rounded-2xl border border-white/10 shadow-lg">
             <div className="flex flex-col gap-0.5">
               <Label htmlFor="merch-reg-code" className="text-xs font-bold text-gray-200">
-                Hubungkan dengan Kode Registrasi Anda <span className="text-gray-400 font-normal">(Opsional)</span>
+                Kode Pemesanan <span className="text-gray-400 font-normal">(Opsional)</span>
               </Label>
               <span className="text-[10px] text-gray-400 leading-normal">Gunakan untuk mengisi formulir secara otomatis</span>
             </div>
@@ -1330,6 +1335,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   value={paymentDate}
                   onChange={(e) => setPaymentDate(e.target.value)}
                   className="bg-black/50 border-white/20 text-white cursor-pointer"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
 
@@ -1446,7 +1452,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
       </div>
       
       {/* 3. FULLSCREEN IMAGE LIGHTBOX */}
-      {lightboxImage && (
+      {lightboxImage && mounted && createPortal(
         <div 
           onClick={() => setLightboxImage(null)}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md cursor-zoom-out animate-in fade-in duration-200"
@@ -1454,7 +1460,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           <button
             type="button"
             onClick={() => setLightboxImage(null)}
-            className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 p-2.5 rounded-full hover:bg-white/20 transition-all z-10"
+            className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 p-2.5 rounded-full hover:bg-white/20 transition-all z-10 cursor-pointer"
             title="Tutup Preview"
           >
             <X className="w-6 h-6" />
@@ -1468,7 +1474,8 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

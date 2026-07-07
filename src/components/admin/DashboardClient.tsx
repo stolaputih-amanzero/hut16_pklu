@@ -131,11 +131,22 @@ export default function DashboardClient({
     });
 
     // 2. Merchandise Statistics
-    let merchRevenue = 0;
-    let merchItemsCount = 0;
+    let verifiedMerchRevenue = 0;
+    let pendingMerchRevenue = 0;
+    let verifiedMerchItemsCount = 0;
+    let pendingMerchItemsCount = 0;
+
     merchOrders.forEach((o) => {
-      merchRevenue += getOrderPrice(o.item_type);
-      merchItemsCount += o.quantity || 1;
+      const price = getOrderPrice(o.item_type);
+      const qty = o.quantity || 1;
+
+      if (o.payment_status === "verified") {
+        verifiedMerchRevenue += price;
+        verifiedMerchItemsCount += qty;
+      } else if (o.payment_status === "pending" || !o.payment_status) {
+        pendingMerchRevenue += price;
+        pendingMerchItemsCount += qty;
+      }
     });
 
     // 3. Proposal Statistics
@@ -155,16 +166,18 @@ export default function DashboardClient({
       }
     });
 
-    const totalRevenue = regRevenue + merchRevenue + confirmedProposalRevenue;
+    const totalRevenue = regRevenue + verifiedMerchRevenue + confirmedProposalRevenue;
 
     return {
       totalRevenue,
       regRevenue,
-      merchRevenue,
+      verifiedMerchRevenue,
+      pendingMerchRevenue,
       confirmedProposalRevenue,
       pendingProposalRevenue,
       totalHeadcount,
-      merchItemsCount,
+      verifiedMerchItemsCount,
+      pendingMerchItemsCount,
       confirmedProposalCount,
       pendingProposalCount,
       umumCount,
@@ -222,10 +235,10 @@ export default function DashboardClient({
       }
     });
 
-    // Accumulate Merchandise
+    // Accumulate Merchandise (Only count verified merch sales in revenue trend!)
     merchOrders.forEach((o) => {
       const dStr = o.created_at.split("T")[0];
-      if (dataMap[dStr]) {
+      if (dataMap[dStr] && o.payment_status === "verified") {
         const pr = getOrderPrice(o.item_type);
         dataMap[dStr].revenue += pr;
         dataMap[dStr].merchandise += o.quantity || 1;
@@ -248,7 +261,7 @@ export default function DashboardClient({
   // Distribution chart data
   const revenueDistributionData = [
     { name: "Pendaftaran", value: summaryStats.regRevenue, color: "#10B981" }, // emerald
-    { name: "Merchandise", value: summaryStats.merchRevenue, color: "#3B82F6" }, // blue
+    { name: "Merchandise", value: summaryStats.verifiedMerchRevenue, color: "#3B82F6" }, // blue
     { name: "Proposal Kontribusi", value: summaryStats.confirmedProposalRevenue, color: "#D4AF37" } // gold
   ].filter(item => item.value > 0);
 
@@ -261,6 +274,7 @@ export default function DashboardClient({
   const merchPopularityData = useMemo(() => {
     const counts: { [key: string]: number } = {};
     merchOrders.forEach((o) => {
+      if (o.payment_status === "rejected") return; // Exclude rejected orders from popularity
       const parts = o.item_type.split(", ");
       parts.forEach((part: string) => {
         const qtyMatch = part.match(/\s+x(\d+)$/);
@@ -308,11 +322,12 @@ export default function DashboardClient({
     });
 
     merchOrders.forEach((o) => {
+      const statusStr = o.payment_status === "verified" ? "Lunas" : o.payment_status === "rejected" ? "Ditolak" : "Pending";
       list.push({
         id: o.id,
         type: "merchandise",
         title: `Merchandise: ${o.buyer_name}`,
-        subtitle: `${o.item_type} (${o.quantity} Pcs)`,
+        subtitle: `${o.item_type} (${o.quantity} Pcs) • [${statusStr}]`,
         time: new Date(o.created_at),
         badge: "Merch",
         badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20"
@@ -402,12 +417,12 @@ export default function DashboardClient({
         {/* Card C: Merch Sales */}
         <div className="rounded-2xl border border-white/10 bg-black/45 hover:border-blue-500/50 p-6 shadow-xl transition-all duration-300 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-blue-500/5 rounded-bl-full pointer-events-none group-hover:bg-blue-500/10 transition-all duration-500" />
-          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Penjualan Merchandise</span>
+          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Penjualan Merchandise Realisasi</span>
           <h2 className="text-2xl md:text-3xl font-black text-blue-400 mt-3 font-mono">
-            Rp {summaryStats.merchRevenue.toLocaleString("id-ID")}
+            Rp {summaryStats.verifiedMerchRevenue.toLocaleString("id-ID")}
           </h2>
-          <div className="mt-4 flex items-center justify-between text-xs pt-3 border-t border-white/5">
-            <span className="text-gray-400">{summaryStats.merchItemsCount} Item Terjual</span>
+          <div className="mt-4 flex items-center justify-between text-xs pt-3 border-t border-white/5 text-[11px]">
+            <span className="text-gray-400">Komitmen Pending: Rp {summaryStats.pendingMerchRevenue.toLocaleString("id-ID")}</span>
             <ShoppingBag className="w-4 h-4 text-blue-400 opacity-60" />
           </div>
         </div>
@@ -747,19 +762,29 @@ export default function DashboardClient({
 
           {/* Quick Info / Guidelines Link */}
           <div className="rounded-2xl border border-white/10 bg-black/45 p-5 shadow-xl space-y-3">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Metrik Finansial</h4>
+            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Metrik Keabsahan</h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between text-gray-400 pb-2 border-b border-white/5">
-                <span>Total Pendaftar Umum:</span>
+                <span>Pendaftar Umum:</span>
                 <span className="font-mono text-[#FDFBF7] font-semibold">{summaryStats.umumCount} Orang</span>
               </div>
               <div className="flex items-center justify-between text-gray-400 pb-2 border-b border-white/5">
-                <span>Total Pendaftar Tuan Rumah:</span>
+                <span>Pendaftar Tuan Rumah:</span>
                 <span className="font-mono text-[#FDFBF7] font-semibold">{summaryStats.tuanRumahCount} Orang</span>
               </div>
+              <div className="flex items-center justify-between text-gray-400 pb-2 border-b border-white/5">
+                <span>Merchandise Lunas:</span>
+                <span className="font-mono text-emerald-400 font-semibold">Rp {summaryStats.verifiedMerchRevenue.toLocaleString("id-ID")}</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-400 pb-2 border-b border-white/5">
+                <span>Merchandise Pending:</span>
+                <span className="font-mono text-amber-400 font-semibold">Rp {summaryStats.pendingMerchRevenue.toLocaleString("id-ID")}</span>
+              </div>
               <div className="flex items-center justify-between text-gray-400">
-                <span>Proposal dengan Komitmen:</span>
-                <span className="font-mono text-[#FDFBF7] font-semibold">{summaryStats.confirmedProposalCount} Realisasi / {summaryStats.pendingProposalCount} Komitmen</span>
+                <span>Proposal Kontribusi:</span>
+                <span className="font-mono text-[#D4AF37] font-semibold">
+                  {summaryStats.confirmedProposalCount} Realisasi / {summaryStats.pendingProposalCount} Komitmen
+                </span>
               </div>
             </div>
           </div>

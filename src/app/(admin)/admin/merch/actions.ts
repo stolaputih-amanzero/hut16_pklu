@@ -185,3 +185,36 @@ export async function deleteMerchOrder(id: string) {
     return { success: false, error: err.message || "Gagal menghapus pesanan." };
   }
 }
+
+export async function updateMerchOrderStatus(id: string, status: string, notes: string) {
+  try {
+    const cleanStatus = (status || "").trim();
+    const cleanNotes = (notes || "").trim() || null;
+
+    if (!id) return { success: false, error: "ID pesanan tidak valid." };
+    if (!["pending", "verified", "rejected"].includes(cleanStatus)) {
+      return { success: false, error: "Status pembayaran tidak valid." };
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("merch_orders")
+      .update({
+        payment_status: cleanStatus,
+        admin_notes: cleanNotes,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Update Merch Order Status Error:", error);
+      return { success: false, error: `Gagal mengupdate pesanan: ${error.message}` };
+    }
+
+    revalidatePath("/admin/merch");
+    revalidatePath("/merch");
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Terjadi kesalahan server" };
+  }
+}

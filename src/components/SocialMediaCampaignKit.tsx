@@ -6,7 +6,7 @@ import { Copy, Check, Share2, MessageSquare, Globe } from "lucide-react";
 
 // Platform Captions Constants
 const CAPTIONS = {
-  IG: `"Bertumbuh dalam Keselamatan, Lansia Teladan dalam Iman, Karya dan Pelayanan." ✝️✨
+  IG: `"Bertumbuh dalam Keselamatan, Lansia Teladan dalam Iman, Karya dan Pelayanan." ✨
 
 Saya bangga menjadi bagian dari perayaan TEMU & HUT ke-16 PKLU GPIB 2026! Mari bersama-sama meneruskan bakti dan pelayanan bagi kemuliaan Tuhan.
 
@@ -31,7 +31,7 @@ Mari kita meriahkan dan sukseskan Acara Temu PKLU GPIB & Peringatan HUT ke-16 Pe
 
 #HUTPKLU16 #GPIB #PKLUGPIB #KaumLanjutUsia #FYP`,
 
-  WA: `*UNDANGAN & KAMPANYE HUT KE-16 PKLU GPIB 2026* ✝️
+  WA: `*UNDANGAN & KAMPANYE HUT KE-16 PKLU GPIB 2026* 🙏
 
 Shalom! Saya mengajak seluruh jemaat dan keluarga besar PKLU GPIB untuk hadir dalam *TEMU PKLU GPIB 2026*:
 

@@ -21,7 +21,7 @@ export default async function GuestbookPage() {
 
   return (
     <div className="container mx-auto min-h-screen py-10 px-4">
-      <div className="mx-auto max-w-4xl space-y-8 rounded-2xl bg-black/50 p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
+      <div className="mx-auto max-w-4xl space-y-8 rounded-2xl bg-black/50 p-4 sm:p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/20 shadow-2xl">
         {/* Header Section */}
         <div className="text-center space-y-3">
           <div className="inline-flex p-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-1">

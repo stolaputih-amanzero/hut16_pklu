@@ -325,6 +325,17 @@ export default function RekapRegistrasiPage() {
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
+          <a
+            href={`/api/reports/registrations?category=${selectedCategory}&q=${encodeURIComponent(search)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 sm:flex-none"
+          >
+            <Button className="w-full bg-[#022c22] border border-[#D4AF37]/45 hover:bg-[#033B2B] text-[#D4AF37] font-bold">
+              <FileText className="w-4 h-4 mr-2" />
+              Laporan PDF
+            </Button>
+          </a>
         </div>
       </div>
 

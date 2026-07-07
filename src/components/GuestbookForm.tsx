@@ -159,7 +159,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
   };
 
   return (
-    <div className="space-y-5 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-6 backdrop-blur-md text-[#FDFBF7] shadow-xl">
+    <div className="space-y-5 rounded-2xl border border-[#D4AF37]/30 bg-black/40 p-4 sm:p-6 backdrop-blur-md text-[#FDFBF7] shadow-xl">
       <div className="border-b border-white/10 pb-3">
         <h2 className="text-xl font-bold text-[#D4AF37]">Tulis Ucapan &amp; Doa Selamat</h2>
         <p className="text-xs text-gray-300">Bagikan ucapan sukacita Anda untuk HUT ke-16 PKLU GPIB 2026.</p>
@@ -231,7 +231,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-semibold rounded-lg cursor-pointer transition-all"
               >
                 <Camera className="w-3.5 h-3.5" />
-                {avatarPreview ? "Ganti Foto" : "Unggah Foto Profil"}
+                {avatarPreview ? "Ganti" : "Unggah Foto"}
               </label>
               <p className="text-[10px] text-gray-400">Format: JPG, PNG, WEBP (Maks 5MB)</p>
             </div>
@@ -270,7 +270,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
                   : "text-gray-300 hover:text-white"
               }`}
             >
-              <ChurchIcon className="w-4 h-4" /> Jemaat GPIB
+              <ChurchIcon className="w-4 h-4" /> GPIB
             </button>
             <button
               type="button"
@@ -285,7 +285,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
                   : "text-gray-300 hover:text-white"
               }`}
             >
-              <Globe className="w-4 h-4" /> Umum / Non-GPIB
+              <Globe className="w-4 h-4" /> Umum
             </button>
           </div>
         </div>
@@ -376,14 +376,14 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
           {cooldown > 0 ? (
             <span className="flex items-center gap-2">
               <Clock className="w-4 h-4 animate-spin" />
-              Tunggu {cooldown}s untuk kirim lagi
+              Tunggu ({cooldown}s)
             </span>
           ) : isSubmitting ? (
-            "Mengirim Ucapan..."
+            "Mengirim..."
           ) : (
             <span className="flex items-center justify-center gap-2">
               <Send className="w-4 h-4" />
-              Kirim Ucapan Selamat
+              Kirim
             </span>
           )}
         </Button>

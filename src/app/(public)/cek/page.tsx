@@ -3,18 +3,21 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { getRegistrationByCode } from "@/app/(public)/daftar/actions";
+import { getMerchOrderByCodeOrWa } from "@/app/(public)/merch/actions";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download } from "lucide-react";
+import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download, ShoppingBag } from "lucide-react";
 
 function CheckContent() {
   const searchParams = useSearchParams();
   const initialCode = searchParams.get("code") || "";
+  const initialMerchId = searchParams.get("merch_id") || "";
 
   const [query, setQuery] = useState(initialCode);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[] | null>(null);
+  const [merchResults, setMerchResults] = useState<any[] | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   const [downloadingCode, setDownloadingCode] = useState<string | null>(null);
@@ -54,28 +57,53 @@ function CheckContent() {
     }
   };
 
-  const handleSearch = async (codeToSearch?: string) => {
-    const q = codeToSearch || query;
-    if (!q.trim()) return;
+  const handleSearch = async (codeToSearch?: string, merchIdToSearch?: string) => {
+    const q = (codeToSearch !== undefined ? codeToSearch : query).trim();
+    const merchId = merchIdToSearch || initialMerchId;
+
+    if (!q && !merchId) return;
     setLoading(true);
     setErrorMsg("");
     setResults(null);
+    setMerchResults(null);
 
-    const res = await getRegistrationByCode(q);
+    let hasReg = false;
+    let hasMerch = false;
+
+    if (q) {
+      const res = await getRegistrationByCode(q);
+      if (res.success && res.registrations) {
+        setResults(res.registrations);
+        hasReg = true;
+      }
+      
+      const resMerch = await getMerchOrderByCodeOrWa(q);
+      if (resMerch.success && resMerch.data && resMerch.data.length > 0) {
+        setMerchResults(resMerch.data);
+        hasMerch = true;
+      }
+    } else if (merchId) {
+      const resMerch = await getMerchOrderByCodeOrWa(merchId);
+      if (resMerch.success && resMerch.data && resMerch.data.length > 0) {
+        setMerchResults(resMerch.data);
+        hasMerch = true;
+      }
+    }
+
     setLoading(false);
 
-    if (res.success && res.registrations) {
-      setResults(res.registrations);
-    } else {
-      setErrorMsg(res.error || "Data tidak ditemukan");
+    if (!hasReg && !hasMerch) {
+      setErrorMsg("Data pendaftaran atau pesanan merchandise tidak ditemukan.");
     }
   };
 
   useEffect(() => {
     if (initialCode) {
-      handleSearch(initialCode);
+      handleSearch(initialCode, "");
+    } else if (initialMerchId) {
+      handleSearch("", initialMerchId);
     }
-  }, [initialCode]);
+  }, [initialCode, initialMerchId]);
 
   return (
     <div className="container mx-auto min-h-screen py-10 px-4">
@@ -184,6 +212,109 @@ function CheckContent() {
                 </div>
               );
             })}
+          </div>
+        )}
+        {/* Merchandise Results */}
+        {merchResults && merchResults.length > 0 && (
+          <div className="space-y-6 pt-6 border-t border-[#D4AF37]/20">
+            <h3 className="text-lg font-bold text-[#D4AF37] flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
+              Pesanan Souvenir / Merchandise
+            </h3>
+            <div className="space-y-4">
+              {merchResults.map((order) => {
+                const isPending = order.payment_status === "pending";
+                const isVerified = order.payment_status === "verified";
+                const isRejected = order.payment_status === "rejected";
+
+                return (
+                  <div 
+                    key={order.id} 
+                    className="rounded-xl border border-[#D4AF37]/35 bg-[#0B0904]/80 p-5 space-y-4 shadow-lg text-xs"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2">
+                      <div>
+                        <span className="text-[10px] text-gray-400 block uppercase tracking-wider">No Pesanan</span>
+                        <span className="font-mono text-sm font-bold text-[#D4AF37] uppercase">#MB-{order.id.slice(0, 8).toUpperCase()}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isPending && (
+                          <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase">
+                            Menunggu Verifikasi
+                          </span>
+                        )}
+                        {isVerified && (
+                          <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase">
+                            Lunas & Terverifikasi
+                          </span>
+                        )}
+                        {isRejected && (
+                          <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase">
+                            Pembayaran Ditolak
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-gray-400 block">Nama Pemesan:</span>
+                        <span className="font-semibold text-white">{order.buyer_name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block">Asal Mupel/Gereja:</span>
+                        <span className="font-semibold text-white">{order.church_city}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block">No WhatsApp:</span>
+                        <span className="font-semibold text-white font-mono">{order.whatsapp}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block">Tanggal Transfer/Bayar:</span>
+                        <span className="font-semibold text-white">
+                          {order.payment_date ? new Date(order.payment_date).toLocaleDateString("id-ID", { dateStyle: "long" }) : "-"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/5">
+                      <span className="text-gray-400 block mb-1">Rincian Souvenir:</span>
+                      <div className="bg-black/40 p-2.5 rounded border border-white/5 font-mono text-[11px] text-gray-200 leading-relaxed">
+                        {order.item_type}
+                      </div>
+                    </div>
+
+                    {order.notes && (
+                      <div className="pt-2 border-t border-white/5">
+                        <span className="text-gray-400 block">Catatan Pemesan:</span>
+                        <p className="italic text-gray-300">{order.notes}</p>
+                      </div>
+                    )}
+
+                    {order.admin_notes && (
+                      <div className="pt-2 border-t border-white/5 bg-amber-500/5 p-3 rounded-lg border border-amber-500/20">
+                        <span className="text-[#D4AF37] font-bold block mb-1">Catatan Panitia:</span>
+                        <p className="text-amber-200 italic font-medium">"{order.admin_notes}"</p>
+                      </div>
+                    )}
+
+                    {order.payment_proof_url && (
+                      <div className="pt-2 border-t border-white/5">
+                        <span className="text-gray-400 block mb-1">Bukti Pembayaran:</span>
+                        <a 
+                          href={order.payment_proof_url} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="inline-block relative h-20 w-20 rounded border border-white/10 overflow-hidden bg-black hover:opacity-85 transition-opacity"
+                        >
+                          <img src={order.payment_proof_url} alt="Bukti Transfer" className="h-full w-full object-cover" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchMerchProducts, saveMerchProduct, deleteMerchProduct, fetchMerchOrders, deleteMerchOrder } from "./actions";
+import { fetchMerchProducts, saveMerchProduct, deleteMerchProduct, fetchMerchOrders, deleteMerchOrder, updateMerchOrderStatus } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,9 @@ import {
   Phone, 
   Calendar, 
   Package, 
-  Users 
+  Users,
+  Eye,
+  FileText
 } from "lucide-react";
 
 type Product = {
@@ -44,6 +46,11 @@ type MerchOrder = {
   size?: string | null;
   quantity: number;
   notes?: string | null;
+  registration_code?: string | null;
+  payment_proof_url?: string | null;
+  payment_status: string;
+  payment_date?: string | null;
+  admin_notes?: string | null;
   created_at: string;
 };
 
@@ -59,6 +66,20 @@ export default function AdminMerchPage() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<MerchOrder | null>(null);
+
+  // Order Verification Panel States
+  const [adminPaymentStatus, setAdminPaymentStatus] = useState("pending");
+  const [adminNotesText, setAdminNotesText] = useState("");
+  const [savingStatus, setSavingStatus] = useState(false);
+
+  const handleSelectOrder = (o: MerchOrder) => {
+    setSelectedOrder(o);
+    setAdminPaymentStatus(o.payment_status || "pending");
+    setAdminNotesText(o.admin_notes || "");
+  };
+
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Product Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -113,6 +134,33 @@ export default function AdminMerchPage() {
       setOrders(cleaned);
     }
     setLoadingOrders(false);
+  };
+
+  const parseOrderItems = (itemTypeStr: string) => {
+    if (!itemTypeStr) return [];
+    return itemTypeStr.split(", ").map((part) => {
+      const qtyMatch = part.match(/\s+x(\d+)$/);
+      const quantity = qtyMatch ? parseInt(qtyMatch[1]) : 1;
+      let cleanItemName = qtyMatch ? part.replace(/\s+x\d+$/, "") : part;
+
+      const sizeMatch = cleanItemName.match(/\(Ukuran\s+([^)]+)\)/i);
+      const size = sizeMatch ? sizeMatch[1] : null;
+      if (sizeMatch) {
+        cleanItemName = cleanItemName.replace(/\s*\(Ukuran\s+[^)]+\)/i, "").trim();
+      }
+
+      const matchedProduct = products.find(
+        (p) => p.name.toLowerCase().trim() === cleanItemName.toLowerCase().trim()
+      );
+
+      return {
+        raw: part,
+        name: cleanItemName,
+        size: size || (matchedProduct?.has_size ? "Standard" : null),
+        quantity,
+        product: matchedProduct,
+      };
+    });
   };
 
   useEffect(() => {
@@ -243,24 +291,24 @@ export default function AdminMerchPage() {
       {/* TAB 1: KATALOG PRODUK */}
       {activeTab === "catalog" && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-base font-bold text-[#D4AF37]">Daftar Item Merchandise Katalog:</h2>
-            <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h2 className="text-base font-bold text-[#D4AF37]">Katalog Produk</h2>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={loadCatalog}
                 disabled={loadingProducts}
-                className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs"
+                className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs flex-1 sm:flex-initial"
               >
                 <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingProducts ? "animate-spin" : ""}`} /> Refresh
               </Button>
               <Button
                 size="sm"
                 onClick={handleOpenAdd}
-                className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs"
+                className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs flex-1 sm:flex-initial"
               >
-                <Plus className="w-3.5 h-3.5 mr-1" /> Tambah Produk Baru
+                <Plus className="w-3.5 h-3.5 mr-1" /> Produk Baru
               </Button>
             </div>
           </div>
@@ -286,7 +334,10 @@ export default function AdminMerchPage() {
                   className="rounded-2xl border border-white/10 bg-black/50 overflow-hidden backdrop-blur-md shadow-lg flex flex-col justify-between group hover:border-[#D4AF37]/50 transition-all text-xs"
                 >
                   <div className="space-y-3">
-                    <div className="relative h-48 w-full bg-black/60 overflow-hidden">
+                    <div 
+                      onClick={() => setPreviewProduct(item)}
+                      className="relative h-48 w-full bg-black/60 overflow-hidden cursor-pointer"
+                    >
                       <img
                         src={item.image_url}
                         alt={item.name}
@@ -307,7 +358,12 @@ export default function AdminMerchPage() {
 
                     <div className="p-4 space-y-2">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-white text-sm leading-snug">{item.name}</h3>
+                        <h3 
+                          onClick={() => setPreviewProduct(item)}
+                          className="font-bold text-white text-sm leading-snug cursor-pointer hover:text-[#D4AF37] transition-colors"
+                        >
+                          {item.name}
+                        </h3>
                         <span className="font-mono font-extrabold text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-2 py-0.5 rounded text-xs shrink-0">
                           Rp {item.price.toLocaleString("id-ID")}
                         </span>
@@ -321,7 +377,7 @@ export default function AdminMerchPage() {
                             Stok Tersedia: {item.stock} pcs
                           </span>
                         ) : (
-                          <span className="bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded font-bold">
+                          <span className="bg-red-500/20 text-red-300 border-red-500/40 px-2 py-0.5 rounded font-bold">
                             STOK HABIS
                           </span>
                         )}
@@ -343,16 +399,24 @@ export default function AdminMerchPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleOpenEdit(item)}
-                      className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 h-8 text-xs"
+                      onClick={() => setPreviewProduct(item)}
+                      className="border-white/20 text-white hover:bg-white/10 h-8 text-xs font-semibold rounded-lg"
                     >
-                      <Edit3 className="w-3.5 h-3.5 mr-1" /> Edit Produk
+                      <Eye className="w-3.5 h-3.5 mr-1" /> Preview
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleOpenEdit(item)}
+                      className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 h-8 text-xs font-semibold rounded-lg"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 mr-1" /> Edit
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDeleteProduct(item.id)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-8 text-xs"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-8 text-xs font-semibold"
                     >
                       <Trash2 className="w-3.5 h-3.5 mr-1" /> Hapus
                     </Button>
@@ -402,15 +466,30 @@ export default function AdminMerchPage() {
               />
             </div>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={loadOrders}
-              disabled={loadingOrders}
-              className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs w-full sm:w-auto h-10"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingOrders ? "animate-spin" : ""}`} /> Refresh Rekap
-            </Button>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={loadOrders}
+                disabled={loadingOrders}
+                className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs flex-1 sm:flex-initial h-10"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingOrders ? "animate-spin" : ""}`} /> Refresh Rekap
+              </Button>
+              <a
+                href={`/api/reports/merch-orders?q=${encodeURIComponent(searchQuery)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 sm:flex-initial"
+              >
+                <Button
+                  size="sm"
+                  className="bg-[#022c22] border border-[#D4AF37]/45 hover:bg-[#033B2B] text-[#D4AF37] text-xs font-bold h-10 w-full"
+                >
+                  <FileText className="w-3.5 h-3.5 mr-1" /> Laporan PDF
+                </Button>
+              </a>
+            </div>
           </div>
 
           {/* Orders Table */}
@@ -437,7 +516,7 @@ export default function AdminMerchPage() {
                       <th className="p-3">Item Merch</th>
                       <th className="p-3">Ukuran</th>
                       <th className="p-3 text-center">Qty</th>
-                      <th className="p-3">Catatan</th>
+                      <th className="p-3 text-center">Status</th>
                       <th className="p-3 text-right">Aksi</th>
                     </tr>
                   </thead>
@@ -447,7 +526,7 @@ export default function AdminMerchPage() {
                       return (
                         <tr
                           key={o.id}
-                          onClick={() => setSelectedOrder(o)}
+                          onClick={() => handleSelectOrder(o)}
                           className="hover:bg-white/5 transition-colors cursor-pointer"
                         >
                           <td className="p-3 font-mono text-gray-400 whitespace-nowrap">
@@ -507,7 +586,23 @@ export default function AdminMerchPage() {
                               {o.quantity} Pcs
                             </span>
                           </td>
-                          <td className="p-3 text-gray-300 italic max-w-xs truncate">{o.notes || "-"}</td>
+                          <td className="p-3 text-center">
+                            {o.payment_status === "pending" && (
+                              <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded text-[10px] uppercase font-bold">
+                                Pending
+                              </span>
+                            )}
+                            {o.payment_status === "verified" && (
+                              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded text-[10px] uppercase font-bold">
+                                Lunas
+                              </span>
+                            )}
+                            {o.payment_status === "rejected" && (
+                              <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-0.5 rounded text-[10px] uppercase font-bold">
+                                Ditolak
+                              </span>
+                            )}
+                          </td>
                           <td className="p-3 text-right">
                             <Button
                               size="sm"
@@ -535,7 +630,7 @@ export default function AdminMerchPage() {
                   return (
                     <div
                       key={o.id}
-                      onClick={() => setSelectedOrder(o)}
+                      onClick={() => handleSelectOrder(o)}
                       className="p-4 bg-black/50 rounded-xl border border-white/10 hover:border-[#D4AF37]/50 transition-all cursor-pointer space-y-3 relative group"
                     >
                       <div className="flex justify-between items-start">
@@ -565,6 +660,21 @@ export default function AdminMerchPage() {
                         <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full font-bold font-mono text-[10px] bg-white/5 text-gray-300 border border-white/10">
                           {o.quantity} Pcs
                         </span>
+                        {o.payment_status === "pending" && (
+                          <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1.5 py-0.5 rounded text-[9px] uppercase font-bold">
+                            Pending
+                          </span>
+                        )}
+                        {o.payment_status === "verified" && (
+                          <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-1.5 py-0.5 rounded text-[9px] uppercase font-bold">
+                            Lunas
+                          </span>
+                        )}
+                        {o.payment_status === "rejected" && (
+                          <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded text-[9px] uppercase font-bold">
+                            Ditolak
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between pt-2 border-t border-white/5 gap-2">
@@ -605,7 +715,7 @@ export default function AdminMerchPage() {
       {/* Add / Edit Product Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-4 sm:p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h2 className="text-lg font-bold text-[#D4AF37] flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
@@ -693,7 +803,7 @@ export default function AdminMerchPage() {
               </div>
 
               {/* Price & Stock */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="p-price" className="text-xs font-semibold text-gray-200">
                     Estimasi Harga / Kontribusi (Rp) *
@@ -732,7 +842,7 @@ export default function AdminMerchPage() {
               </div>
 
               {/* Toggles */}
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <label className="flex items-center gap-2 p-3 bg-black/40 rounded-xl border border-white/10 cursor-pointer">
                   <input
                     type="checkbox"
@@ -780,7 +890,7 @@ export default function AdminMerchPage() {
       {/* Order Detail Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-4 sm:p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[92vh] md:max-h-[85vh] overflow-y-auto">
             
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
@@ -790,7 +900,7 @@ export default function AdminMerchPage() {
               </h2>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -801,14 +911,14 @@ export default function AdminMerchPage() {
               
               {/* Buyer Info */}
               <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
-                <div>
-                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Nama Pemesan</div>
-                  <div className="text-sm font-extrabold text-white">{selectedOrder.buyer_name}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Asal Jemaat / Kota</div>
-                  <div className="text-xs text-emerald-300 font-semibold flex items-center gap-1">
-                    {selectedOrder.church_city}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Nama Pemesan</div>
+                    <div className="text-sm font-extrabold text-white">{selectedOrder.buyer_name}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Asal Jemaat / Kota</div>
+                    <div className="text-xs text-emerald-300 font-semibold">{selectedOrder.church_city}</div>
                   </div>
                 </div>
                 <div>
@@ -822,7 +932,7 @@ export default function AdminMerchPage() {
                             href={`https://wa.me/${cleanWa}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-emerald-400 hover:underline flex items-center gap-1 py-1"
+                            className="text-emerald-400 hover:underline inline-flex items-center gap-1 py-1"
                           >
                             <Phone className="w-3.5 h-3.5 shrink-0" />
                             {selectedOrder.whatsapp}
@@ -838,30 +948,75 @@ export default function AdminMerchPage() {
 
               {/* Order Item Info */}
               <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-1">
-                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Item Merchandise</div>
-                    <div className="text-xs font-bold text-[#D4AF37]">
-                      {selectedOrder.item_type}
-                    </div>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Jumlah (Qty)</div>
-                    <div className="text-xs font-bold font-mono text-white">{selectedOrder.quantity} Pcs</div>
-                  </div>
-                </div>
+                <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Rincian Item Dipesan</div>
+                <div className="space-y-3 divide-y divide-white/5">
+                  {(() => {
+                    const parsedItems = parseOrderItems(selectedOrder.item_type);
+                    let computedGrandTotal = 0;
+                    return (
+                      <>
+                        {parsedItems.map((item, idx) => {
+                          const subtotal = item.product ? item.product.price * item.quantity : 0;
+                          computedGrandTotal += subtotal;
+                          return (
+                            <div key={idx} className={`pt-2.5 first:pt-0 flex items-start gap-3 text-xs`}>
+                              {/* Product Image Thumbnail */}
+                              <div 
+                                className="relative h-12 w-12 rounded-lg overflow-hidden border border-white/20 bg-black shrink-0 cursor-zoom-in"
+                                onClick={() => {
+                                  if (item.product?.image_url) {
+                                    setLightboxImage(item.product.image_url);
+                                  }
+                                }}
+                              >
+                                {item.product?.image_url ? (
+                                  <img src={item.product.image_url} alt={item.name} className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center text-gray-500 bg-gray-800">
+                                    <ShoppingBag className="w-5 h-5 text-gray-600" />
+                                  </div>
+                                )}
+                              </div>
 
-                <div className="flex justify-between items-center gap-4 pt-2 border-t border-white/5">
-                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Ukuran</div>
-                  <div>
-                    {selectedOrder.size ? (
-                      <span className="inline-block px-2.5 py-0.5 rounded font-mono font-black text-xs border bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40">
-                        {selectedOrder.size.includes(":") ? selectedOrder.size.split(":").pop()?.trim() || "" : selectedOrder.size}
-                      </span>
-                    ) : (
-                      <span className="text-gray-500 font-mono">-</span>
-                    )}
-                  </div>
+                              <div className="flex-1 min-w-0 space-y-1">
+                                <div className="font-bold text-white leading-tight truncate">
+                                  {item.name}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+                                  {item.size && (
+                                    <span className="px-1.5 py-0.2 rounded font-mono font-black bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                      Size: {item.size}
+                                    </span>
+                                  )}
+                                  <span className="text-gray-400">
+                                    Qty: <strong className="text-white font-mono">{item.quantity} pcs</strong>
+                                  </span>
+                                </div>
+                                {item.product && (
+                                  <div className="flex justify-between items-center text-[10px] text-gray-400 pt-0.5">
+                                    <span>Rp {item.product.price.toLocaleString("id-ID")} / pcs</span>
+                                    <span className="font-mono font-bold text-emerald-400">
+                                      Subtotal: Rp {subtotal.toLocaleString("id-ID")}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Calculated Grand Total */}
+                        {computedGrandTotal > 0 && (
+                          <div className="flex justify-between items-center pt-2.5 border-t border-white/10 text-xs">
+                            <span className="font-bold text-gray-400 uppercase text-[10px]">Total Estimasi Kontribusi:</span>
+                            <span className="font-mono font-extrabold text-sm text-[#D4AF37]">
+                              Rp {computedGrandTotal.toLocaleString("id-ID")}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -885,6 +1040,94 @@ export default function AdminMerchPage() {
                 </span>
               </div>
 
+              {/* Payment Verification Panel */}
+              <div className="bg-black/50 p-4 rounded-xl border border-[#D4AF37]/35 space-y-4">
+                <div className="text-[10px] uppercase text-[#D4AF37] font-bold tracking-wider flex items-center gap-1.5">
+                  <Package className="w-4 h-4" />
+                  Verifikasi Pembayaran &amp; Catatan
+                </div>
+
+                {/* Uploaded Payment Proof */}
+                {selectedOrder.payment_proof_url ? (
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-gray-400 block font-semibold">Bukti Transfer Pendaftar:</span>
+                    <div className="flex gap-3 items-center">
+                      <div 
+                        className="relative h-20 w-20 rounded-lg overflow-hidden border border-white/20 bg-black cursor-zoom-in group shrink-0"
+                        onClick={() => setLightboxImage(selectedOrder.payment_proof_url || null)}
+                      >
+                        <img src={selectedOrder.payment_proof_url} alt="Bukti Transfer" className="h-full w-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <Eye className="w-5 h-5 text-white" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[11px] text-gray-300">
+                          Tanggal Transfer: <strong className="text-white">{selectedOrder.payment_date ? new Date(selectedOrder.payment_date).toLocaleDateString("id-ID", { dateStyle: "medium" }) : "-"}</strong>
+                        </p>
+                        <a 
+                          href={selectedOrder.payment_proof_url} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="inline-flex text-[10px] text-blue-400 hover:text-blue-300 underline font-semibold"
+                        >
+                          Buka Gambar di Tab Baru ↗
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-amber-400 text-[11px] italic">⚠️ Belum ada bukti transfer terunggah.</p>
+                )}
+
+                {/* Status Selection */}
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-semibold text-gray-300">Status Verifikasi:</Label>
+                  <select
+                    value={adminPaymentStatus}
+                    onChange={(e) => setAdminPaymentStatus(e.target.value)}
+                    className="w-full rounded-md border border-white/20 bg-black p-2 text-xs text-white focus:border-[#D4AF37] focus:outline-none"
+                  >
+                    <option value="pending">PENDING (Menunggu Verifikasi)</option>
+                    <option value="verified">VERIFIED (Lunas &amp; Valid)</option>
+                    <option value="rejected">REJECTED (Ditolak / Salah)</option>
+                  </select>
+                </div>
+
+                {/* Admin Notes */}
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-semibold text-gray-300">Catatan Panitia (Terlihat oleh User):</Label>
+                  <textarea
+                    rows={2}
+                    value={adminNotesText}
+                    onChange={(e) => setAdminNotesText(e.target.value)}
+                    placeholder="Masukkan catatan panitia (misal: 'Baju siap diambil', atau 'Bukti transfer blur, mohon upload ulang')"
+                    className="w-full rounded-md border border-white/20 bg-black p-2 text-xs text-white focus:border-[#D4AF37] focus:outline-none resize-none"
+                  />
+                </div>
+
+                {/* Action button inside verification panel */}
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    setSavingStatus(true);
+                    const res = await updateMerchOrderStatus(selectedOrder.id, adminPaymentStatus, adminNotesText);
+                    setSavingStatus(false);
+                    if (res.success) {
+                      alert("Status pesanan berhasil diperbarui!");
+                      loadOrders();
+                      setSelectedOrder((prev) => prev ? { ...prev, payment_status: adminPaymentStatus, admin_notes: adminNotesText } : null);
+                    } else {
+                      alert(res.error || "Gagal memperbarui status.");
+                    }
+                  }}
+                  disabled={savingStatus}
+                  className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-9 text-xs transition-all shadow-[0_0_10px_rgba(212,175,55,0.2)]"
+                >
+                  {savingStatus ? "Menyimpan..." : "Simpan Status & Catatan"}
+                </Button>
+              </div>
+
             </div>
 
             {/* Actions */}
@@ -894,7 +1137,7 @@ export default function AdminMerchPage() {
                   href={`https://wa.me/${selectedOrder.whatsapp.replace(/^0/, "62").replace(/\D/g, "")}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-md shadow-emerald-900/30"
+                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-md shadow-emerald-900/30 h-10"
                 >
                   <Phone className="w-4 h-4" /> Hubungi WhatsApp
                 </a>
@@ -910,7 +1153,7 @@ export default function AdminMerchPage() {
                 }}
                 className="w-full sm:w-auto text-red-400 hover:text-red-300 hover:bg-red-950/40 font-bold rounded-xl h-10 px-4"
               >
-                <Trash2 className="w-4 h-4 mr-1 shrink-0" /> Hapus Pesanan
+                <Trash2 className="w-4 h-4 mr-1 shrink-0" /> Hapus
               </Button>
               <Button
                 type="button"
@@ -922,6 +1165,134 @@ export default function AdminMerchPage() {
               </Button>
             </div>
 
+          </div>
+        </div>
+      )}
+      {/* Product Preview Modal */}
+      {previewProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-5 md:p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[92vh] md:max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
+                Spesifikasi Detail Produk
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPreviewProduct(null)}
+                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Photo */}
+            <div 
+              onClick={() => setLightboxImage(previewProduct.image_url)}
+              className="relative h-60 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black cursor-zoom-in group/img"
+            >
+              <img
+                src={previewProduct.image_url}
+                alt={previewProduct.name}
+                className="h-full w-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="bg-black/70 px-3 py-1.5 rounded-lg border border-[#D4AF37]/40 text-xs font-semibold text-[#D4AF37] flex items-center gap-1.5 shadow-lg">
+                  <Eye className="w-4 h-4" /> Lihat Gambar Penuh
+                </span>
+              </div>
+            </div>
+
+            {/* Details */}
+            <div className="space-y-4 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-white/10 pb-2.5">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold text-white leading-tight">{previewProduct.name}</h3>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                      previewProduct.is_active 
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" 
+                        : "bg-red-500/20 text-red-300 border-red-500/30"
+                    }`}>
+                      {previewProduct.is_active ? "Aktif di Publik" : "Disembunyikan"}
+                    </span>
+                    <span className="text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded">
+                      {previewProduct.has_size ? "Memiliki Pilihan Ukuran" : "All Size"}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-left sm:text-right shrink-0">
+                  <span className="text-lg font-mono font-black text-[#D4AF37] block">
+                    Rp {previewProduct.price.toLocaleString("id-ID")}
+                  </span>
+                  <span className={`inline-block text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border mt-1 ${
+                    previewProduct.stock <= 0 
+                      ? "bg-red-500/20 text-red-300 border-red-500/30" 
+                      : previewProduct.stock <= 10
+                      ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                      : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                  }`}>
+                    Stok: {previewProduct.stock} pcs
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-1 bg-black/40 p-4 rounded-xl border border-white/10">
+                <span className="text-gray-400 font-semibold block">Deskripsi &amp; Spesifikasi:</span>
+                <p className="text-gray-200 leading-relaxed whitespace-pre-line text-xs">
+                  {previewProduct.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setPreviewProduct(null);
+                  handleOpenEdit(previewProduct);
+                }}
+                className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs font-bold rounded-xl h-10 px-4"
+              >
+                <Edit3 className="w-3.5 h-3.5 mr-1" /> Edit Produk
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPreviewProduct(null)}
+                className="border-white/20 text-white hover:bg-white/10 text-xs font-bold rounded-xl h-10 px-4"
+              >
+                Tutup
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Image Lightbox */}
+      {lightboxImage && (
+        <div 
+          onClick={() => setLightboxImage(null)}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md cursor-zoom-out animate-in fade-in duration-200"
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 p-2.5 rounded-full hover:bg-white/20 transition-all z-10"
+            title="Tutup Preview"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center select-none">
+            <img
+              src={lightboxImage}
+              alt="Merchandise Preview Full"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
         </div>
       )}

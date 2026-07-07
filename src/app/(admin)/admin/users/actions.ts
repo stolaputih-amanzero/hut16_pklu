@@ -159,6 +159,7 @@ export async function updateUser(
   data: {
     full_name: string;
     role: "admin" | "super_user";
+    password?: string;
   }
 ) {
   try {
@@ -174,6 +175,17 @@ export async function updateUser(
         success: false,
         error: "Anda tidak dapat menghapus wewenang Super User Anda sendiri demi keamanan.",
       };
+    }
+
+    // Update password via admin auth SDK if provided
+    if (data.password && data.password.trim()) {
+      if (data.password.length < 8) {
+        return { success: false, error: "Sandi minimal harus 8 karakter." };
+      }
+      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
+        password: data.password.trim(),
+      });
+      if (authError) throw authError;
     }
 
     const { error } = await supabaseAdmin

@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchMerchProducts } from "@/app/(admin)/admin/merch/actions";
-import { submitMerchOrder, CartItemInput } from "@/app/(public)/merch/actions";
+import { submitMerchOrder, CartItemInput, lookupRegistrationForMerch } from "@/app/(public)/merch/actions";
+import { QRCodeSVG } from "qrcode.react";
 import { 
   AlertTriangle, 
   ShoppingBag, 
@@ -84,6 +85,43 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const [errorMsg, setErrorMsg] = useState("");
   const [isGuideOpen, setIsGuideOpen] = useState(true);
 
+  // Lookup Registration State
+  const [registrationCode, setRegistrationCode] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupSuccess, setLookupSuccess] = useState(false);
+  const [lookupError, setLookupError] = useState("");
+
+  // Payment states
+  const [paymentDate, setPaymentDate] = useState("");
+  const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
+  const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
+
+  const handleLookup = async () => {
+    if (!registrationCode.trim()) return;
+    setLookupLoading(true);
+    setLookupError("");
+    setLookupSuccess(false);
+
+    const res = await lookupRegistrationForMerch(registrationCode);
+    setLookupLoading(false);
+
+    if (res.success && res.data) {
+      setLookupSuccess(true);
+      setValue("buyer_name", res.data.name);
+      setValue("whatsapp", res.data.whatsapp);
+      if (res.data.church_name) {
+        setIsGpibMember(true);
+        setSelectedMupel(res.data.mupel);
+        setSelectedJemaat(res.data.church_name);
+      } else {
+        setIsGpibMember(false);
+        setCustomChurch(res.data.church_name || "");
+      }
+    } else {
+      setLookupError("Kode registrasi tidak ditemukan. Silakan isi form secara manual.");
+    }
+  };
+
   useEffect(() => {
     if (window.innerWidth < 768) {
       setIsGuideOpen(false);
@@ -95,6 +133,17 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
   // Modal Detail Product Preview State
   const [previewProduct, setPreviewProduct] = useState<MerchProductItem | null>(null);
+  const [previewSize, setPreviewSize] = useState<string>("L");
+  const [previewQty, setPreviewQty] = useState<number>(1);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  // Reset preview selections when preview product changes
+  useEffect(() => {
+    if (previewProduct) {
+      setPreviewSize("L");
+      setPreviewQty(1);
+    }
+  }, [previewProduct]);
 
   // Church Selection State (GPIB vs Non-GPIB/Umum)
   const [isGpibMember, setIsGpibMember] = useState(true);
@@ -250,6 +299,52 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setCartItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
   };
 
+  const handleAddFromPreview = () => {
+    if (!previewProduct) return;
+
+    setCartItems((prev) => {
+      if (previewProduct.has_size) {
+        // Check if same size already exists
+        const existsIdx = prev.findIndex(
+          (ci) => ci.productId === previewProduct.id && ci.size === previewSize
+        );
+        if (existsIdx > -1) {
+          return prev.map((ci, idx) =>
+            idx === existsIdx
+              ? { ...ci, quantity: Math.min(50, ci.quantity + previewQty) }
+              : ci
+          );
+        }
+      } else {
+        const existsIdx = prev.findIndex((ci) => ci.productId === previewProduct.id);
+        if (existsIdx > -1) {
+          return prev.map((ci, idx) =>
+            idx === existsIdx
+              ? { ...ci, quantity: Math.min(50, ci.quantity + previewQty) }
+              : ci
+          );
+        }
+      }
+
+      // Add new
+      return [
+        ...prev,
+        {
+          cartItemId: `cart_${previewProduct.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          productId: previewProduct.id,
+          name: previewProduct.name,
+          image_url: previewProduct.image_url,
+          price: previewProduct.price,
+          has_size: previewProduct.has_size,
+          size: previewProduct.has_size ? previewSize : "L",
+          quantity: previewQty,
+        },
+      ];
+    });
+
+    setPreviewProduct(null);
+  };
+
   // Group cart items by Product ID for clean grouping in the UI
   const groupedCartByProduct = useMemo(() => {
     const map = new Map<string, { product: MerchProductItem; items: CartItemState[] }>();
@@ -271,28 +366,45 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
   const onSubmit = async (data: MerchFormValues) => {
     if (cartItems.length === 0) {
-      setErrorMsg("Silakan pilih minimal 1 item merchandise.");
+      setErrorMsg("Silakan pilih minimal 1 item produk.");
+      return;
+    }
+
+    if (!paymentProofFile) {
+      setErrorMsg("Bukti transfer wajib diunggah.");
+      return;
+    }
+
+    if (!paymentDate) {
+      setErrorMsg("Tanggal transfer wajib diisi.");
       return;
     }
 
     setIsSubmitting(true);
     setErrorMsg("");
 
-    const payloadItems: CartItemInput[] = cartItems.map((item) => ({
+    const payloadItems = cartItems.map((item) => ({
       name: item.name,
       price: item.price,
       size: item.has_size ? item.size : undefined,
       quantity: item.quantity,
     }));
 
-    const res = await submitMerchOrder({
-      buyer_name: data.buyer_name,
-      church_city: data.church_city,
-      whatsapp: data.whatsapp,
-      notes: data.notes,
-      items: payloadItems,
-    });
+    const fd = new FormData();
+    fd.append("buyer_name", data.buyer_name);
+    fd.append("church_city", data.church_city);
+    fd.append("whatsapp", data.whatsapp);
+    if (registrationCode && lookupSuccess) {
+      fd.append("registration_code", registrationCode);
+    }
+    fd.append("items", JSON.stringify(payloadItems));
+    if (data.notes) {
+      fd.append("notes", data.notes);
+    }
+    fd.append("payment_date", paymentDate);
+    fd.append("payment_proof", paymentProofFile);
 
+    const res = await submitMerchOrder(fd);
     setIsSubmitting(false);
 
     if (res.success && res.data) {
@@ -310,6 +422,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setSelectedMupel("");
     setSelectedJemaat("");
     setCustomChurch("");
+    setRegistrationCode("");
+    setLookupSuccess(false);
+    setLookupError("");
+    setPaymentDate("");
+    setPaymentProofFile(null);
+    setPaymentProofPreview(null);
+
     if (products.length > 0) {
       const p0 = products[0];
       setCartItems([
@@ -403,6 +522,32 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               <p className="italic text-gray-200">{successData.notes}</p>
             </div>
           )}
+        </div>
+
+        {/* QR Code Status Check Section */}
+        <div className="bg-[#0B0904] p-5 rounded-xl border border-[#D4AF37]/45 flex flex-col items-center justify-center space-y-3 text-center">
+          <div className="bg-white p-3 rounded-lg flex items-center justify-center">
+            <QRCodeSVG 
+              value={`${window.location.origin}/cek?merch_id=${successData.id}`} 
+              size={135} 
+              level="H" 
+            />
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs font-bold text-[#D4AF37]">QR Code Status Pesanan</p>
+            <p className="text-[10px] text-gray-400 max-w-xs leading-normal">
+              Scan atau simpan QR Code di atas untuk memantau status persetujuan pembayaran dan notes/catatan dari panitia.
+            </p>
+            <div className="pt-2">
+              <a 
+                href={`/cek?merch_id=${successData.id}`} 
+                target="_blank" 
+                className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 underline"
+              >
+                Cek Status Pesanan Langsung →
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Action Buttons to CP Marsya Theresia */}
@@ -508,85 +653,196 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
       </div>
 
       {/* 1. MODAL DETAIL PRODUCT PREVIEW */}
-      {previewProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/50 p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
-                Detail Spesifikasi Produk
-              </h2>
-              <button
-                type="button"
-                onClick={() => setPreviewProduct(null)}
-                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+      {previewProduct && (() => {
+        const isOutOfStock = (previewProduct.stock ?? 100) <= 0;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+            <div className="w-full max-w-lg rounded-2xl bg-[#022c22] border border-[#D4AF37]/50 p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
+                  Detail Spesifikasi Produk
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setPreviewProduct(null)}
+                  className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Photo */}
+              <div 
+                onClick={() => setLightboxImage(previewProduct.image_url)}
+                className="relative h-64 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black cursor-zoom-in group/img"
               >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Photo */}
-            <div className="relative h-64 w-full rounded-xl overflow-hidden border border-[#D4AF37]/30 shadow-lg bg-black">
-              <Image
-                src={previewProduct.image_url}
-                alt={previewProduct.name}
-                fill
-                sizes="(max-width: 768px) 100vw, 500px"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Info */}
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-2">
-                <h3 className="text-xl font-bold text-white">{previewProduct.name}</h3>
-                <span className="text-lg font-mono font-black text-[#D4AF37]">
-                  {previewProduct.price > 0 ? `Rp ${previewProduct.price.toLocaleString("id-ID")}` : "Cenderamata"}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-xs font-semibold text-gray-400">Deskripsi &amp; Bahan Spesifikasi:</p>
-                <p className="text-xs text-gray-200 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/10 whitespace-pre-line">
-                  {previewProduct.description}
-                </p>
-              </div>
-
-              {previewProduct.has_size && (
-                <div className="flex items-center gap-2 text-xs text-purple-300 bg-purple-500/10 p-2.5 rounded-lg border border-purple-500/20">
-                  <Shirt className="w-4 h-4 text-purple-400 shrink-0" />
-                  <span>Tersedia pilihan ukuran kaos: <strong>S, M, L, XL, XXL, 3XL</strong></span>
+                <Image
+                  src={previewProduct.image_url}
+                  alt={previewProduct.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className="object-cover transition-transform duration-300 group-hover/img:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="bg-black/70 px-3 py-1.5 rounded-lg border border-[#D4AF37]/40 text-xs font-semibold text-[#D4AF37] flex items-center gap-1.5 shadow-lg">
+                    <Eye className="w-4 h-4" /> Lihat Gambar Penuh
+                  </span>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Modal Actions */}
-            <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setPreviewProduct(null)}
-                className="w-1/3 text-gray-400 hover:text-white"
-              >
-                Tutup
-              </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  const exists = cartItems.some((ci) => ci.productId === previewProduct.id);
-                  if (!exists) {
-                    toggleCartProduct(previewProduct);
+              {/* Info */}
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-2">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-white leading-tight">{previewProduct.name}</h3>
+                    <div className="flex items-center gap-2">
+                      {isOutOfStock ? (
+                        <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">
+                          Habis
+                        </span>
+                      ) : (
+                        <span
+                          className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded border ${
+                            previewProduct.stock <= 10
+                              ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                              : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                          }`}
+                        >
+                          Stok: {previewProduct.stock} pcs
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-lg font-mono font-black text-[#D4AF37] shrink-0">
+                    {previewProduct.price > 0 ? `Rp ${previewProduct.price.toLocaleString("id-ID")}` : "Cenderamata"}
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-gray-400">Deskripsi &amp; Bahan Spesifikasi:</p>
+                  <p className="text-xs text-gray-200 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/10 whitespace-pre-line">
+                    {previewProduct.description}
+                  </p>
+                </div>
+
+                {/* Size Selector in Modal */}
+                {!isOutOfStock && previewProduct.has_size && (
+                  <div className="space-y-2 p-3 bg-purple-500/5 rounded-xl border border-purple-500/20">
+                    <span className="text-xs font-semibold text-purple-300 flex items-center gap-1.5">
+                      <Shirt className="w-4 h-4 text-purple-400 shrink-0" /> Pilih Ukuran Kaos:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SHIRT_SIZES.map((sz) => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => setPreviewSize(sz)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                            previewSize === sz
+                              ? "bg-purple-600 text-white shadow ring-1 ring-purple-300"
+                              : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10"
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quantity Stepper in Modal */}
+                {!isOutOfStock && (
+                  <div className="flex items-center justify-between gap-4 p-3 bg-black/40 rounded-xl border border-white/10">
+                    <span className="text-xs font-semibold text-gray-300">
+                      Jumlah Pesanan (Pcs):
+                    </span>
+                    <div className="flex items-center border border-white/20 rounded-lg bg-black/60 overflow-hidden shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewQty((q) => Math.max(1, q - 1))}
+                        className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="px-3.5 font-mono font-bold text-white text-xs min-w-[32px] text-center">
+                        {previewQty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewQty((q) => Math.min(50, q + 1))}
+                        className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show items already in cart */}
+                {(() => {
+                  const itemsInCart = cartItems.filter((ci) => ci.productId === previewProduct.id);
+                  if (itemsInCart.length > 0) {
+                    return (
+                      <div className="space-y-1.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-xs">
+                        <div className="font-semibold text-emerald-400 flex items-center gap-1.5">
+                          <Check className="w-4 h-4 text-emerald-400" /> Sudah dalam Pesanan:
+                        </div>
+                        <div className="space-y-1">
+                          {itemsInCart.map((ci) => (
+                            <div key={ci.cartItemId} className="flex justify-between items-center text-gray-300 pl-5">
+                              <span>
+                                {ci.has_size ? `Ukuran ${ci.size}` : "All Size"} x{ci.quantity} pcs
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeCartRow(ci.cartItemId)}
+                                className="text-red-400 hover:text-red-300 hover:underline text-[10px] ml-2"
+                              >
+                                Hapus
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
                   }
-                  setPreviewProduct(null);
-                }}
-                className="w-2/3 bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs"
-              >
-                <Check className="w-4 h-4 mr-1" /> Tambahkan ke Pesanan
-              </Button>
+                  return null;
+                })()}
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center gap-3 pt-3 border-t border-white/10">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setPreviewProduct(null)}
+                  className="w-1/3 text-gray-400 hover:text-white"
+                >
+                  Tutup
+                </Button>
+                {isOutOfStock ? (
+                  <Button
+                    type="button"
+                    disabled
+                    className="w-2/3 bg-gray-700 text-gray-400 cursor-not-allowed text-xs font-bold"
+                  >
+                    Stok Habis
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleAddFromPreview}
+                    className="w-2/3 bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs"
+                  >
+                    <Check className="w-4 h-4 mr-1 inline" /> Tambahkan ke Pesanan
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 2. FORM INPUT CONTAINER */}
       <div className="space-y-6 text-[#FDFBF7]">
@@ -606,6 +862,42 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Optional Registration Lookup */}
+          <div className="space-y-2 p-4 bg-black/40 rounded-xl border border-white/5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="merch-reg-code" className="text-xs font-semibold text-gray-300">
+                Hubungkan dengan Kode Registrasi Anda <span className="text-gray-500 font-normal">(Opsional)</span>
+              </Label>
+              <span className="text-[10px] text-gray-400">Pre-fill data form otomatis</span>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="merch-reg-code"
+                placeholder="Contoh: PKLU-XXXXX"
+                value={registrationCode}
+                onChange={(e) => setRegistrationCode(e.target.value.toUpperCase())}
+                className="bg-black/50 border-white/20 text-white text-xs h-9 uppercase"
+              />
+              <Button
+                type="button"
+                onClick={handleLookup}
+                disabled={lookupLoading || !registrationCode.trim()}
+                className="bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/30 text-xs h-9 font-semibold shrink-0"
+              >
+                {lookupLoading ? "Mencari..." : "Cari Kode"}
+              </Button>
+            </div>
+            {lookupSuccess && (
+              <p className="text-[11px] text-emerald-400 font-medium">
+                ✓ Profil Pendaftaran ditemukan! Data form berhasil diisi otomatis.
+              </p>
+            )}
+            {lookupError && (
+              <p className="text-[11px] text-amber-400 font-medium">
+                ⚠️ {lookupError}
+              </p>
+            )}
+          </div>
           {/* Field: Nama Pemesan */}
           <div className="space-y-1.5">
             <Label htmlFor="merch-name" className="text-xs font-semibold text-gray-200">
@@ -746,24 +1038,30 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   return (
                     <div
                       key={p.id}
-                      onClick={() => !isOutOfStock && toggleCartProduct(p)}
-                      className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                      onClick={() => setPreviewProduct(p)}
+                      className={`group relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
                         isOutOfStock
-                          ? "border-red-500/30 bg-black/40 opacity-50 cursor-not-allowed"
+                          ? "border-red-500/30 bg-black/40 opacity-50 hover:border-red-500/50 hover:bg-black/50"
                           : isSelected
-                          ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.2)] ring-1 ring-[#D4AF37] cursor-pointer"
-                          : "border-white/15 bg-black/60 hover:border-white/30 hover:bg-black/80 opacity-90 hover:opacity-100 cursor-pointer"
+                          ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.2)] ring-1 ring-[#D4AF37]"
+                          : "border-white/15 bg-black/60 hover:border-[#D4AF37]/45 hover:bg-black/80 opacity-90 hover:opacity-100"
                       }`}
                     >
                       {/* Checkbox */}
-                      <div className="shrink-0">
+                      <div 
+                        className="shrink-0 p-1.5 -m-1.5 cursor-pointer relative z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isOutOfStock) toggleCartProduct(p);
+                        }}
+                      >
                         <div
                           className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
                             isOutOfStock
                               ? "border-gray-600 bg-gray-800"
                               : isSelected
                               ? "bg-[#D4AF37] border-[#D4AF37] text-black"
-                              : "border-gray-500 bg-black/40"
+                              : "border-gray-500 bg-black/40 hover:border-[#D4AF37]"
                           }`}
                         >
                           {isSelected && !isOutOfStock && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -784,49 +1082,45 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                             HABIS
                           </div>
                         )}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPreviewProduct(p);
-                          }}
-                          className="absolute inset-0 bg-black/40 hover:bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-white text-[10px]"
-                        >
-                          <Eye className="w-4 h-4 text-[#D4AF37]" />
-                        </button>
                       </div>
 
                       {/* Title, Price & Stock Badge */}
                       <div className="flex-1 min-w-0 space-y-0.5">
                         <h4 className="font-bold text-white text-xs truncate">{p.name}</h4>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-[11px] text-[#D4AF37] font-extrabold">
-                            {p.price > 0 ? `Rp ${p.price.toLocaleString("id-ID")}` : "Cenderamata"}
-                          </span>
+                        <span className="font-mono text-[11px] text-[#D4AF37] font-extrabold block">
+                          {p.price > 0 ? `Rp ${p.price.toLocaleString("id-ID")}` : "Cenderamata"}
+                        </span>
+                        
+                        <div className="flex items-center justify-between gap-2 pt-0.5">
+                          <div className="flex items-center gap-2">
+                            {/* Remaining Stock Badge */}
+                            {isOutOfStock ? (
+                              <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/30">
+                                Habis
+                              </span>
+                            ) : (
+                              <span
+                                className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border ${
+                                  p.stock <= 10
+                                    ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                                    : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                                }`}
+                              >
+                                Stok: {p.stock} pcs
+                              </span>
+                            )}
 
-                          {/* Remaining Stock Badge */}
-                          {isOutOfStock ? (
-                            <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/30">
-                              Habis
-                            </span>
-                          ) : (
-                            <span
-                              className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border ${
-                                p.stock <= 10
-                                  ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                                  : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                              }`}
-                            >
-                              Stok: {p.stock} pcs
-                            </span>
-                          )}
+                            {isSelected && countVariants > 1 && (
+                              <span className="inline-block text-[10px] text-purple-300 font-semibold bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30">
+                                {countVariants} Ukuran
+                              </span>
+                            )}
+                          </div>
+                          
+                          <span className="text-[10px] text-gray-400 flex items-center gap-1 group-hover:text-[#D4AF37] transition-colors font-semibold">
+                            <Info className="w-3 h-3" /> Detail
+                          </span>
                         </div>
-
-                        {isSelected && countVariants > 1 && (
-                          <span className="inline-block text-[10px] text-purple-300 font-semibold bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30">
-                            {countVariants} Variasi Ukuran
-                          </span>
-                        )}
                       </div>
                     </div>
                   );
@@ -975,6 +1269,96 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             </div>
           )}
 
+          {cartItems.length > 0 && (
+            <div className="space-y-4 rounded-xl border border-[#D4AF37]/30 bg-black/40 p-4">
+              <h3 className="text-xs font-bold text-[#D4AF37] border-b border-white/10 pb-1 flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-[#D4AF37]" /> Informasi Pembayaran
+              </h3>
+              
+              <div className="rounded-lg bg-[#D4AF37]/10 p-3.5 border border-[#D4AF37]/30 text-xs leading-relaxed space-y-1">
+                <span className="text-gray-300 block">Silakan transfer biaya pesanan Anda ke rekening panitia:</span>
+                <div className="flex items-center gap-2 my-1.5 bg-black/40 p-2 rounded w-fit border border-[#D4AF37]/20">
+                  <span className="font-mono text-[#D4AF37] font-semibold text-xs">Bank BTN 00179-01-88-000447-9</span>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      navigator.clipboard.writeText("0017901880004479");
+                      alert("Nomor rekening berhasil disalin!");
+                    }}
+                    className="p-1 hover:bg-[#D4AF37]/20 rounded text-[#D4AF37] transition-colors"
+                    title="Copy Rekening"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                Atas nama: <strong>Panitia MUPEL GPIB BEKASI</strong><br/>
+                Total Tagihan: <strong className="text-emerald-400 font-mono">Rp {grandTotalPrice.toLocaleString("id-ID")}</strong>
+              </div>
+
+              {/* Tanggal Bayar */}
+              <div className="space-y-1.5">
+                <Label htmlFor="payment-date" className="text-xs font-semibold text-gray-200">
+                  Tanggal Transfer *
+                </Label>
+                <Input
+                  id="payment-date"
+                  type="date"
+                  required
+                  value={paymentDate}
+                  onChange={(e) => setPaymentDate(e.target.value)}
+                  className="bg-black/50 border-white/20 text-white cursor-pointer"
+                />
+              </div>
+
+              {/* Bukti Bayar */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-gray-200">
+                  Unggah Bukti Bayar (Format: JPG, PNG, WEBP, Maks 5MB) *
+                </Label>
+                <div className="flex items-center gap-4 p-3 bg-black/50 rounded-xl border border-white/10">
+                  <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-black/60 border border-[#D4AF37]/40 shrink-0">
+                    {paymentProofPreview ? (
+                      <img src={paymentProofPreview} alt="Bukti Transfer" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-gray-500">
+                        <ShoppingBag className="w-6 h-6" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1 text-xs">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="merch-proof-input"
+                      className="hidden"
+                      required={!paymentProofFile}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            alert("File maksimal 5MB.");
+                            return;
+                          }
+                          setPaymentProofFile(file);
+                          const reader = new FileReader();
+                          reader.onload = (ev) => setPaymentProofPreview(ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor="merch-proof-input"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D4AF37]/15 border border-[#D4AF37]/45 text-[#D4AF37] font-semibold rounded-lg cursor-pointer hover:bg-[#D4AF37]/30 transition-all text-xs"
+                    >
+                      Pilih Bukti Transfer
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Field: Catatan */}
           <div className="space-y-1.5">
             <Label htmlFor="merch-notes" className="text-xs font-semibold text-gray-200">
@@ -1009,6 +1393,32 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           </Button>
         </form>
       </div>
+      
+      {/* 3. FULLSCREEN IMAGE LIGHTBOX */}
+      {lightboxImage && (
+        <div 
+          onClick={() => setLightboxImage(null)}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md cursor-zoom-out animate-in fade-in duration-200"
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 p-2.5 rounded-full hover:bg-white/20 transition-all z-10"
+            title="Tutup Preview"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center select-none">
+            <img
+              src={lightboxImage}
+              alt="Merchandise Preview Full"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/10"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -16,17 +16,13 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(() => {
-    if (typeof window === "undefined") return true;
-    try {
-      const keys = Object.keys(localStorage);
-      const hasToken = keys.some((key) => key.startsWith("sb-") && key.endsWith("-auth-token"));
-      return hasToken;
-    } catch (e) {
-      return true;
-    }
-  });
+  const [checkingSession, setCheckingSession] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Forgot password states
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   // 1. Auto-focus email field on page load & check if user is already authenticated
   useEffect(() => {
@@ -39,33 +35,45 @@ export default function AdminLoginPage() {
       emailInputRef.current.focus();
     }
 
-    const checkSession = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+    // Check if there is an active session token in localStorage before displaying the loader
+    let hasToken = false;
+    try {
+      const keys = Object.keys(localStorage);
+      hasToken = keys.some((key) => key.startsWith("sb-") && key.endsWith("-auth-token"));
+    } catch (e) {
+      // ignore
+    }
 
-        if (session?.user) {
-          // Verify if they exist in admin_profiles
-          const { data: profile } = await supabase
-            .from("admin_profiles")
-            .select("id")
-            .eq("id", session.user.id)
-            .maybeSingle();
+    if (hasToken) {
+      setCheckingSession(true);
+      const checkSession = async () => {
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
 
-          if (profile) {
-            window.location.href = "/admin/dashboard";
-            return;
+          if (session?.user) {
+            // Verify if they exist in admin_profiles
+            const { data: profile } = await supabase
+              .from("admin_profiles")
+              .select("id")
+              .eq("id", session.user.id)
+              .maybeSingle();
+
+            if (profile) {
+              window.location.href = "/admin/dashboard";
+              return;
+            }
           }
+        } catch (err) {
+          console.error("Error checking existing session:", err);
+        } finally {
+          setCheckingSession(false);
         }
-      } catch (err) {
-        console.error("Error checking existing session:", err);
-      } finally {
-        setCheckingSession(false);
-      }
-    };
+      };
 
-    checkSession();
+      checkSession();
+    }
   }, []);
 
   // 2. Handle admin credentials submission
@@ -149,6 +157,40 @@ export default function AdminLoginPage() {
     }
   };
 
+  // 3. Handle forgot password email link trigger
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading) return;
+
+    if (!forgotEmail.trim()) {
+      setError("Email wajib diisi.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        forgotEmail.trim(),
+        {
+          redirectTo: `${window.location.origin}/admin/reset-password`,
+        }
+      );
+
+      if (resetError) {
+        setError(resetError.message);
+      } else {
+        setSuccessMsg("Tautan atur ulang kata sandi telah dikirim ke email Anda.");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Gagal memproses permintaan reset sandi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#022c22]">
@@ -192,103 +234,198 @@ export default function AdminLoginPage() {
 
         {/* Login Card Form */}
         <div className="bg-black/60 backdrop-blur-xl border border-[#D4AF37]/20 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-          <form onSubmit={handleLogin} className="space-y-5">
-            {/* Error Message Area */}
-            {error && (
-              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold text-center animate-in fade-in slide-in-from-top-2 duration-300">
-                {error}
-              </div>
-            )}
-
-            {/* Email Field */}
-            <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="text-xs font-bold text-[#D4AF37] tracking-wider uppercase"
-              >
-                Alamat Email
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Mail className="h-4.5 w-4.5" />
+          {isForgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-5">
+              {/* Error Message Area */}
+              {error && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold text-center animate-in fade-in slide-in-from-top-2 duration-300">
+                  {error}
                 </div>
-                <input
-                  ref={emailInputRef}
-                  id="email"
-                  type="email"
-                  required
-                  placeholder="admin@hut16pklu.org"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) setError(null); // Clear error on typing
-                  }}
-                  className="block w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="text-xs font-bold text-[#D4AF37] tracking-wider uppercase"
-              >
-                Kata Sandi
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Lock className="h-4.5 w-4.5" />
-                </div>
-                <input
-                  ref={passwordInputRef}
-                  id="password"
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) setError(null); // Clear error on typing
-                  }}
-                  className="block w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Remember Me Checkbox */}
-            <div className="flex items-center">
-              <input
-                id="rememberMe"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-600 bg-black/40 text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-offset-gray-900 cursor-pointer"
-              />
-              <label
-                htmlFor="rememberMe"
-                className="ml-2 block text-xs font-semibold text-gray-300 cursor-pointer select-none"
-              >
-                Ingat Email Saya
-              </label>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#D4AF37] hover:bg-[#B3932D] disabled:bg-gray-700 disabled:text-gray-400 text-black font-bold text-sm rounded-xl cursor-pointer disabled:cursor-not-allowed transition-all duration-300 shadow-lg active:scale-98"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                  Mengotentikasi...
-                </>
-              ) : (
-                "Masuk ke Dashboard"
               )}
-            </button>
-          </form>
+
+              {/* Success Message Area */}
+              {successMsg && (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold text-center animate-in fade-in slide-in-from-top-2 duration-300">
+                  {successMsg}
+                </div>
+              )}
+
+              <div className="text-xs text-gray-300 leading-relaxed bg-white/5 border border-white/10 p-3 rounded-xl">
+                Masukkan alamat email akun administrator Anda. Kami akan mengirimkan tautan pemulihan untuk mengatur ulang kata sandi.
+              </div>
+
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="forgot-email"
+                  className="text-xs font-bold text-[#D4AF37] tracking-wider uppercase"
+                >
+                  Alamat Email Admin
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <Mail className="h-4.5 w-4.5" />
+                  </div>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    required
+                    placeholder="admin@hut16pklu.org"
+                    value={forgotEmail}
+                    onChange={(e) => {
+                      setForgotEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    className="block w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#D4AF37] hover:bg-[#B3932D] disabled:bg-gray-700 disabled:text-gray-400 text-black font-bold text-sm rounded-xl cursor-pointer disabled:cursor-not-allowed transition-all duration-300 shadow-lg active:scale-98"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                    Mengirim Link...
+                  </>
+                ) : (
+                  "Kirim Link Atur Ulang"
+                )}
+              </button>
+
+              <div className="h-px bg-white/10" />
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setError(null);
+                    setSuccessMsg(null);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#D4AF37] transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Kembali ke Halaman Login
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-5">
+              {/* Error Message Area */}
+              {error && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold text-center animate-in fade-in slide-in-from-top-2 duration-300">
+                  {error}
+                </div>
+              )}
+
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="text-xs font-bold text-[#D4AF37] tracking-wider uppercase"
+                >
+                  Alamat Email
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <Mail className="h-4.5 w-4.5" />
+                  </div>
+                  <input
+                    ref={emailInputRef}
+                    id="email"
+                    type="email"
+                    required
+                    placeholder="admin@hut16pklu.org"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    className="block w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="text-xs font-bold text-[#D4AF37] tracking-wider uppercase"
+                  >
+                    Kata Sandi
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotPassword(true);
+                      setError(null);
+                      setSuccessMsg(null);
+                    }}
+                    className="text-xs text-gray-400 hover:text-[#D4AF37] transition-colors hover:underline cursor-pointer"
+                  >
+                    Lupa sandi?
+                  </button>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <Lock className="h-4.5 w-4.5" />
+                  </div>
+                  <input
+                    ref={passwordInputRef}
+                    id="password"
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    className="block w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Remember Me Checkbox */}
+              <div className="flex items-center">
+                <input
+                  id="rememberMe"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 bg-black/40 text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-offset-gray-900 cursor-pointer"
+                />
+                <label
+                  htmlFor="rememberMe"
+                  className="ml-2 block text-xs font-semibold text-gray-300 cursor-pointer select-none"
+                >
+                  Ingat Email Saya
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#D4AF37] hover:bg-[#B3932D] disabled:bg-gray-700 disabled:text-gray-400 text-black font-bold text-sm rounded-xl cursor-pointer disabled:cursor-not-allowed transition-all duration-300 shadow-lg active:scale-98"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                    Mengotentikasi...
+                  </>
+                ) : (
+                  "Masuk ke Dashboard"
+                )}
+              </button>
+            </form>
+          )}
 
           <div className="h-px bg-white/10" />
 

@@ -7,6 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, UserCheck, ChevronDown, Loader2 } from "lucide-react";
 import Image from "next/image";
 
+const decodeHTMLEntities = (str: string) => {
+  if (!str) return "";
+  return str
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&apos;", "'")
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+};
+
 interface GuestbookLoadMoreProps {
   initialMessages: GuestbookMessage[];
   totalCount: number;
@@ -39,7 +50,7 @@ export function GuestbookLoadMore({ initialMessages, totalCount }: GuestbookLoad
         {messages.map((item) => (
           <div
             key={item.id}
-            className="rounded-xl border border-white/10 bg-black/50 p-5 backdrop-blur-md text-[#FDFBF7] space-y-3 shadow-md hover:border-[#D4AF37]/40 transition-colors"
+            className="rounded-xl border border-white/10 bg-black/50 p-4 sm:p-5 backdrop-blur-md text-[#FDFBF7] space-y-3 shadow-md hover:border-[#D4AF37]/40 transition-colors"
           >
             <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
               <div className="flex items-center gap-3">
@@ -83,7 +94,7 @@ export function GuestbookLoadMore({ initialMessages, totalCount }: GuestbookLoad
             </div>
 
             <p className="text-xs text-gray-200 leading-relaxed italic whitespace-pre-line">
-              "{item.message}"
+              "{decodeHTMLEntities(item.message)}"
             </p>
           </div>
         ))}
@@ -101,12 +112,12 @@ export function GuestbookLoadMore({ initialMessages, totalCount }: GuestbookLoad
             {loading ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin text-[#D4AF37]" />
-                Memuat Ucapan...
+                Memuat...
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <ChevronDown className="h-4 w-4" />
-                Muat Lebih Banyak ({totalCount - messages.length} Ucapan Lagi)
+                Muat Lagi
               </span>
             )}
           </Button>

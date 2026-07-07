@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Loader2, Mail, User, ShieldCheck, AlertTriangle } from "lucide-react";
+import { X, Loader2, Mail, User, ShieldCheck, AlertTriangle, Lock } from "lucide-react";
 import { updateUser } from "@/app/(admin)/admin/users/actions";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +20,7 @@ export function EditUserModal({ user, currentUserId, onClose }: EditUserModalPro
   const router = useRouter();
   const [fullName, setFullName] = useState(user.full_name);
   const [role, setRole] = useState<"admin" | "super_user">(user.role as any);
+  const [newPassword, setNewPassword] = useState("");
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,11 @@ export function EditUserModal({ user, currentUserId, onClose }: EditUserModalPro
       return;
     }
 
+    if (newPassword && newPassword.length < 8) {
+      setError("Sandi baru minimal harus 8 karakter.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -42,6 +48,7 @@ export function EditUserModal({ user, currentUserId, onClose }: EditUserModalPro
       const result = await updateUser(user.id, {
         full_name: fullName.trim(),
         role,
+        password: newPassword ? newPassword : undefined,
       });
 
       if (result.success) {
@@ -162,6 +169,28 @@ export function EditUserModal({ user, currentUserId, onClose }: EditUserModalPro
                 <span>Pemberitahuan: Anda tidak dapat mengubah peran Anda sendiri demi mencegah kehilangan akses Super User.</span>
               </div>
             )}
+          </div>
+
+          {/* New Password input (Optional force reset by Super User) */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-[#D4AF37] tracking-wider uppercase">
+              Kata Sandi Baru (Kosongkan jika tidak diubah)
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                <Lock className="h-4 w-4" />
+              </div>
+              <input
+                type="password"
+                placeholder="Kata sandi baru (min 8 karakter)"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  if (error) setError(null);
+                }}
+                className="block w-full pl-9 pr-3 py-2 bg-black/30 border border-white/10 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none transition-all"
+              />
+            </div>
           </div>
 
           {/* Action Buttons */}

@@ -77,3 +77,25 @@ export async function deleteGuestbookMessage(id: string) {
     return { success: false, error: err.message || "Gagal menghapus ucapan" };
   }
 }
+
+export async function updateGuestbookMessage(
+  id: string,
+  updates: { name?: string; church_city?: string; message: string }
+) {
+  try {
+    const { error } = await supabaseAdmin
+      .from("guestbook_messages")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/admin/guestbook");
+    revalidatePath("/ucapan");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal mengedit ucapan" };
+  }
+}

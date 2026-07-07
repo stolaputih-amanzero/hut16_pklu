@@ -5,7 +5,8 @@ import {
   fetchAdminGuestbookMessages, 
   approveGuestbookMessage, 
   unapproveGuestbookMessage, 
-  deleteGuestbookMessage 
+  deleteGuestbookMessage,
+  updateGuestbookMessage
 } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +21,21 @@ import {
   RefreshCw, 
   ShieldAlert, 
   MapPin, 
-  Calendar 
+  Calendar,
+  Edit3,
+  FileText
 } from "lucide-react";
+
+const decodeHTMLEntities = (str: string) => {
+  if (!str) return "";
+  return str
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&apos;", "'")
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+};
 
 type GuestbookItem = {
   id: string;
@@ -39,6 +53,46 @@ export default function AdminGuestbookPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved">("all");
   const [actionId, setActionId] = useState<string | null>(null);
+
+  // Edit State
+  const [editingMessage, setEditingMessage] = useState<GuestbookItem | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editChurchCity, setEditChurchCity] = useState("");
+  const [editMessageText, setEditMessageText] = useState("");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const handleOpenEdit = (item: GuestbookItem) => {
+    setEditingMessage(item);
+    setEditName(item.name);
+    setEditChurchCity(item.church_city);
+    setEditMessageText(decodeHTMLEntities(item.message));
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMessage) return;
+    setIsSavingEdit(true);
+
+    const res = await updateGuestbookMessage(editingMessage.id, {
+      name: editName,
+      church_city: editChurchCity,
+      message: editMessageText,
+    });
+    setIsSavingEdit(false);
+
+    if (res.success) {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === editingMessage.id
+            ? { ...m, name: editName, church_city: editChurchCity, message: editMessageText }
+            : m
+        )
+      );
+      setEditingMessage(null);
+    } else {
+      alert(res.error || "Gagal mengupdate ucapan.");
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -123,16 +177,32 @@ export default function AdminGuestbookPage() {
           </p>
         </div>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={loadData}
-          disabled={loading}
-          className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10"
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-          Refresh Data
-        </Button>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={loadData}
+            disabled={loading}
+            className="border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10 flex-1 md:flex-initial"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+            Refresh Data
+          </Button>
+          <a
+            href={`/api/reports/guestbook?status=${statusFilter}&q=${encodeURIComponent(search)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 md:flex-initial"
+          >
+            <Button
+              size="sm"
+              className="bg-[#022c22] border border-[#D4AF37]/45 hover:bg-[#033B2B] text-[#D4AF37] font-bold h-9 w-full"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Laporan PDF
+            </Button>
+          </a>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -281,7 +351,7 @@ export default function AdminGuestbookPage() {
 
               {/* Message Content */}
               <p className="text-xs md:text-sm text-gray-200 whitespace-pre-line leading-relaxed italic bg-black/40 p-3 rounded-lg border border-white/5">
-                "{item.message}"
+                "{decodeHTMLEntities(item.message)}"
               </p>
 
               {/* Action Buttons */}
@@ -311,6 +381,17 @@ export default function AdminGuestbookPage() {
 
                 <Button
                   size="sm"
+                  variant="outline"
+                  disabled={actionId === item.id}
+                  onClick={() => handleOpenEdit(item)}
+                  className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs h-8 px-3"
+                >
+                  <Edit3 className="w-3.5 h-3.5 mr-1" />
+                  Edit
+                </Button>
+
+                <Button
+                  size="sm"
                   variant="ghost"
                   disabled={actionId === item.id}
                   onClick={() => handleDelete(item.id)}
@@ -322,6 +403,86 @@ export default function AdminGuestbookPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {/* Edit Guestbook Message Modal */}
+      {editingMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-2xl border border-[#D4AF37]/30 bg-[#0c0d0e] p-6 text-[#FDFBF7] shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-lg font-bold text-[#D4AF37] flex items-center gap-2">
+                <Edit3 className="w-5 h-5" />
+                Edit Ucapan Buku Tamu
+              </h3>
+              <button
+                onClick={() => setEditingMessage(null)}
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Tutup modal"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-300">Nama Pengirim</label>
+                <Input
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="bg-black/60 border-white/20 text-white text-sm"
+                  placeholder="Contoh: Oma Elizabeth"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-300">Asal Jemaat / Kota</label>
+                <Input
+                  required
+                  value={editChurchCity}
+                  onChange={(e) => setEditChurchCity(e.target.value)}
+                  className="bg-black/60 border-white/20 text-white text-sm"
+                  placeholder="Contoh: GPIB Immanuel (Mupel Banten)"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-gray-300">Isi Ucapan &amp; Harapan</label>
+                  <span className={`text-[10px] font-mono ${editMessageText.length > 280 ? "text-amber-400 font-bold" : "text-gray-400"}`}>
+                    {editMessageText.length}/300
+                  </span>
+                </div>
+                <textarea
+                  required
+                  rows={5}
+                  maxLength={300}
+                  value={editMessageText}
+                  onChange={(e) => setEditMessageText(e.target.value)}
+                  className="w-full rounded-md border border-white/20 bg-black/60 p-3 text-sm text-white focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] resize-none"
+                  placeholder="Tuliskan ucapan selamat..."
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-white/10">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setEditingMessage(null)}
+                  className="text-gray-300 hover:text-white hover:bg-white/5 text-sm h-10 px-4 rounded-xl"
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-sm h-10 px-6 rounded-xl transition-all"
+                >
+                  {isSavingEdit ? "Menyimpan..." : "Simpan Perubahan"}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

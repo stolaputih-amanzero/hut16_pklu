@@ -58,6 +58,7 @@ export default function AdminMerchPage() {
   const [orders, setOrders] = useState<MerchOrder[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<MerchOrder | null>(null);
 
   // Product Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -401,96 +402,177 @@ export default function AdminMerchPage() {
               Belum ada data pesanan merchandise yang sesuai.
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/50">
-              <table className="w-full text-left text-xs text-[#FDFBF7]">
-                <thead className="bg-white/5 text-[11px] uppercase tracking-wider text-gray-400 border-b border-white/10">
-                  <tr>
-                    <th className="p-3">Waktu</th>
-                    <th className="p-3">Nama Pemesan</th>
-                    <th className="p-3">Asal Jemaat</th>
-                    <th className="p-3">WhatsApp</th>
-                    <th className="p-3">Item Merch</th>
-                    <th className="p-3">Ukuran</th>
-                    <th className="p-3 text-center">Qty</th>
-                    <th className="p-3">Catatan</th>
-                    <th className="p-3 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {filteredOrders.map((o) => {
-                    const cleanWa = (o.whatsapp || "").replace(/^0/, "62").replace(/\D/g, "");
-                    return (
-                      <tr key={o.id} className="hover:bg-white/5 transition-colors">
-                        <td className="p-3 font-mono text-gray-400 whitespace-nowrap">
-                          {new Date(o.created_at).toLocaleString("id-ID", {
-                            dateStyle: "short",
-                            timeStyle: "short",
+            <div className="space-y-4">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto rounded-xl border border-white/10 bg-black/50">
+                <table className="w-full text-left text-xs text-[#FDFBF7]">
+                  <thead className="bg-white/5 text-[11px] uppercase tracking-wider text-gray-400 border-b border-white/10">
+                    <tr>
+                      <th className="p-3">Waktu</th>
+                      <th className="p-3">Nama Pemesan</th>
+                      <th className="p-3">Asal Jemaat</th>
+                      <th className="p-3">WhatsApp</th>
+                      <th className="p-3">Item Merch</th>
+                      <th className="p-3">Ukuran</th>
+                      <th className="p-3 text-center">Qty</th>
+                      <th className="p-3">Catatan</th>
+                      <th className="p-3 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {filteredOrders.map((o) => {
+                      const cleanWa = (o.whatsapp || "").replace(/^0/, "62").replace(/\D/g, "");
+                      return (
+                        <tr
+                          key={o.id}
+                          onClick={() => setSelectedOrder(o)}
+                          className="hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          <td className="p-3 font-mono text-gray-400 whitespace-nowrap">
+                            {new Date(o.created_at).toLocaleString("id-ID", {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })}
+                          </td>
+                          <td className="p-3 font-bold text-white whitespace-nowrap">{o.buyer_name}</td>
+                          <td className="p-3 text-emerald-300 whitespace-nowrap">{o.church_city}</td>
+                          <td className="p-3 font-mono">
+                            {cleanWa ? (
+                              <a
+                                href={`https://wa.me/${cleanWa}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-emerald-400 font-bold hover:underline flex items-center gap-1"
+                              >
+                                <Phone className="w-3.5 h-3.5" /> {o.whatsapp}
+                              </a>
+                            ) : (
+                              o.whatsapp
+                            )}
+                          </td>
+                          <td className="p-3 font-semibold text-[#D4AF37] whitespace-nowrap">{o.item_type}</td>
+                          <td className="p-3">
+                            {o.size ? (
+                              (() => {
+                                const sizeVal = o.size.includes(":") ? o.size.split(":").pop()?.trim() || "" : o.size;
+                                const sizeUpper = sizeVal.toUpperCase();
+                                const isSmallMed = ["S", "M", "XS"].some(s => sizeUpper.includes(s)) && !sizeUpper.includes("XL") && !sizeUpper.includes("XXL");
+                                const isLarge = sizeUpper === "L" || (sizeUpper.includes("L") && !sizeUpper.includes("X"));
+                                const displayColor = isSmallMed 
+                                  ? "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                                  : isLarge
+                                  ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40"
+                                  : "bg-red-500/20 text-red-300 border-red-500/40";
+                                return (
+                                  <span className={`inline-block px-2.5 py-0.5 rounded font-mono font-black text-xs border ${displayColor}`}>
+                                    {sizeVal}
+                                  </span>
+                                );
+                              })()
+                            ) : (
+                              <span className="text-gray-500 font-mono">-</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-center">
+                            <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full font-bold font-mono text-xs border ${
+                              o.quantity > 1
+                                ? "bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                                : "bg-white/5 text-gray-300 border-white/10"
+                            }`}>
+                              {o.quantity} Pcs
+                            </span>
+                          </td>
+                          <td className="p-3 text-gray-300 italic max-w-xs truncate">{o.notes || "-"}</td>
+                          <td className="p-3 text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteOrder(o.id);
+                              }}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-7 text-[11px]"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card List View */}
+              <div className="block md:hidden space-y-3">
+                {filteredOrders.map((o) => {
+                  const cleanWa = (o.whatsapp || "").replace(/^0/, "62").replace(/\D/g, "");
+                  return (
+                    <div
+                      key={o.id}
+                      onClick={() => setSelectedOrder(o)}
+                      className="p-4 bg-black/50 rounded-xl border border-white/10 hover:border-[#D4AF37]/50 transition-all cursor-pointer space-y-3 relative group"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-bold text-white text-sm">{o.buyer_name}</div>
+                          <div className="text-emerald-300 text-[11px] font-medium">{o.church_city}</div>
+                        </div>
+                        <span className="text-[10px] text-gray-400 font-mono">
+                          {new Date(o.created_at).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
-                        </td>
-                        <td className="p-3 font-bold text-white whitespace-nowrap">{o.buyer_name}</td>
-                        <td className="p-3 text-emerald-300 whitespace-nowrap">{o.church_city}</td>
-                        <td className="p-3 font-mono">
-                          {cleanWa ? (
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
+                        <span className="font-semibold text-[#D4AF37] text-xs">
+                          {o.item_type}
+                        </span>
+                        {o.size && (
+                          <span className="px-1.5 py-0.5 rounded font-mono font-black text-[10px] bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
+                            {o.size.includes(":") ? o.size.split(":").pop()?.trim() || "" : o.size}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full font-bold font-mono text-[10px] bg-white/5 text-gray-300 border border-white/10">
+                          {o.quantity} Pcs
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-white/5 gap-2">
+                        <div>
+                          {cleanWa && (
                             <a
                               href={`https://wa.me/${cleanWa}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-emerald-400 font-bold hover:underline flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-emerald-400 font-bold hover:underline flex items-center gap-1 text-[11px]"
                             >
-                              <Phone className="w-3 h-3" /> {o.whatsapp}
+                              <Phone className="w-3.5 h-3.5" /> Chat WA
                             </a>
-                          ) : (
-                            o.whatsapp
                           )}
-                        </td>
-                        <td className="p-3 font-semibold text-[#D4AF37] whitespace-nowrap">{o.item_type}</td>
-                        <td className="p-3">
-                          {o.size ? (
-                            (() => {
-                              const sizeVal = o.size.includes(":") ? o.size.split(":").pop()?.trim() || "" : o.size;
-                              const sizeUpper = sizeVal.toUpperCase();
-                              const isSmallMed = ["S", "M", "XS"].some(s => sizeUpper.includes(s)) && !sizeUpper.includes("XL") && !sizeUpper.includes("XXL");
-                              const isLarge = sizeUpper === "L" || (sizeUpper.includes("L") && !sizeUpper.includes("X"));
-                              const displayColor = isSmallMed 
-                                ? "bg-blue-500/20 text-blue-300 border-blue-500/40"
-                                : isLarge
-                                ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40"
-                                : "bg-red-500/20 text-red-300 border-red-500/40";
-                              return (
-                                <span className={`inline-block px-2.5 py-0.5 rounded font-mono font-black text-xs border ${displayColor}`}>
-                                  {sizeVal}
-                                </span>
-                              );
-                            })()
-                          ) : (
-                            <span className="text-gray-500 font-mono">-</span>
-                          )}
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full font-bold font-mono text-xs border ${
-                            o.quantity > 1
-                              ? "bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
-                              : "bg-white/5 text-gray-300 border-white/10"
-                          }`}>
-                            {o.quantity} Pcs
-                          </span>
-                        </td>
-                        <td className="p-3 text-gray-300 italic max-w-xs truncate">{o.notes || "-"}</td>
-                        <td className="p-3 text-right">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteOrder(o.id)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-7 text-[11px]"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteOrder(o.id);
+                          }}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-7 px-2 text-[11px] shrink-0"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -667,6 +749,153 @@ export default function AdminMerchPage() {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Order Detail Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-md rounded-2xl bg-[#022c22] border border-[#D4AF37]/40 p-6 shadow-2xl space-y-5 text-[#FDFBF7] max-h-[90vh] overflow-y-auto">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h2 className="text-base font-bold text-[#D4AF37] flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
+                Detail Pesanan Merchandise
+              </h2>
+              <button
+                onClick={() => setSelectedOrder(null)}
+                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-4 text-xs">
+              
+              {/* Buyer Info */}
+              <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
+                <div>
+                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Nama Pemesan</div>
+                  <div className="text-sm font-extrabold text-white">{selectedOrder.buyer_name}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">Asal Jemaat / Kota</div>
+                  <div className="text-xs text-emerald-300 font-semibold flex items-center gap-1">
+                    {selectedOrder.church_city}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-0.5">WhatsApp / No. HP</div>
+                  <div className="text-xs font-mono font-bold text-white">
+                    {selectedOrder.whatsapp ? (
+                      (() => {
+                        const cleanWa = selectedOrder.whatsapp.replace(/^0/, "62").replace(/\D/g, "");
+                        return (
+                          <a
+                            href={`https://wa.me/${cleanWa}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-emerald-400 hover:underline flex items-center gap-1 py-1"
+                          >
+                            <Phone className="w-3.5 h-3.5 shrink-0" />
+                            {selectedOrder.whatsapp}
+                          </a>
+                        );
+                      })()
+                    ) : (
+                      "-"
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Item Info */}
+              <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-1">
+                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Item Merchandise</div>
+                    <div className="text-xs font-bold text-[#D4AF37]">{selectedOrder.item_type}</div>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Jumlah (Qty)</div>
+                    <div className="text-xs font-bold font-mono text-white">{selectedOrder.quantity} Pcs</div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center gap-4 pt-2 border-t border-white/5">
+                  <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Ukuran</div>
+                  <div>
+                    {selectedOrder.size ? (
+                      <span className="inline-block px-2.5 py-0.5 rounded font-mono font-black text-xs border bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40">
+                        {selectedOrder.size.includes(":") ? selectedOrder.size.split(":").pop()?.trim() || "" : selectedOrder.size}
+                      </span>
+                    ) : (
+                      <span className="text-gray-500 font-mono">-</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-1">
+                <div className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Catatan Tambahan</div>
+                <div className="text-xs text-gray-300 italic whitespace-pre-wrap leading-relaxed">
+                  {selectedOrder.notes || "Tidak ada catatan."}
+                </div>
+              </div>
+
+              {/* Order Meta */}
+              <div className="flex items-center gap-1.5 px-1 text-[10px] text-gray-400">
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
+                <span>Dipesan pada:</span>
+                <span className="font-mono font-bold">
+                  {new Date(selectedOrder.created_at).toLocaleString("id-ID", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </span>
+              </div>
+
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-white/10 text-xs">
+              {selectedOrder.whatsapp && (
+                <a
+                  href={`https://wa.me/${selectedOrder.whatsapp.replace(/^0/, "62").replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-md shadow-emerald-900/30"
+                >
+                  <Phone className="w-4 h-4" /> Hubungi WhatsApp
+                </a>
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  if (confirm("Apakah Anda yakin ingin menghapus pesanan ini?")) {
+                    handleDeleteOrder(selectedOrder.id);
+                    setSelectedOrder(null);
+                  }
+                }}
+                className="w-full sm:w-auto text-red-400 hover:text-red-300 hover:bg-red-950/40 font-bold rounded-xl h-10 px-4"
+              >
+                <Trash2 className="w-4 h-4 mr-1 shrink-0" /> Hapus Pesanan
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setSelectedOrder(null)}
+                className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 font-bold rounded-xl h-10 px-4"
+              >
+                Tutup
+              </Button>
+            </div>
+
           </div>
         </div>
       )}

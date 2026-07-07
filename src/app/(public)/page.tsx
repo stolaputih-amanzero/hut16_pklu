@@ -66,7 +66,7 @@ const servicesData = [
     badge: "Kampanye",
     btnText: "Buat Bingkai Amanaura",
     specs: [
-      { label: "Jenis Produk", value: "Amanaura Resmi Digital" },
+      { label: "Jenis Produk", value: "Amanaura Frame Resmi Digital" },
       { label: "Kualitas Gambar", value: "High Definition (HD PNG)" },
       { label: "Teks Pendukung", value: "Caption & Hashtag Otomatis" },
       { label: "Proses Unduh", value: "Instan langsung ke perangkat Anda" }
@@ -407,8 +407,8 @@ export default function Home() {
                 {section.label}
               </span>
               <div className={`w-2.5 h-2.5 rounded-full border transition-all duration-300 ${isActive
-                  ? 'bg-[#D4AF37] border-[#D4AF37] scale-125 shadow-[0_0_8px_#D4AF37]'
-                  : 'border-gray-500 bg-transparent group-hover:border-[#D4AF37] group-hover:scale-110'
+                ? 'bg-[#D4AF37] border-[#D4AF37] scale-125 shadow-[0_0_8px_#D4AF37]'
+                : 'border-gray-500 bg-transparent group-hover:border-[#D4AF37] group-hover:scale-110'
                 }`} />
             </a>
           )
@@ -603,8 +603,8 @@ export default function Home() {
                     key={idx}
                     onClick={() => setActiveServiceTab(idx)}
                     className={`flex items-center gap-3 sm:gap-4 text-left px-4 sm:px-5 py-3 sm:py-4 rounded-xl transition-all duration-300 w-auto lg:w-full shrink-0 lg:shrink whitespace-nowrap lg:whitespace-normal cursor-pointer select-none group border lg:border-0 ${isActive
-                        ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 lg:border-l-2 lg:border-[#D4AF37] lg:rounded-l-none text-[#D4AF37]'
-                        : 'border-white/5 text-gray-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 lg:border-l-2 lg:border-[#D4AF37] lg:rounded-l-none text-[#D4AF37]'
+                      : 'border-white/5 text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                   >
                     <div className={`p-2.5 rounded-lg border transition-all ${isActive ? 'border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]' : 'border-white/10 bg-black/40 text-gray-400 group-hover:text-white'
@@ -958,8 +958,8 @@ export default function Home() {
             <button
               onClick={() => setActiveRundown('pra')}
               className={`relative w-full sm:w-auto text-center px-6 py-3 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase transition-all duration-300 cursor-pointer ${activeRundown === 'pra'
-                  ? 'text-[#022c22] bg-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
-                  : 'text-gray-400 border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-white'
+                ? 'text-[#022c22] bg-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
+                : 'text-gray-400 border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-white'
                 }`}
             >
               Pra-Kegiatan (Lomba & Webinar)
@@ -967,8 +967,8 @@ export default function Home() {
             <button
               onClick={() => setActiveRundown('puncak')}
               className={`relative w-full sm:w-auto text-center px-6 py-3 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase transition-all duration-300 cursor-pointer ${activeRundown === 'puncak'
-                  ? 'text-[#022c22] bg-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
-                  : 'text-gray-400 border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-white'
+                ? 'text-[#022c22] bg-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
+                : 'text-gray-400 border border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-white'
                 }`}
             >
               Acara Puncak (12 Okt)
@@ -1420,8 +1420,8 @@ export default function Home() {
                       disabled={submitting}
                       onClick={() => setModalForm(prev => ({ ...prev, type: 'donatur' }))}
                       className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${modalForm.type === 'donatur'
-                          ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
-                          : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
+                        ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                        : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
                         }`}
                     >
                       <div className="text-xs uppercase tracking-wider">Donasi</div>
@@ -1432,8 +1432,8 @@ export default function Home() {
                       disabled={submitting}
                       onClick={() => setModalForm(prev => ({ ...prev, type: 'sponsorship' }))}
                       className={`p-3 rounded-lg border text-center transition-all cursor-pointer ${modalForm.type === 'sponsorship'
-                          ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
-                          : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
+                        ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#FDFBF7] font-medium shadow-[0_0_15px_rgba(212,175,55,0.15)]'
+                        : 'border-[#D4AF37]/20 bg-black/20 text-[#FDFBF7]/60 hover:border-[#D4AF37]/45'
                         }`}
                     >
                       <div className="text-xs uppercase tracking-wider">Sponsor</div>

@@ -97,6 +97,17 @@ function CheckContent() {
     }
   };
 
+  // Check if we are checking merchandise or registration
+  const isMerchMode = !!initialMerchId || (merchResults && merchResults.length > 0 && (!results || results.length === 0));
+
+  const titleText = isMerchMode ? "Cek Status Pemesanan Merchandise" : "Cek Status Pendaftaran";
+  const subtext = isMerchMode 
+    ? "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status pesanan merchandise."
+    : "Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status.";
+  const placeholderText = isMerchMode
+    ? "Contoh: 08123456789 atau Kode Registrasi"
+    : "Contoh: PKLU-A8K9X atau 08123456789";
+
   useEffect(() => {
     if (initialCode) {
       handleSearch(initialCode, "");
@@ -105,32 +116,38 @@ function CheckContent() {
     }
   }, [initialCode, initialMerchId]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.title = `${titleText} | HUT PKLU 16`;
+    }
+  }, [titleText]);
+
   return (
-    <div className="container mx-auto min-h-screen py-10 px-4">
-      <div className="mx-auto max-w-2xl space-y-8 rounded-2xl bg-black/60 p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/30 shadow-2xl text-[#FDFBF7]">
-        <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-2">
+    <div className="container mx-auto min-h-screen py-6 sm:py-10 px-3 sm:px-4">
+      <div className="mx-auto max-w-2xl space-y-6 sm:space-y-8 rounded-2xl bg-black/60 p-4 sm:p-6 md:p-8 backdrop-blur-md border border-[#D4AF37]/30 shadow-2xl text-[#FDFBF7]">
+        <div className="text-center space-y-2.5">
+          <div className="inline-flex p-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-1">
             <ShieldCheck className="w-8 h-8 text-[#D4AF37]" />
           </div>
-          <h1 className="text-3xl font-extrabold text-[#D4AF37]">Cek Status Pendaftaran</h1>
-          <p className="text-sm text-gray-300">Masukkan Kode Registrasi (PKLU-XXXXX) atau No WhatsApp untuk verifikasi status.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#D4AF37] tracking-tight leading-tight">{titleText}</h1>
+          <p className="text-xs sm:text-sm text-gray-300 max-w-md mx-auto leading-relaxed">{subtext}</p>
         </div>
 
         {/* Search Bar */}
-        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex gap-3">
+        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col sm:flex-row gap-3">
           <Input 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Contoh: PKLU-A8K9X atau 08123456789" 
-            className="bg-black/50 text-white border-[#D4AF37]/30 py-6"
+            placeholder={placeholderText} 
+            className="bg-black/50 text-white border-[#D4AF37]/30 py-3.5 px-4 h-12 text-sm focus-visible:ring-1 focus-visible:ring-[#D4AF37]/50 rounded-xl"
           />
-          <Button type="submit" disabled={loading} className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold px-6 py-6">
-            {loading ? "Mencari..." : <><Search className="w-5 h-5 mr-1" /> Cari</>}
+          <Button type="submit" disabled={loading} className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-12 py-3 px-6 shrink-0 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5">
+            {loading ? "Mencari..." : <><Search className="w-4 h-4 mr-1.5" /> Cari</>}
           </Button>
         </form>
 
         {errorMsg && (
-          <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 text-red-400 text-sm">
+          <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 text-red-400 text-xs sm:text-sm">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -146,48 +163,80 @@ function CheckContent() {
                 <div 
                   key={reg.id} 
                   id={`ticket-${reg.registration_code}`}
-                  className="rounded-xl border border-[#D4AF37]/40 bg-[#0B0904] p-6 space-y-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden"
+                  className="rounded-xl border border-[#D4AF37]/40 bg-[#0B0904] p-4 sm:p-6 space-y-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
                     <div>
-                      <span className="text-xs uppercase tracking-wider text-gray-400">Kode Registrasi</span>
+                      <span className="text-[10px] uppercase tracking-wider text-gray-400 block mb-0.5">Kode Registrasi</span>
                       <h2 className="text-2xl font-black text-[#D4AF37] font-mono tracking-wider">{reg.registration_code}</h2>
                     </div>
                     <div className="flex items-center gap-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-3 py-1.5 rounded-full text-xs font-semibold">
                       <CheckCircle2 className="w-4 h-4" />
-                      Status: TEREKAM & VALID
+                      Status: TEREKAM &amp; VALID
                     </div>
                   </div>
 
                   <div className="grid gap-6 md:grid-cols-3 items-center">
                     {/* Details */}
-                    <div className="md:col-span-2 space-y-2 text-sm">
-                      <p><span className="text-gray-400">Mode:</span> <strong>{reg.registration_mode}</strong></p>
-                      <p><span className="text-gray-400">Kategori:</span> <strong>{reg.category}</strong></p>
-                      <p><span className="text-gray-400">Asal Jemaat:</span> <strong>{reg.church_name} ({reg.mupel})</strong></p>
+                    <div className="md:col-span-2 space-y-2.5 text-xs sm:text-sm">
+                      <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                        <span className="text-gray-400 shrink-0">Mode:</span>
+                        <span className="font-semibold text-white text-right">{reg.registration_mode}</span>
+                      </div>
+                      <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                        <span className="text-gray-400 shrink-0">Kategori:</span>
+                        <span className="font-semibold text-white text-right">{reg.category}</span>
+                      </div>
+                      <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                        <span className="text-gray-400 shrink-0">Asal Jemaat:</span>
+                        <span className="font-semibold text-emerald-300 text-right">{reg.church_name} ({reg.mupel})</span>
+                      </div>
                       {reg.registration_mode === "Mandiri" ? (
                         <>
-                          <p><span className="text-gray-400">Nama Pendaftar:</span> <strong>{reg.full_name}</strong></p>
-                          <p><span className="text-gray-400">Tipe / Peran:</span> <strong>{reg.type} {reg.role ? `(${reg.role})` : ""}</strong></p>
-                          <p><span className="text-gray-400">Ukuran Kaos:</span> <strong>{reg.shirt_size || "Acak"}</strong></p>
+                          <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                            <span className="text-gray-400 shrink-0">Nama Pendaftar:</span>
+                            <span className="font-semibold text-white text-right">{reg.full_name}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                            <span className="text-gray-400 shrink-0">Tipe / Peran:</span>
+                            <span className="font-semibold text-white text-right">{reg.type} {reg.role ? `(${reg.role})` : ""}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                            <span className="text-gray-400 shrink-0">Ukuran Kaos:</span>
+                            <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded text-xs">{reg.shirt_size || "Acak"}</span>
+                          </div>
                         </>
                       ) : (
                         <>
-                          <p><span className="text-gray-400">PIC Rombongan:</span> <strong>{reg.pic_name}</strong></p>
-                          <p><span className="text-gray-400">Total Orang:</span> <strong>{(reg.participant_count || 0) + (reg.companion_count || 0)} Orang</strong> ({reg.participant_count} Peserta, {reg.companion_count} Pendamping)</p>
+                          <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                            <span className="text-gray-400 shrink-0">PIC Rombongan:</span>
+                            <span className="font-semibold text-white text-right">{reg.pic_name}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5 border-b border-white/5 gap-2">
+                            <span className="text-gray-400 shrink-0">Total Orang:</span>
+                            <span className="font-semibold text-white text-right">
+                              {(reg.participant_count || 0) + (reg.companion_count || 0)} Orang <span className="text-xs text-gray-400 font-normal">({reg.participant_count} Peserta, {reg.companion_count} Pendamping)</span>
+                            </span>
+                          </div>
                           {reg.shirt_sizes_summary && (
-                            <div className="mt-2 pt-2 border-t border-white/10 text-xs">
-                              <p className="text-gray-400 mb-1">Rekap Baju:</p>
+                            <div className="py-2 border-b border-white/5">
+                              <span className="text-gray-400 block mb-1.5">Rekap Baju:</span>
                               <div className="flex flex-wrap gap-1.5 font-mono">
                                 {Object.entries(reg.shirt_sizes_summary).map(([sz, qty]) => (
-                                  Number(qty) > 0 ? <span key={sz} className="bg-white/10 px-2 py-0.5 rounded text-white">{sz}: {String(qty)}</span> : null
+                                  Number(qty) > 0 ? (
+                                    <span key={sz} className="bg-white/10 px-2 py-0.5 rounded text-white text-[10px]">
+                                      {sz}: {String(qty)}
+                                    </span>
+                                  ) : null
                                 ))}
                               </div>
                             </div>
                           )}
                         </>
                       )}
-                      <p className="text-xs text-gray-400 pt-2 border-t border-white/10">Waktu Daftar: {new Date(reg.created_at).toLocaleString("id-ID")}</p>
+                      <div className="text-[10px] text-gray-500 pt-1.5">
+                        Waktu Daftar: {new Date(reg.created_at).toLocaleString("id-ID")}
+                      </div>
                     </div>
 
                     {/* QR Code */}
@@ -203,7 +252,7 @@ function CheckContent() {
                       type="button"
                       disabled={downloadingCode === reg.registration_code}
                       onClick={() => downloadTicketImage(reg.registration_code)}
-                      className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs py-2 px-4 rounded-lg inline-flex items-center gap-1.5 cursor-pointer shadow-[0_0_10px_rgba(212,175,55,0.15)]"
+                      className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold text-xs py-2.5 px-4 rounded-xl inline-flex items-center gap-1.5 cursor-pointer shadow-[0_0_10px_rgba(212,175,55,0.15)] w-full sm:w-auto h-10 transition-all active:scale-[0.98]"
                     >
                       <Download className="w-4 h-4" />
                       {downloadingCode === reg.registration_code ? "Menyimpan..." : "Simpan Gambar"}
@@ -214,6 +263,7 @@ function CheckContent() {
             })}
           </div>
         )}
+        
         {/* Merchandise Results */}
         {merchResults && merchResults.length > 0 && (
           <div className="space-y-6 pt-6 border-t border-[#D4AF37]/20">
@@ -230,64 +280,69 @@ function CheckContent() {
                 return (
                   <div 
                     key={order.id} 
-                    className="rounded-xl border border-[#D4AF37]/35 bg-[#0B0904]/80 p-5 space-y-4 shadow-lg text-xs"
+                    className="rounded-xl border border-[#D4AF37]/35 bg-[#0B0904]/80 p-4 sm:p-5 space-y-4 shadow-lg text-xs"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2.5">
                       <div>
                         <span className="text-[10px] text-gray-400 block uppercase tracking-wider">No Pesanan</span>
-                        <span className="font-mono text-sm font-bold text-[#D4AF37] uppercase">#MB-{order.id.slice(0, 8).toUpperCase()}</span>
+                        <span className="font-mono text-sm font-black text-[#D4AF37] uppercase">#MB-{order.id.slice(0, 8).toUpperCase()}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {isPending && (
-                          <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase">
+                          <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider">
                             Menunggu Verifikasi
                           </span>
                         )}
                         {isVerified && (
-                          <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase">
-                            Lunas & Terverifikasi
+                          <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider">
+                            Lunas &amp; Terverifikasi
                           </span>
                         )}
                         {isRejected && (
-                          <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase">
+                          <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-2.5 py-1 rounded-full font-semibold text-[10px] uppercase tracking-wider">
                             Pembayaran Ditolak
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 bg-black/40 p-4 rounded-xl border border-white/5 text-xs">
+                      <div className="flex justify-between sm:block py-1 border-b border-white/5 sm:border-0 gap-2">
                         <span className="text-gray-400 block">Nama Pemesan:</span>
-                        <span className="font-semibold text-white">{order.buyer_name}</span>
+                        <span className="font-semibold text-white text-right sm:text-left">{order.buyer_name}</span>
                       </div>
-                      <div>
+                      <div className="flex justify-between sm:block py-1 border-b border-white/5 sm:border-0 gap-2">
                         <span className="text-gray-400 block">Asal Mupel/Gereja:</span>
-                        <span className="font-semibold text-white">{order.church_city}</span>
+                        <span className="font-semibold text-emerald-300 text-right sm:text-left">{order.church_city}</span>
                       </div>
-                      <div>
+                      <div className="flex justify-between sm:block py-1 border-b border-white/5 sm:border-0 gap-2">
                         <span className="text-gray-400 block">No WhatsApp:</span>
-                        <span className="font-semibold text-white font-mono">{order.whatsapp}</span>
+                        <span className="font-semibold text-white font-mono text-right sm:text-left">{order.whatsapp}</span>
                       </div>
-                      <div>
+                      <div className="flex justify-between sm:block py-1 border-b border-white/5 sm:border-0 gap-2">
                         <span className="text-gray-400 block">Tanggal Transfer/Bayar:</span>
-                        <span className="font-semibold text-white">
+                        <span className="font-semibold text-white text-right sm:text-left">
                           {order.payment_date ? new Date(order.payment_date).toLocaleDateString("id-ID", { dateStyle: "long" }) : "-"}
                         </span>
                       </div>
                     </div>
 
                     <div className="pt-2 border-t border-white/5">
-                      <span className="text-gray-400 block mb-1">Rincian Souvenir:</span>
-                      <div className="bg-black/40 p-2.5 rounded border border-white/5 font-mono text-[11px] text-gray-200 leading-relaxed">
-                        {order.item_type}
+                      <span className="text-gray-400 block mb-1.5 font-semibold">Rincian Souvenir:</span>
+                      <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono text-[11px] text-gray-200 space-y-1.5">
+                        {order.item_type?.split(", ").map((item: string, idx: number) => (
+                          <div key={idx} className="flex items-start gap-1.5">
+                            <span className="text-[#D4AF37] shrink-0">•</span>
+                            <span>{item}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
                     {order.notes && (
                       <div className="pt-2 border-t border-white/5">
-                        <span className="text-gray-400 block">Catatan Pemesan:</span>
-                        <p className="italic text-gray-300">{order.notes}</p>
+                        <span className="text-gray-400 block mb-1 font-semibold">Catatan Pemesan:</span>
+                        <p className="italic text-gray-300 leading-relaxed bg-black/20 p-2.5 rounded-lg border border-white/5">{order.notes}</p>
                       </div>
                     )}
 
@@ -300,15 +355,28 @@ function CheckContent() {
 
                     {order.payment_proof_url && (
                       <div className="pt-2 border-t border-white/5">
-                        <span className="text-gray-400 block mb-1">Bukti Pembayaran:</span>
-                        <a 
-                          href={order.payment_proof_url} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="inline-block relative h-20 w-20 rounded border border-white/10 overflow-hidden bg-black hover:opacity-85 transition-opacity"
-                        >
-                          <img src={order.payment_proof_url} alt="Bukti Transfer" className="h-full w-full object-cover" />
-                        </a>
+                        <span className="text-gray-400 block mb-1.5 font-semibold">Bukti Pembayaran:</span>
+                        <div className="flex items-center gap-3 bg-black/30 p-2.5 rounded-lg border border-white/5">
+                          <a 
+                            href={order.payment_proof_url} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="inline-block relative h-14 w-14 rounded-lg overflow-hidden border border-white/10 bg-black hover:opacity-85 transition-opacity shrink-0"
+                          >
+                            <img src={order.payment_proof_url} alt="Bukti Transfer" className="h-full w-full object-cover" />
+                          </a>
+                          <div className="text-[10px] text-gray-400">
+                            <p className="font-semibold text-white mb-0.5">Bukti transfer terunggah</p>
+                            <a 
+                              href={order.payment_proof_url} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              className="text-[#D4AF37] hover:underline font-semibold"
+                            >
+                              Lihat Gambar Penuh ↗
+                            </a>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

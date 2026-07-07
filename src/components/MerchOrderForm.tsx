@@ -511,8 +511,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
           <div className="pt-2 border-t border-white/10 space-y-2">
             <span className="text-gray-400 font-semibold block">Rincian Item yang Dipesan:</span>
-            <div className="bg-black/40 p-3 rounded-lg border border-white/10 space-y-1.5 font-mono text-xs">
-              <p className="text-white font-semibold">{successData.item_type}</p>
+            <div className="bg-black/40 p-3 rounded-lg border border-white/10 space-y-1.5 font-mono text-xs text-gray-200">
+              {successData.item_type?.split(", ").map((item: string, idx: number) => (
+                <div key={idx} className="flex items-start gap-1.5">
+                  <span className="text-[#D4AF37] shrink-0">•</span>
+                  <span className="text-white font-semibold">{item}</span>
+                </div>
+              ))}
             </div>
           </div>
 

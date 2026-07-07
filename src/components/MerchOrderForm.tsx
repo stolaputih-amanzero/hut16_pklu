@@ -587,18 +587,18 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   return (
     <div className="space-y-6">
       {/* Combined Collapsible Guidelines Block */}
-      <div className="rounded-2xl border border-[#D4AF37]/30 bg-black/60 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-inner">
+      <div className="rounded-2xl border border-white/10 bg-black/45 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-lg">
         <button
           type="button"
           onClick={() => setIsGuideOpen(!isGuideOpen)}
-          className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none"
+          className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none group/btn"
         >
-          <h2 className="text-base font-bold flex items-center gap-2">
-            <Info className="w-5 h-5 text-[#D4AF37]" />
-            Info
+          <h2 className="text-sm sm:text-base font-bold flex items-center gap-2">
+            <Info className="w-5 h-5 text-[#D4AF37] shrink-0 animate-pulse" />
+            Informasi Penting &amp; Panduan Pemesanan
           </h2>
           <ChevronDown
-            className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 ${
+            className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
               isGuideOpen ? "rotate-180" : ""
             }`}
           />
@@ -611,13 +611,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         >
           <div className="space-y-4 pt-2">
             {/* 👤 CONTACT PERSON SEKSI DANA CARD */}
-            <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-4 text-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-4 text-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
-                  <MessageSquare className="w-3.5 h-3.5" /> Contact Person Seksi Dana Panitia
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 shrink-0" /> Contact Person Seksi Dana Panitia
                 </span>
                 <p className="font-bold text-white text-base">Marsya Theresia</p>
-                <p className="text-xs text-emerald-300">Hubungi panitia untuk pertanyaan seputar pemesanan &amp; konfirmasi kontribusi merchandise.</p>
+                <p className="text-xs text-emerald-300 leading-relaxed">Hubungi panitia untuk pertanyaan seputar pemesanan &amp; konfirmasi kontribusi merchandise.</p>
               </div>
 
               <a
@@ -626,14 +626,14 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 rel="noreferrer"
                 className="w-full sm:w-auto shrink-0"
               >
-                <Button type="button" size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
+                <Button type="button" size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all active:scale-[0.98]">
                   <MessageSquare className="w-3.5 h-3.5 mr-1.5" /> Chat WA (081219964142)
                 </Button>
               </a>
             </div>
 
             {/* 📍 VENUE CLAIM BANNER NOTICE */}
-            <div className="rounded-xl border border-[#D4AF37]/50 bg-[#D4AF37]/15 p-4 text-amber-200 text-xs space-y-1.5 shadow-lg">
+            <div className="rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 p-4 text-amber-200 text-xs space-y-1.5 shadow-md">
               <div className="flex items-center gap-2 font-bold text-[#D4AF37] text-xs">
                 <Calendar className="w-4 h-4 text-[#D4AF37] shrink-0" />
                 📌 CATATAN PENGAMBILAN MERCHANDISE:
@@ -644,7 +644,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             </div>
 
             {/* ⚠️ CRITICAL WARNING ALERT BANNER */}
-            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-amber-200 text-xs leading-relaxed space-y-1">
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3.5 text-amber-200 text-xs leading-relaxed space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-amber-300">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 PERHATIAN PENTING:
@@ -1034,7 +1034,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 <Loader2 className="w-5 h-5 animate-spin mx-auto mb-1 text-[#D4AF37]" /> Memuat item merchandise...
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {products.map((p) => {
                   const isSelected = cartItems.some((ci) => ci.productId === p.id);
                   const countVariants = cartItems.filter((ci) => ci.productId === p.id).length;
@@ -1044,85 +1044,89 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     <div
                       key={p.id}
                       onClick={() => setPreviewProduct(p)}
-                      className={`group relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                      className={`group relative flex flex-col rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer ${
                         isOutOfStock
-                          ? "border-red-500/30 bg-black/40 opacity-50 hover:border-red-500/50 hover:bg-black/50"
+                          ? "border-red-500/25 bg-black/40 opacity-60 hover:border-red-500/40"
                           : isSelected
-                          ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.2)] ring-1 ring-[#D4AF37]"
-                          : "border-white/15 bg-black/60 hover:border-[#D4AF37]/45 hover:bg-black/80 opacity-90 hover:opacity-100"
+                          ? "border-[#D4AF37] bg-[#D4AF37]/5 shadow-[0_0_20px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/50"
+                          : "border-white/10 bg-black/40 hover:border-[#D4AF37]/40 hover:bg-black/60 shadow-lg"
                       }`}
                     >
-                      {/* Checkbox */}
+                      {/* Floating Checkbox */}
                       <div 
-                        className="shrink-0 p-1.5 -m-1.5 cursor-pointer relative z-10"
+                        className="absolute top-2.5 left-2.5 z-20 cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (!isOutOfStock) toggleCartProduct(p);
                         }}
                       >
                         <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
+                          className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors shadow-md ${
                             isOutOfStock
                               ? "border-gray-600 bg-gray-800"
                               : isSelected
                               ? "bg-[#D4AF37] border-[#D4AF37] text-black"
-                              : "border-gray-500 bg-black/40 hover:border-[#D4AF37]"
+                              : "border-white/40 bg-black/60 hover:border-[#D4AF37]"
                           }`}
                         >
-                          {isSelected && !isOutOfStock && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                          {isSelected && !isOutOfStock && <Check className="w-4 h-4 stroke-[3]" />}
                         </div>
                       </div>
 
-                      {/* Small Thumbnail Photo */}
-                      <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-white/20 bg-black shrink-0">
+                      {/* Visual Product Image */}
+                      <div className="relative aspect-square w-full overflow-hidden bg-black/80 border-b border-white/5 shrink-0">
                         <Image
                           src={p.image_url}
                           alt={p.name}
-                          width={56}
-                          height={56}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 250px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         {isOutOfStock && (
-                          <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-[9px] font-bold text-red-400">
+                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center text-xs font-bold text-red-400 tracking-wider">
                             HABIS
                           </div>
                         )}
                       </div>
 
-                      {/* Title, Price & Stock Badge */}
-                      <div className="flex-1 min-w-0 space-y-0.5">
-                        <h4 className="font-bold text-white text-xs truncate">{p.name}</h4>
-                        <span className="font-mono text-[11px] text-[#D4AF37] font-extrabold block">
-                          {p.price > 0 ? `Rp ${p.price.toLocaleString("id-ID")}` : "Cenderamata"}
-                        </span>
+                      {/* Details Area */}
+                      <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-grow space-y-2">
+                        <div className="space-y-1">
+                          <h4 className="font-bold text-white text-[11px] sm:text-xs line-clamp-2 leading-snug group-hover:text-[#D4AF37] transition-colors">
+                            {p.name}
+                          </h4>
+                          <span className="font-mono text-xs sm:text-sm text-[#D4AF37] font-black block">
+                            {p.price > 0 ? `Rp ${p.price.toLocaleString("id-ID")}` : "Cenderamata"}
+                          </span>
+                        </div>
                         
-                        <div className="flex items-center justify-between gap-2 pt-0.5">
-                          <div className="flex items-center gap-2">
-                            {/* Remaining Stock Badge */}
+                        <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1.5 border-t border-white/5">
+                          <div className="flex items-center gap-1">
+                            {/* Stock Badge */}
                             {isOutOfStock ? (
-                              <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/30">
+                              <span className="text-[9px] text-red-400 font-semibold bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
                                 Habis
                               </span>
                             ) : (
                               <span
-                                className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border ${
+                                className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded border ${
                                   p.stock <= 10
-                                    ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                                    : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                                    ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                                    : "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
                                 }`}
                               >
-                                Stok: {p.stock} pcs
+                                {p.stock} Pcs
                               </span>
                             )}
 
                             {isSelected && countVariants > 1 && (
-                              <span className="inline-block text-[10px] text-purple-300 font-semibold bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30">
-                                {countVariants} Ukuran
+                              <span className="text-[9px] text-purple-300 font-semibold bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">
+                                {countVariants} Var
                               </span>
                             )}
                           </div>
                           
-                          <span className="text-[10px] text-gray-400 flex items-center gap-1 group-hover:text-[#D4AF37] transition-colors font-semibold">
+                          <span className="text-[9px] text-gray-400 flex items-center gap-0.5 group-hover:text-[#D4AF37] transition-colors font-medium">
                             <Info className="w-3 h-3" /> Detail
                           </span>
                         </div>
@@ -1181,7 +1185,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                       {items.map((cartItem) => (
                         <div
                           key={cartItem.cartItemId}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40 p-3 rounded-xl border border-white/10 text-xs"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 bg-black/40 p-3.5 rounded-xl border border-white/10 text-xs"
                         >
                           {/* Size selector if shirt */}
                           {cartItem.has_size ? (
@@ -1195,10 +1199,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                                     key={sz}
                                     type="button"
                                     onClick={() => updateCartSize(cartItem.cartItemId, sz)}
-                                    className={`px-2 py-1 rounded text-[10px] sm:text-[11px] font-mono font-bold transition-all ${
+                                    className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border cursor-pointer ${
                                       cartItem.size === sz
-                                        ? "bg-purple-600 text-white shadow ring-1 ring-purple-300"
-                                        : "bg-white/5 text-gray-400 hover:bg-white/10"
+                                        ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300"
+                                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
                                     }`}
                                   >
                                     {sz}
@@ -1211,36 +1215,36 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                           )}
 
                           {/* Quantity Stepper & Remove */}
-                          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t border-white/5 sm:border-t-0">
-                            <div className="flex items-center border border-white/20 rounded-lg bg-black/60 overflow-hidden">
+                          <div className="flex items-center justify-between sm:justify-end gap-3.5 w-full sm:w-auto pt-3 sm:pt-0 border-t border-white/5 sm:border-t-0">
+                            <div className="flex items-center border border-white/15 rounded-lg bg-black/60 overflow-hidden h-9">
                               <button
                                 type="button"
                                 onClick={() => updateCartQty(cartItem.cartItemId, -1)}
-                                className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+                                className="px-3 bg-white/5 hover:bg-white/10 text-white font-bold h-full flex items-center justify-center transition-colors cursor-pointer"
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
-                              <span className="px-3 font-mono font-bold text-white text-xs">
+                              <span className="px-3.5 font-mono font-bold text-white text-xs h-full flex items-center justify-center">
                                 {cartItem.quantity} pcs
                               </span>
                               <button
                                 type="button"
                                 onClick={() => updateCartQty(cartItem.cartItemId, 1)}
-                                className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+                                className="px-3 bg-white/5 hover:bg-white/10 text-white font-bold h-full flex items-center justify-center transition-colors cursor-pointer"
                               >
                                 <Plus className="w-3 h-3" />
                               </button>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                              <span className="font-mono font-extrabold text-emerald-400 text-xs min-w-[70px] text-right">
+                            <div className="flex items-center gap-3.5">
+                              <span className="font-mono font-black text-emerald-400 text-xs min-w-[70px] text-right">
                                 Rp {(cartItem.price * cartItem.quantity).toLocaleString("id-ID")}
                               </span>
 
                               <button
                                 type="button"
                                 onClick={() => removeCartRow(cartItem.cartItemId)}
-                                className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-950/40"
+                                className="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-950/40 cursor-pointer transition-colors"
                                 title="Hapus baris ini"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1316,50 +1320,78 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               </div>
 
               {/* Bukti Bayar */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label className="text-xs font-semibold text-gray-200">
                   Unggah Bukti Bayar (Format: JPG, PNG, WEBP, Maks 5MB) *
                 </Label>
-                <div className="flex items-center gap-4 p-3 bg-black/50 rounded-xl border border-white/10">
-                  <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-black/60 border border-[#D4AF37]/40 shrink-0">
-                    {paymentProofPreview ? (
-                      <img src={paymentProofPreview} alt="Bukti Transfer" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-gray-500">
-                        <ShoppingBag className="w-6 h-6" />
-                      </div>
-                    )}
-                  </div>
+                
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="merch-proof-input"
+                  className="hidden"
+                  required={!paymentProofFile}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 5 * 1024 * 1024) {
+                        alert("File maksimal 5MB.");
+                        return;
+                      }
+                      setPaymentProofFile(file);
+                      const reader = new FileReader();
+                      reader.onload = (ev) => setPaymentProofPreview(ev.target?.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
 
-                  <div className="space-y-1 text-xs">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id="merch-proof-input"
-                      className="hidden"
-                      required={!paymentProofFile}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > 5 * 1024 * 1024) {
-                            alert("File maksimal 5MB.");
-                            return;
-                          }
-                          setPaymentProofFile(file);
-                          const reader = new FileReader();
-                          reader.onload = (ev) => setPaymentProofPreview(ev.target?.result as string);
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor="merch-proof-input"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D4AF37]/15 border border-[#D4AF37]/45 text-[#D4AF37] font-semibold rounded-lg cursor-pointer hover:bg-[#D4AF37]/30 transition-all text-xs"
-                    >
-                      Pilih Bukti Transfer
-                    </label>
+                {paymentProofPreview ? (
+                  <div className="relative group rounded-xl overflow-hidden border border-[#D4AF37]/40 bg-black/60 p-3.5 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in duration-300">
+                    <div className="relative h-24 w-24 rounded-lg overflow-hidden border border-white/10 bg-black shrink-0">
+                      <img src={paymentProofPreview} alt="Bukti Transfer" className="h-full w-full object-cover" />
+                    </div>
+                    <div className="text-xs space-y-1.5 flex-1 w-full text-center sm:text-left">
+                      <p className="font-semibold text-white">Bukti transfer terpilih:</p>
+                      <p className="text-gray-400 truncate max-w-xs mx-auto sm:mx-0 font-mono text-[10px]">
+                        {paymentProofFile?.name || "receipt.png"}
+                      </p>
+                      <div className="flex justify-center sm:justify-start gap-2 pt-1">
+                        <label
+                          htmlFor="merch-proof-input"
+                          className="px-3 py-1.5 bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#D4AF37] font-semibold rounded-lg cursor-pointer transition-all text-[10px]"
+                        >
+                          Ganti File
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaymentProofFile(null);
+                            setPaymentProofPreview(null);
+                          }}
+                          className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg transition-all text-[10px] cursor-pointer"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <label
+                    htmlFor="merch-proof-input"
+                    className="flex flex-col items-center justify-center border-2 border-dashed border-white/15 hover:border-[#D4AF37]/50 bg-black/35 hover:bg-black/60 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 group shadow-inner"
+                  >
+                    <div className="p-3 rounded-full bg-white/5 border border-white/10 group-hover:bg-[#D4AF37]/10 group-hover:border-[#D4AF37]/30 transition-colors mb-3">
+                      <ShoppingBag className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors" />
+                    </div>
+                    <span className="text-xs font-semibold text-white group-hover:text-[#D4AF37] transition-colors">
+                      Pilih Bukti Pembayaran
+                    </span>
+                    <span className="text-[10px] text-gray-500 mt-1 max-w-[240px] leading-normal">
+                      Tekan untuk memilih gambar dari galeri/penyimpanan perangkat Anda (Format JPG, PNG, WEBP, Maks 5MB)
+                    </span>
+                  </label>
+                )}
               </div>
             </div>
           )}

@@ -868,12 +868,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Optional Registration Lookup */}
-          <div className="space-y-2 p-4 bg-black/40 rounded-xl border border-white/5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="merch-reg-code" className="text-xs font-semibold text-gray-300">
-                Hubungkan dengan Kode Registrasi Anda <span className="text-gray-500 font-normal">(Opsional)</span>
+          <div className="space-y-3 p-4 bg-black/45 rounded-2xl border border-white/10 shadow-lg">
+            <div className="flex flex-col gap-0.5">
+              <Label htmlFor="merch-reg-code" className="text-xs font-bold text-gray-200">
+                Hubungkan dengan Kode Registrasi Anda <span className="text-gray-400 font-normal">(Opsional)</span>
               </Label>
-              <span className="text-[10px] text-gray-400">Pre-fill data form otomatis</span>
+              <span className="text-[10px] text-gray-400 leading-normal">Gunakan untuk mengisi formulir secara otomatis</span>
             </div>
             <div className="flex gap-2">
               <Input
@@ -881,141 +881,155 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 placeholder="Contoh: PKLU-XXXXX"
                 value={registrationCode}
                 onChange={(e) => setRegistrationCode(e.target.value.toUpperCase())}
-                className="bg-black/50 border-white/20 text-white text-xs h-9 uppercase"
+                className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs h-10 uppercase focus-visible:ring-1 focus-visible:ring-[#D4AF37]/45 focus-visible:border-[#D4AF37]/45 rounded-xl transition-all"
               />
               <Button
                 type="button"
                 onClick={handleLookup}
                 disabled={lookupLoading || !registrationCode.trim()}
-                className="bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/30 text-xs h-9 font-semibold shrink-0"
+                className="bg-[#D4AF37] hover:bg-[#B3932D] text-black text-xs h-10 font-bold px-4 rounded-xl shrink-0 transition-all active:scale-[0.98] shadow-md border-0 cursor-pointer"
               >
                 {lookupLoading ? "Mencari..." : "Cari Kode"}
               </Button>
             </div>
             {lookupSuccess && (
-              <p className="text-[11px] text-emerald-400 font-medium">
+              <p className="text-[11px] text-emerald-400 font-medium pt-0.5">
                 ✓ Profil Pendaftaran ditemukan! Data form berhasil diisi otomatis.
               </p>
             )}
             {lookupError && (
-              <p className="text-[11px] text-amber-400 font-medium">
+              <p className="text-[11px] text-amber-400 font-medium pt-0.5">
                 ⚠️ {lookupError}
               </p>
             )}
           </div>
-          {/* Field: Nama Pemesan */}
-          <div className="space-y-1.5">
-            <Label htmlFor="merch-name" className="text-xs font-semibold text-gray-200">
-              Nama Lengkap Pemesan *
-            </Label>
-            <Input
-              id="merch-name"
-              placeholder="Masukkan nama pemesan"
-              className="bg-black/50 border-white/20 text-white"
-              {...register("buyer_name")}
-            />
-            {errors.buyer_name && <p className="text-xs text-red-400">{errors.buyer_name.message}</p>}
-          </div>
 
-          {/* Field: Asal Jemaat / Mupel (GPIB vs Umum) */}
-          <div className="space-y-3 p-4 bg-black/60 rounded-xl border border-white/10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-2">
-              <Label className="text-xs font-semibold text-[#D4AF37] flex items-center gap-1.5">
-                <Church className="w-4 h-4 text-[#D4AF37]" /> Asal Jemaat / Gereja *
+          {/* Section: Data Pemesan */}
+          <div className="space-y-4 p-5 md:p-6 bg-black/45 rounded-2xl border border-white/10 shadow-lg">
+            <h3 className="text-xs sm:text-sm font-bold text-[#D4AF37] border-b border-white/5 pb-2.5 flex items-center gap-1.5">
+              <Church className="w-4 h-4 text-[#D4AF37]" /> Data Lengkap Pemesan
+            </h3>
+            
+            {/* Field: Nama Pemesan */}
+            <div className="space-y-1.5">
+              <Label htmlFor="merch-name" className="text-xs font-bold text-gray-300 block">
+                Nama Lengkap Pemesan *
               </Label>
-              <div className="flex gap-2 text-xs w-full sm:w-auto justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsGpibMember(true)}
-                  className={`px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
-                    isGpibMember
-                      ? "bg-[#D4AF37] text-black border-[#D4AF37]"
-                      : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
-                  }`}
-                >
-                  GPIB
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsGpibMember(false)}
-                  className={`px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
-                    !isGpibMember
-                      ? "bg-[#D4AF37] text-black border-[#D4AF37]"
-                      : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
-                  }`}
-                >
-                  Umum
-                </button>
-              </div>
+              <Input
+                id="merch-name"
+                placeholder="Masukkan nama pemesan"
+                className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs sm:text-sm h-11 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/40 focus-visible:border-[#D4AF37]/40 rounded-xl transition-all"
+                {...register("buyer_name")}
+              />
+              {errors.buyer_name && <p className="text-xs text-red-400 mt-1">{errors.buyer_name.message}</p>}
             </div>
 
-            {isGpibMember ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                {/* Select Mupel */}
-                <div className="space-y-1">
-                  <span className="text-[11px] text-gray-400 block">Pilih Mupel GPIB:</span>
-                  <select
-                    value={selectedMupel}
-                    onChange={(e) => {
-                      setSelectedMupel(e.target.value);
-                      setSelectedJemaat("");
-                    }}
-                    className="w-full rounded-md border border-white/20 bg-black/80 p-2.5 text-xs text-white focus:border-[#D4AF37] focus:outline-none"
+            {/* Field: Asal Jemaat / Mupel (GPIB vs Umum) */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between gap-3 pb-1 border-b border-white/5">
+                <span className="text-xs font-bold text-gray-300">Asal Jemaat / Gereja *</span>
+                
+                {/* Modern Pill Toggle */}
+                <div className="flex p-0.5 bg-black/60 rounded-xl border border-white/10 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsGpibMember(true)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      isGpibMember
+                        ? "bg-[#D4AF37] text-black shadow-md"
+                        : "text-gray-400 hover:text-white"
+                    }`}
                   >
-                    <option value="">-- Pilih Mupel --</option>
-                    {mupelList.map((m) => (
-                      <option key={m} value={m}>
-                        {m}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Select Jemaat */}
-                <div className="space-y-1">
-                  <span className="text-[11px] text-gray-400 block">Pilih Jemaat GPIB:</span>
-                  <select
-                    value={selectedJemaat}
-                    disabled={!selectedMupel}
-                    onChange={(e) => setSelectedJemaat(e.target.value)}
-                    className="w-full rounded-md border border-white/20 bg-black/80 p-2.5 text-xs text-white focus:border-[#D4AF37] focus:outline-none disabled:opacity-50"
+                    GPIB
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsGpibMember(false)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      !isGpibMember
+                        ? "bg-[#D4AF37] text-black shadow-md"
+                        : "text-gray-400 hover:text-white"
+                    }`}
                   >
-                    <option value="">-- Pilih Jemaat --</option>
-                    {availableJemaatList.map((j) => (
-                      <option key={j} value={j}>
-                        {j}
-                      </option>
-                    ))}
-                  </select>
+                    Umum
+                  </button>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-1 pt-1">
-                <span className="text-[11px] text-gray-400 block">Nama Gereja / Instansi / Umum:</span>
-                <Input
-                  value={customChurch}
-                  onChange={(e) => setCustomChurch(e.target.value)}
-                  placeholder="Contoh: GKI Kebayoran / Umum"
-                  className="bg-black/50 border-white/20 text-white text-xs"
-                />
-              </div>
-            )}
 
-            {errors.church_city && <p className="text-xs text-red-400">{errors.church_city.message}</p>}
-          </div>
+              {isGpibMember ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  {/* Select Mupel */}
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-gray-400 block font-medium">Pilih Mupel GPIB:</span>
+                    <div className="relative">
+                      <select
+                        value={selectedMupel}
+                        onChange={(e) => {
+                          setSelectedMupel(e.target.value);
+                          setSelectedJemaat("");
+                        }}
+                        className="w-full rounded-xl border border-white/10 bg-black/60 px-3.5 py-2.5 text-xs sm:text-sm text-white focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 focus:outline-none h-11 appearance-none cursor-pointer pr-10 transition-all hover:border-white/20"
+                      >
+                        <option value="">-- Pilih Mupel --</option>
+                        {mupelList.map((m) => (
+                          <option key={m} value={m}>
+                            {m}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
 
-          {/* Field: WhatsApp */}
-          <div className="space-y-1.5">
-            <Label htmlFor="merch-wa" className="text-xs font-semibold text-gray-200">
-              Nomor WhatsApp Pemesan *
-            </Label>
-            <Input
-              id="merch-wa"
-              placeholder="Contoh: 08123456789"
-              className="bg-black/50 border-white/20 text-white font-mono"
-              {...register("whatsapp")}
-            />
-            {errors.whatsapp && <p className="text-xs text-red-400">{errors.whatsapp.message}</p>}
+                  {/* Select Jemaat */}
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-gray-400 block font-medium">Pilih Jemaat GPIB:</span>
+                    <div className="relative">
+                      <select
+                        value={selectedJemaat}
+                        disabled={!selectedMupel}
+                        onChange={(e) => setSelectedJemaat(e.target.value)}
+                        className="w-full rounded-xl border border-white/10 bg-black/60 px-3.5 py-2.5 text-xs sm:text-sm text-white focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 focus:outline-none h-11 appearance-none cursor-pointer pr-10 transition-all hover:border-white/20 disabled:opacity-50"
+                      >
+                        <option value="">-- Pilih Jemaat --</option>
+                        {availableJemaatList.map((j) => (
+                          <option key={j} value={j}>
+                            {j}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[11px] text-gray-400 block font-medium">Nama Gereja / Instansi / Umum:</span>
+                  <Input
+                    value={customChurch}
+                    onChange={(e) => setCustomChurch(e.target.value)}
+                    placeholder="Contoh: GKI Kebayoran / Umum"
+                    className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs sm:text-sm h-11 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/40 focus-visible:border-[#D4AF37]/40 rounded-xl transition-all"
+                  />
+                </div>
+              )}
+
+              {errors.church_city && <p className="text-xs text-red-400 mt-1">{errors.church_city.message}</p>}
+            </div>
+
+            {/* Field: WhatsApp */}
+            <div className="space-y-1.5 pt-2">
+              <Label htmlFor="merch-wa" className="text-xs font-bold text-gray-300 block">
+                Nomor WhatsApp Pemesan *
+              </Label>
+              <Input
+                id="merch-wa"
+                placeholder="Contoh: 08123456789"
+                className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs sm:text-sm h-11 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/40 focus-visible:border-[#D4AF37]/40 rounded-xl transition-all font-mono"
+                {...register("whatsapp")}
+              />
+              {errors.whatsapp && <p className="text-xs text-red-400 mt-1">{errors.whatsapp.message}</p>}
+            </div>
           </div>
 
           {/* 🛍️ MULTI-ITEM SELECTION CARDS */}

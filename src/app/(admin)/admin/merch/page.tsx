@@ -802,7 +802,7 @@ export default function AdminMerchPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="p-price" className="text-xs font-semibold text-gray-200">
-                    Estimasi Harga / Kontribusi (Rp) *
+                    Estimasi Harga Jual (Rp) *
                   </Label>
                   <Input
                     id="p-price"
@@ -1004,7 +1004,7 @@ export default function AdminMerchPage() {
                         {/* Calculated Grand Total */}
                         {computedGrandTotal > 0 && (
                           <div className="flex justify-between items-center pt-2.5 border-t border-white/10 text-xs">
-                            <span className="font-bold text-gray-400 uppercase text-[10px]">Total Estimasi Kontribusi:</span>
+                            <span className="font-bold text-gray-400 uppercase text-[10px]">Total Pembelian:</span>
                             <span className="font-mono font-extrabold text-sm text-[#D4AF37]">
                               Rp {computedGrandTotal.toLocaleString("id-ID")}
                             </span>

@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   ShoppingBag,
   Info,
+  BookOpen,
   Loader2,
   Shirt,
   Send,
@@ -90,7 +91,26 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [activeTab, setActiveTab] = useState<"info" | "panduan" | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(true);
   const [isGuideOpen, setIsGuideOpen] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // If mobile state changes, reset active tab
+  useEffect(() => {
+    if (isMobile) {
+      setActiveTab(null); // Collapsed by default on mobile
+    }
+  }, [isMobile]);
 
   // Status check modal states
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -631,6 +651,78 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     );
   }
 
+  const renderInfoContent = () => (
+    <div className="space-y-4 pt-2">
+      {/* 👤 CONTACT PERSON SEKSI DANA CARD */}
+      <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/10 p-4 text-[#FDFBF7] text-xs flex flex-col gap-3 shadow-md backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/30 border border-emerald-500/40 flex items-center justify-center font-bold text-emerald-300 text-sm shrink-0 shadow-inner">
+            MT
+          </div>
+          <div className="space-y-0.5 text-left">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 block">
+              Seksi Dana Panitia
+            </span>
+            <p className="font-extrabold text-white text-sm">Marsya Theresia</p>
+          </div>
+        </div>
+
+        <p className="text-[11px] text-emerald-200/80 leading-relaxed text-left">
+          Hubungi panitia untuk informasi produk &amp; pembelian
+        </p>
+
+        <a
+          href="https://wa.me/6281219964142?text=Halo%20Marsya%20Theresia%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pembelian%20merchandise"
+          target="_blank"
+          rel="noreferrer"
+          className="w-full"
+        >
+          <Button type="button" size="sm" className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all active:scale-[0.98] py-2.5 px-3.5 flex items-center justify-center gap-1.5 cursor-pointer">
+            <MessageSquare className="w-3.5 h-3.5 shrink-0" /> Chat WA (081219964142)
+          </Button>
+        </a>
+      </div>
+
+      {/* 📍 VENUE CLAIM BANNER NOTICE */}
+      <div className="rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 p-4 text-amber-200 text-xs space-y-1.5 shadow-md text-left font-normal leading-relaxed">
+        <div className="flex items-center gap-2 font-bold text-[#D4AF37] text-xs">
+          <Calendar className="w-4 h-4 text-[#D4AF37] shrink-0" />
+          📌 CATATAN PENGAMBILAN MERCHANDISE:
+        </div>
+        <p className="leading-relaxed">
+          Seluruh barang merchandise yang Anda beli dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>).
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderPanduanContent = () => (
+    <div className="space-y-4 pt-2 text-left font-normal leading-relaxed">
+      <ol className="list-decimal list-inside space-y-3 text-xs text-gray-300 leading-relaxed font-semibold">
+        <li>
+          <span className="font-bold text-[#D4AF37]">Pilih Produk Merchandise:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Pilih produk yang Anda inginkan dari daftar produk di bawah, atur ukuran (bila ada) dan jumlah (quantity), lalu klik <strong>"Tambahkan ke Pembelian"</strong>.</p>
+        </li>
+        <li>
+          <span className="font-bold text-[#D4AF37]">Isi Formulir Data Pembeli:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Lengkapi Nama Lengkap, pilih asal jemaat GPIB (Mupel &amp; Jemaat) atau pilih kategori Umum/Lainnya, serta masukkan nomor WhatsApp aktif.</p>
+        </li>
+        <li>
+          <span className="font-bold text-[#D4AF37]">Transfer Biaya Pembelian:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Lakukan pembayaran via transfer ke rekening panitia: <strong>Bank BTN 00179-01-88-000447-9 a.n. Panitia MUPEL GPIB BEKASI</strong> sesuai total tagihan belanja Anda.</p>
+        </li>
+        <li>
+          <span className="font-bold text-[#D4AF37]">Unggah Bukti Pembayaran:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Isi Tanggal Transfer, unggah foto/screenshot bukti transfer, lalu klik tombol <strong>"Kirim Formulir Pembelian"</strong>.</p>
+        </li>
+        <li>
+          <span className="font-bold text-[#D4AF37]">Simpan Tanda Terima &amp; QR Code:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Setelah sukses, simpan gambar tiket bukti pembelian dan scan/tunjukkan QR Code tersebut ke meja pengambilan pada hari H acara.</p>
+        </li>
+      </ol>
+    </div>
+  );
+
   // FORM INPUT VIEW
   return (
     <div className="space-y-6">
@@ -645,74 +737,105 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         </button>
       </div>
 
-      {/* Combined Collapsible Guidelines Block */}
-      <div className="rounded-2xl border border-white/10 bg-black/45 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-lg">
-        <button
-          type="button"
-          onClick={() => setIsGuideOpen(!isGuideOpen)}
-          className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none group/btn"
-        >
-          <h2 className="text-sm sm:text-base font-bold flex items-center gap-2">
-            <Info className="w-5 h-5 text-[#D4AF37] shrink-0 animate-pulse" />
-            Panduan
-          </h2>
-          <ChevronDown
-            className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${isGuideOpen ? "rotate-180" : ""
+      {/* Info & Panduan Blocks (Desktop Side-by-Side, Mobile Responsive Tabs) */}
+      {isMobile ? (
+        <div className="space-y-4">
+          {/* Mobile Side-by-Side Buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveTab(activeTab === "info" ? null : "info")}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-300 cursor-pointer ${
+                activeTab === "info"
+                  ? "bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]"
+                  : "bg-black/60 text-gray-300 border-white/10 hover:bg-black/85"
               }`}
-          />
-        </button>
+            >
+              <Info className="w-4 h-4 shrink-0" />
+              Info
+            </button>
 
-        <div
-          className={`transition-all duration-300 overflow-hidden ${isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+            <button
+              type="button"
+              onClick={() => setActiveTab(activeTab === "panduan" ? null : "panduan")}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-300 cursor-pointer ${
+                activeTab === "panduan"
+                  ? "bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]"
+                  : "bg-black/60 text-gray-300 border-white/10 hover:bg-black/85"
+              }`}
+            >
+              <BookOpen className="w-4 h-4 shrink-0" />
+              Panduan
+            </button>
+          </div>
+
+          {/* Collapsible Panel Content */}
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              activeTab !== null
+                ? "max-h-[1200px] opacity-100 p-4 sm:p-5 border border-[#D4AF37]/30 bg-black/60 rounded-2xl shadow-inner mt-2"
+                : "max-h-0 opacity-0 pointer-events-none"
             }`}
-        >
-          <div className="space-y-4 pt-2">
-            {/* 👤 CONTACT PERSON SEKSI DANA CARD */}
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-4 text-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
-              <div className="space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 shrink-0" /> Contact Person Seksi Dana Panitia
-                </span>
-                <p className="font-bold text-white text-base">Marsya Theresia</p>
-                <p className="text-xs text-emerald-300 leading-relaxed">Hubungi panitia untuk pertanyaan seputar pembelian &amp; konfirmasi kontribusi merchandise.</p>
-              </div>
-
-              <a
-                href="https://wa.me/6281219964142?text=Halo%20Marsya%20Theresia%20(Seksi%20Dana%20HUT%20PKLU),%20saya%20ingin%20bertanya%20mengenai%20pembelian%20merchandise"
-                target="_blank"
-                rel="noreferrer"
-                className="w-full sm:w-auto shrink-0"
-              >
-                <Button type="button" size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all active:scale-[0.98]">
-                  <MessageSquare className="w-3.5 h-3.5 mr-1.5" /> Chat WA (081219964142)
-                </Button>
-              </a>
+          >
+            {activeTab === "info" && renderInfoContent()}
+            {activeTab === "panduan" && renderPanduanContent()}
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Card Info */}
+          <div className="rounded-2xl border border-white/10 bg-black/45 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-lg">
+            <button
+              type="button"
+              onClick={() => setIsInfoOpen(!isInfoOpen)}
+              className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none group/btn"
+            >
+              <h2 className="text-sm sm:text-base font-bold flex items-center gap-2">
+                <Info className="w-5 h-5 text-[#D4AF37] shrink-0" />
+                Informasi &amp; Kontak Panitia
+              </h2>
+              <ChevronDown
+                className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
+                  isInfoOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${
+                isInfoOpen ? "max-h-[1000px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+              }`}
+            >
+              {renderInfoContent()}
             </div>
+          </div>
 
-            {/* 📍 VENUE CLAIM BANNER NOTICE */}
-            <div className="rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 p-4 text-amber-200 text-xs space-y-1.5 shadow-md">
-              <div className="flex items-center gap-2 font-bold text-[#D4AF37] text-xs">
-                <Calendar className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                📌 CATATAN PENGAMBILAN MERCHANDISE:
-              </div>
-              <p className="leading-relaxed">
-                Seluruh barang merchandise yang Anda beli dapat diambil di <strong>Meja Khusus Pengambilan Merchandise</strong> pada Hari-H Acara (<strong>Senin, 12 Oktober 2026</strong> di venue <strong>Bekasi Convention Center</strong>).
-              </p>
-            </div>
-
-            {/* ⚠️ CRITICAL WARNING ALERT BANNER */}
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3.5 text-amber-200 text-xs leading-relaxed space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-amber-300">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                PERHATIAN PENTING:
-              </div>
-              <p>
-                Formulir ini <strong>KHUSUS untuk Pembelian Merchandise Tambahan (Cenderamata Opsional)</strong>. Ini BUKAN untuk Kaos Seragam Resmi Acara yang ukurannya sudah diisi saat pendaftaran.
-              </p>
+          {/* Card Panduan */}
+          <div className="rounded-2xl border border-white/10 bg-black/45 p-4 sm:p-5 md:p-6 text-sm text-[#FDFBF7] space-y-4 shadow-lg">
+            <button
+              type="button"
+              onClick={() => setIsGuideOpen(!isGuideOpen)}
+              className="w-full flex items-center justify-between text-[#D4AF37] text-left cursor-pointer focus:outline-none group/btn"
+            >
+              <h2 className="text-sm sm:text-base font-bold flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-[#D4AF37] shrink-0" />
+                Tata Cara / Panduan Pembelian
+              </h2>
+              <ChevronDown
+                className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
+                  isGuideOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${
+                isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+              }`}
+            >
+              {renderPanduanContent()}
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 1. MODAL DETAIL PRODUCT PREVIEW */}
       {previewProduct && (() => {
@@ -1297,7 +1420,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   <span className="font-bold text-white font-mono">{grandTotalQty} Pcs</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-gray-400 block text-[11px]">Total Estimasi Kontribusi:</span>
+                  <span className="text-gray-400 block text-[11px]">Total Pembelian:</span>
                   <span className="font-mono font-black text-xl text-[#D4AF37]">
                     Rp {grandTotalPrice.toLocaleString("id-ID")}
                   </span>

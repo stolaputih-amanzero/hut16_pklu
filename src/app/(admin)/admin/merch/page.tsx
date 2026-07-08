@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getSizeSurcharge, splitItemType } from "@/lib/utils";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   ShoppingBag,
   Plus,
@@ -57,6 +58,7 @@ type MerchOrder = {
 };
 
 export default function AdminMerchPage() {
+  const confirm = useConfirm();
   const [activeTab, setActiveTab] = useState<"catalog" | "orders">("catalog");
 
   // Catalog State
@@ -223,7 +225,14 @@ export default function AdminMerchPage() {
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
+    const isConfirmed = await confirm({
+      title: "Hapus Produk",
+      message: "Apakah Anda yakin ingin menghapus produk ini secara permanen dari katalog? Tindakan ini tidak dapat dibatalkan.",
+      variant: "danger",
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+    });
+    if (!isConfirmed) return;
     const res = await deleteMerchProduct(id);
     if (res.success) {
       loadCatalog();
@@ -231,11 +240,20 @@ export default function AdminMerchPage() {
   };
 
   const handleDeleteOrder = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus pembelian ini?")) return;
+    const isConfirmed = await confirm({
+      title: "Hapus Pembelian",
+      message: "Apakah Anda yakin ingin menghapus rekaman pembelian merchandise ini? Tindakan ini tidak dapat dibatalkan.",
+      variant: "danger",
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+    });
+    if (!isConfirmed) return false;
     const res = await deleteMerchOrder(id);
     if (res.success) {
       loadOrders();
+      return true;
     }
+    return false;
   };
 
   // Filter Orders
@@ -1181,9 +1199,9 @@ export default function AdminMerchPage() {
                     <Button
                       type="button"
                       variant="ghost"
-                      onClick={() => {
-                        if (confirm("Apakah Anda yakin ingin menghapus pembelian ini?")) {
-                          handleDeleteOrder(selectedOrder.id);
+                      onClick={async () => {
+                        const deleted = await handleDeleteOrder(selectedOrder.id);
+                        if (deleted) {
                           setSelectedOrder(null);
                         }
                       }}

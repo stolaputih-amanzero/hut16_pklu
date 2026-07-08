@@ -10,6 +10,7 @@ import {
 } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { 
   MessageSquareQuote, 
   Search, 
@@ -48,6 +49,7 @@ type GuestbookItem = {
 };
 
 export default function AdminGuestbookPage() {
+  const confirm = useConfirm();
   const [messages, setMessages] = useState<GuestbookItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -154,7 +156,14 @@ export default function AdminGuestbookPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus ucapan ini secara permanen?")) return;
+    const isConfirmed = await confirm({
+      title: "Hapus Ucapan",
+      message: "Apakah Anda yakin ingin menghapus ucapan ini secara permanen? Tindakan ini tidak dapat dibatalkan.",
+      variant: "danger",
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+    });
+    if (!isConfirmed) return;
     setActionId(id);
     const res = await deleteGuestbookMessage(id);
     setActionId(null);

@@ -13,6 +13,7 @@ import {
   DialogDescription,
   DialogFooter 
 } from "@/components/ui/dialog";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { 
   Users, 
   Banknote,
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 
 export default function RekapRegistrasiPage() {
+  const confirm = useConfirm();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -74,7 +76,14 @@ export default function RekapRegistrasiPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus data registrasi ini?")) return;
+    const isConfirmed = await confirm({
+      title: "Hapus Data Registrasi",
+      message: "Apakah Anda yakin ingin menghapus data registrasi ini secara permanen? Tindakan ini tidak dapat dibatalkan.",
+      variant: "danger",
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+    });
+    if (!isConfirmed) return;
     setDeletingId(id);
     const res = await deleteRegistration(id);
     setDeletingId(null);

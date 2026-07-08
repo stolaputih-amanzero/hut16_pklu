@@ -18,7 +18,9 @@ import {
   FileText,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Heart,
+  Handshake
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -156,6 +158,18 @@ export default function DashboardClient({
     let confirmedProposalCount = 0;
     let pendingProposalCount = 0;
 
+    // Proposal Donatur Breakdown
+    let donaturTotalCount = 0;
+    let donaturConfirmedCount = 0;
+    let donaturPendingCount = 0;
+    let donaturCancelledCount = 0;
+
+    // Proposal Sponsorship Breakdown
+    let sponsorTotalCount = 0;
+    let sponsorConfirmedCount = 0;
+    let sponsorPendingCount = 0;
+    let sponsorCancelledCount = 0;
+
     proposals.forEach((p) => {
       const val = Number(p.contribution_value || 0);
       if (p.payment_status === "confirmed") {
@@ -164,6 +178,27 @@ export default function DashboardClient({
       } else if (p.payment_status === "pending" && val > 0) {
         pendingProposalRevenue += val;
         pendingProposalCount += 1;
+      }
+
+      // Type-based counting and status breakdowns
+      if (p.type === "donatur") {
+        donaturTotalCount += 1;
+        if (p.payment_status === "confirmed") {
+          donaturConfirmedCount += 1;
+        } else if (p.payment_status === "pending") {
+          donaturPendingCount += 1;
+        } else if (p.payment_status === "cancelled") {
+          donaturCancelledCount += 1;
+        }
+      } else if (p.type === "sponsorship") {
+        sponsorTotalCount += 1;
+        if (p.payment_status === "confirmed") {
+          sponsorConfirmedCount += 1;
+        } else if (p.payment_status === "pending") {
+          sponsorPendingCount += 1;
+        } else if (p.payment_status === "cancelled") {
+          sponsorCancelledCount += 1;
+        }
       }
     });
 
@@ -183,6 +218,14 @@ export default function DashboardClient({
       pendingProposalCount,
       umumCount,
       tuanRumahCount,
+      donaturTotalCount,
+      donaturConfirmedCount,
+      donaturPendingCount,
+      donaturCancelledCount,
+      sponsorTotalCount,
+      sponsorConfirmedCount,
+      sponsorPendingCount,
+      sponsorCancelledCount,
     };
   }, [registrations, merchOrders, proposals, getOrderPrice]);
 
@@ -386,8 +429,8 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* 2. Financial Metrics Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 2. Financial & Proposal Metrics Highlights */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Card A: Total Revenue */}
         <div className="rounded-2xl border border-[#D4AF37]/35 bg-gradient-to-br from-[#033B2B]/60 to-[#022c22]/40 p-6 shadow-xl relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-[#D4AF37]/5 rounded-bl-full pointer-events-none group-hover:bg-[#D4AF37]/10 transition-all duration-500" />
@@ -437,6 +480,58 @@ export default function DashboardClient({
           <div className="mt-4 flex items-center justify-between text-xs pt-3 border-t border-white/5 text-[11px]">
             <span className="text-gray-400">Komitmen Pending: Rp {summaryStats.pendingProposalRevenue.toLocaleString("id-ID")}</span>
             <FileSpreadsheet className="w-4 h-4 text-[#D4AF37] opacity-60" />
+          </div>
+        </div>
+
+        {/* Card E: Proposal Donatur Counts */}
+        <div className="rounded-2xl border border-white/10 bg-black/45 hover:border-purple-500/50 p-6 shadow-xl transition-all duration-300 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 w-24 h-24 bg-purple-500/5 rounded-bl-full pointer-events-none group-hover:bg-purple-500/10 transition-all duration-500" />
+          <div className="flex justify-between items-center">
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Proposal Donatur</span>
+            <Heart className="w-4 h-4 text-purple-400 opacity-60" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black text-white mt-3 font-mono">
+            {summaryStats.donaturTotalCount} <span className="text-xs font-normal text-gray-400 font-sans">Total</span>
+          </h2>
+          <div className="mt-4 grid grid-cols-3 gap-2 pt-3 border-t border-white/5 text-[10px] text-center">
+            <div className="flex flex-col items-center">
+              <span className="text-gray-400">Lunas</span>
+              <span className="font-mono text-emerald-400 font-bold mt-0.5">{summaryStats.donaturConfirmedCount}</span>
+            </div>
+            <div className="flex flex-col items-center border-x border-white/5">
+              <span className="text-gray-400">Komitmen</span>
+              <span className="font-mono text-amber-400 font-bold mt-0.5">{summaryStats.donaturPendingCount}</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-gray-400">Batal</span>
+              <span className="font-mono text-red-400 font-bold mt-0.5">{summaryStats.donaturCancelledCount}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card F: Proposal Sponsorship Counts */}
+        <div className="rounded-2xl border border-white/10 bg-black/45 hover:border-teal-500/50 p-6 shadow-xl transition-all duration-300 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 w-24 h-24 bg-teal-500/5 rounded-bl-full pointer-events-none group-hover:bg-teal-500/10 transition-all duration-500" />
+          <div className="flex justify-between items-center">
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Proposal Sponsorship</span>
+            <Handshake className="w-4 h-4 text-teal-400 opacity-60" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black text-white mt-3 font-mono">
+            {summaryStats.sponsorTotalCount} <span className="text-xs font-normal text-gray-400 font-sans">Total</span>
+          </h2>
+          <div className="mt-4 grid grid-cols-3 gap-2 pt-3 border-t border-white/5 text-[10px] text-center">
+            <div className="flex flex-col items-center">
+              <span className="text-gray-400">Lunas</span>
+              <span className="font-mono text-emerald-400 font-bold mt-0.5">{summaryStats.sponsorConfirmedCount}</span>
+            </div>
+            <div className="flex flex-col items-center border-x border-white/5">
+              <span className="text-gray-400">Komitmen</span>
+              <span className="font-mono text-amber-400 font-bold mt-0.5">{summaryStats.sponsorPendingCount}</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-gray-400">Batal</span>
+              <span className="font-mono text-red-400 font-bold mt-0.5">{summaryStats.sponsorCancelledCount}</span>
+            </div>
           </div>
         </div>
       </div>

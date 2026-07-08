@@ -1130,79 +1130,79 @@ export default function AdminMerchPage() {
 
             </div>
 
-            {selectedOrder.payment_status === "verified" && (
-              <div className="flex flex-col sm:flex-row gap-2.5 mt-4 pt-4 border-t border-[#D4AF37]/35 no-export">
-                <a
-                  href={`/api/merch/invoice?id=${selectedOrder.id}`}
-                  onClick={() => {
-                    toast.success("Memulai pengunduhan Invoice PDF...");
-                  }}
-                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/40 text-white font-bold rounded-xl transition-all shadow-md h-10 text-xs"
-                >
-                  <FileText className="w-4 h-4" /> Unduh Invoice PDF
-                </a>
-                {selectedOrder.whatsapp && (() => {
-                  const waMessage = `Halo, *${selectedOrder.buyer_name}*!
+            {(() => {
+              if (!selectedOrder) return null;
+              const cleanPhone = selectedOrder.whatsapp.replace(/^0/, "62").replace(/\D/g, "");
+              const itemsList = splitItemType(selectedOrder.item_type).map(item => `• ${item}`).join("\n");
+              const isVerified = selectedOrder.payment_status === "verified";
+              
+              const waMessage = isVerified
+                ? `Halo, *${selectedOrder.buyer_name}*!\n\nTerima kasih telah melakukan pemesanan Souvenir / Merchandise resmi HUT ke-16 PKLU GPIB. Pembayaran Anda untuk Kode Pembelian *#MB-${selectedOrder.id.slice(0, 6).toUpperCase()}* telah kami verifikasi dan dinyatakan *LUNAS*.\n\nBerikut adalah tautan untuk mengunduh Invoice resmi Anda (PDF):\n${window.location.origin}/api/merch/invoice?id=${selectedOrder.id}\n\nHambatan pengambilan & informasi detail tertera di berkas Invoice.\n\nSampai jumpa di Bekasi Convention Center pada hari-H acara (Senin, 12 Oktober 2026)!\n\nSalam hangat,\nPanitia HUT 16 PKLU GPIB`
+                : `Halo, *${selectedOrder.buyer_name}*!\n\nKami dari Panitia HUT 16 PKLU GPIB ingin mengonfirmasi pemesanan Souvenir / Merchandise resmi Anda dengan Kode Pembelian *#MB-${selectedOrder.id.slice(0, 6).toUpperCase()}*.\n\nStatus pembayaran pesanan Anda saat ini: *Menunggu Verifikasi / Pembayaran*.\n\nRincian Pesanan:\n${itemsList}\n\nSilakan melakukan transfer pembayaran ke rekening berikut:\n*Bank BTN*\nNo Rekening: *0003401300002844*\na.n. *PAN HUT 16 PKLU GPIB*\n\nJika Anda sudah melakukan transfer, harap unggah bukti pembayaran di website atau kirimkan fotonya melalui chat WhatsApp ini agar segera kami verifikasi.\n\nTerima kasih atas partisipasinya!\nPanitia HUT 16 PKLU GPIB`;
+              
+              const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
 
-Terima kasih telah melakukan pemesanan Souvenir / Merchandise resmi HUT ke-16 PKLU GPIB. Pembayaran Anda untuk Kode Pembelian *#MB-${selectedOrder.id.slice(0, 6).toUpperCase()}* telah kami verifikasi dan dinyatakan *LUNAS*.
+              return (
+                <>
+                  {isVerified && (
+                    <div className="flex flex-col sm:flex-row gap-2.5 mt-4 pt-4 border-t border-[#D4AF37]/35 no-export">
+                      <a
+                        href={`/api/merch/invoice?id=${selectedOrder.id}`}
+                        onClick={() => {
+                          toast.success("Memulai pengunduhan Invoice PDF...");
+                        }}
+                        className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/40 text-white font-bold rounded-xl transition-all shadow-md h-10 text-xs"
+                      >
+                        <FileText className="w-4 h-4" /> Unduh Invoice PDF
+                      </a>
+                      <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 border border-blue-500/40 text-white font-bold rounded-xl transition-all shadow-md h-10 text-xs"
+                      >
+                        <Phone className="w-4 h-4" /> Kirim Invoice via WA
+                      </a>
+                    </div>
+                  )}
 
-Berikut adalah tautan untuk mengunduh Invoice resmi Anda (PDF):
-${window.location.origin}/api/merch/invoice?id=${selectedOrder.id}
-
-Sampai jumpa di Bekasi Convention Center pada hari-H acara (Senin, 12 Oktober 2026)!
-
-Salam hangat,
-Panitia HUT 16 PKLU GPIB`;
-                  const waLink = `https://wa.me/${selectedOrder.whatsapp.replace(/^0/, "62").replace(/\D/g, "")}?text=${encodeURIComponent(waMessage)}`;
-                  return (
-                    <a
-                      href={waLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 border border-blue-500/40 text-white font-bold rounded-xl transition-all shadow-md h-10 text-xs"
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-white/10 text-xs">
+                    {selectedOrder.whatsapp && (
+                      <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-md shadow-emerald-900/30 h-10"
+                      >
+                        <Phone className="w-4 h-4" /> Hubungi WhatsApp
+                      </a>
+                    )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        if (confirm("Apakah Anda yakin ingin menghapus pembelian ini?")) {
+                          handleDeleteOrder(selectedOrder.id);
+                          setSelectedOrder(null);
+                        }
+                      }}
+                      className="w-full sm:w-auto text-red-400 hover:text-red-300 hover:bg-red-950/40 font-bold rounded-xl h-10 px-4"
                     >
-                      <Phone className="w-4 h-4" /> Kirim Invoice via WA
-                    </a>
-                  );
-                })()}
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-white/10 text-xs">
-              {selectedOrder.whatsapp && (
-                <a
-                  href={`https://wa.me/${selectedOrder.whatsapp.replace(/^0/, "62").replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-md shadow-emerald-900/30 h-10"
-                >
-                  <Phone className="w-4 h-4" /> Hubungi WhatsApp
-                </a>
-              )}
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  if (confirm("Apakah Anda yakin ingin menghapus pembelian ini?")) {
-                    handleDeleteOrder(selectedOrder.id);
-                    setSelectedOrder(null);
-                  }
-                }}
-                className="w-full sm:w-auto text-red-400 hover:text-red-300 hover:bg-red-950/40 font-bold rounded-xl h-10 px-4"
-              >
-                <Trash2 className="w-4 h-4 mr-1 shrink-0" /> Hapus
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setSelectedOrder(null)}
-                className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 font-bold rounded-xl h-10 px-4"
-              >
-                Tutup
-              </Button>
-            </div>
-
+                      <Trash2 className="w-4 h-4 mr-1 shrink-0" /> Hapus
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setSelectedOrder(null)}
+                      className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 font-bold rounded-xl h-10 px-4"
+                    >
+                      Tutup
+                    </Button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

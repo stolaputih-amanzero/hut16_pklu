@@ -27,7 +27,7 @@ export default async function MerchOrderPage() {
             Merchandise
           </h1>
           <p className="text-gray-300 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
-            Dapatkan koleksi souvenir cenderamata edisi terbatas HUT ke-16 PKLU GPIB 2026.
+            Dapatkan koleksi souvenir edisi terbatas HUT ke-16 PKLU GPIB 2026.
           </p>
         </div>
 

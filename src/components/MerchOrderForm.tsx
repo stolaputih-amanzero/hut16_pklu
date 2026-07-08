@@ -727,7 +727,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   return (
     <div className="space-y-6">
       {/* Top Banner Status Button */}
-      <div className="text-center pb-2 border-b border-white/5">
+      <div className="text-center pb-2">
         <button
           type="button"
           onClick={() => setIsStatusModalOpen(true)}
@@ -745,11 +745,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             <button
               type="button"
               onClick={() => setActiveTab(activeTab === "info" ? null : "info")}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-300 cursor-pointer ${
-                activeTab === "info"
-                  ? "bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]"
-                  : "bg-black/60 text-gray-300 border-white/10 hover:bg-black/85"
-              }`}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-300 cursor-pointer ${activeTab === "info"
+                ? "bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]"
+                : "bg-black/60 text-gray-300 border-white/10 hover:bg-black/85"
+                }`}
             >
               <Info className="w-4 h-4 shrink-0" />
               Info
@@ -758,11 +757,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             <button
               type="button"
               onClick={() => setActiveTab(activeTab === "panduan" ? null : "panduan")}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-300 cursor-pointer ${
-                activeTab === "panduan"
-                  ? "bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]"
-                  : "bg-black/60 text-gray-300 border-white/10 hover:bg-black/85"
-              }`}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-300 cursor-pointer ${activeTab === "panduan"
+                ? "bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]"
+                : "bg-black/60 text-gray-300 border-white/10 hover:bg-black/85"
+                }`}
             >
               <BookOpen className="w-4 h-4 shrink-0" />
               Panduan
@@ -771,11 +769,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
           {/* Collapsible Panel Content */}
           <div
-            className={`transition-all duration-300 overflow-hidden ${
-              activeTab !== null
-                ? "max-h-[1200px] opacity-100 p-4 sm:p-5 border border-[#D4AF37]/30 bg-black/60 rounded-2xl shadow-inner mt-2"
-                : "max-h-0 opacity-0 pointer-events-none"
-            }`}
+            className={`transition-all duration-300 overflow-hidden ${activeTab !== null
+              ? "max-h-[1200px] opacity-100 p-4 sm:p-5 border border-[#D4AF37]/30 bg-black/60 rounded-2xl shadow-inner mt-2"
+              : "max-h-0 opacity-0 pointer-events-none"
+              }`}
           >
             {activeTab === "info" && renderInfoContent()}
             {activeTab === "panduan" && renderPanduanContent()}
@@ -795,15 +792,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 Informasi &amp; Kontak Panitia
               </h2>
               <ChevronDown
-                className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
-                  isInfoOpen ? "rotate-180" : ""
-                }`}
+                className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${isInfoOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
             <div
-              className={`transition-all duration-300 overflow-hidden ${
-                isInfoOpen ? "max-h-[1000px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
-              }`}
+              className={`transition-all duration-300 overflow-hidden ${isInfoOpen ? "max-h-[1000px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
             >
               {renderInfoContent()}
             </div>
@@ -821,15 +816,13 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 Tata Cara / Panduan Pembelian
               </h2>
               <ChevronDown
-                className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${
-                  isGuideOpen ? "rotate-180" : ""
-                }`}
+                className={`w-5 h-5 text-[#D4AF37] transition-transform duration-300 shrink-0 ml-2 group-hover/btn:translate-y-0.5 ${isGuideOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
             <div
-              className={`transition-all duration-300 overflow-hidden ${
-                isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
-              }`}
+              className={`transition-all duration-300 overflow-hidden ${isGuideOpen ? "max-h-[1200px] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
             >
               {renderPanduanContent()}
             </div>
@@ -1030,7 +1023,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
       {/* 2. FORM INPUT CONTAINER */}
       <div className="space-y-6 text-[#FDFBF7]">
-        <div className="border-b border-white/10 pb-3">
+        <div className="pb-1">
           <h2 className="text-lg sm:text-xl font-bold text-[#D4AF37] flex items-center gap-2">
             <Plus className="w-5 h-5 text-[#D4AF37]" />
             Pembelian Merchandise
@@ -1069,9 +1062,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             </div>
 
             {/* Field: Asal Jemaat / Mupel (GPIB vs Umum) */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between gap-3 pb-1 border-b border-white/5">
-                <span className="text-xs font-bold text-gray-300">Asal Jemaat / Gereja *</span>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3 pb-1">
+                <span className="text-xs font-bold text-gray-300">Asal Jemaat *</span>
 
                 {/* Modern Pill Toggle */}
                 <div className="flex p-0.5 bg-black/60 rounded-xl border border-white/10 shrink-0">
@@ -1099,7 +1092,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
               </div>
 
               {isGpibMember ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Select Mupel */}
                   <div className="space-y-1.5">
                     <span className="text-[11px] text-gray-400 block font-medium">Pilih Mupel GPIB:</span>
@@ -1145,7 +1138,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1.5 pt-1">
+                <div className="space-y-1.5">
                   <span className="text-[11px] text-gray-400 block font-medium">Nama Gereja / Instansi / Umum:</span>
                   <Input
                     value={customChurch}
@@ -1160,7 +1153,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             </div>
 
             {/* Field: WhatsApp */}
-            <div className="space-y-1.5 pt-2">
+            <div className="space-y-1.5">
               <Label htmlFor="merch-wa" className="text-xs font-bold text-gray-300 block">
                 Nomor WhatsApp Pembeli *
               </Label>
@@ -1175,7 +1168,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           </div>
 
           {/* 🛍️ MULTI-ITEM SELECTION CARDS */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-bold text-[#D4AF37] flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[#D4AF37]" /> Pilih Produk Merchandise *

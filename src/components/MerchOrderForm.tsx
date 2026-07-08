@@ -1635,7 +1635,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isSubmitting || cartItems.length === 0}
+            disabled={isSubmitting}
             className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-auto py-3.5 px-4 text-sm whitespace-normal rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
           >
             {isSubmitting ? (

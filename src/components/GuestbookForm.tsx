@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { submitGuestbookMessage } from "@/app/(public)/ucapan/actions";
-import { Send, CheckCircle2, AlertCircle, Clock, Church as ChurchIcon, Globe, Camera, X, User } from "lucide-react";
+import { Send, CheckCircle2, AlertCircle, Clock, Church as ChurchIcon, Globe, Camera, X, User, ChevronDown } from "lucide-react";
 
 type Church = {
   id: string;
@@ -246,7 +246,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
           <Input
             id="gb-name"
             placeholder="Contoh: Oma Elizabeth"
-            className="bg-black/50 border-white/20 text-white"
+            className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs sm:text-sm h-11 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/40 focus-visible:border-[#D4AF37]/40 rounded-xl transition-all"
             {...register("name")}
           />
           {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
@@ -264,7 +264,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
                 setCategory("gpib");
                 setCustomChurchText("");
               }}
-              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 category === "gpib"
                   ? "bg-[#D4AF37] text-black shadow"
                   : "text-gray-300 hover:text-white"
@@ -279,7 +279,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
                 setSelectedMupel("");
                 setSelectedChurchName("");
               }}
-              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 category === "umum"
                   ? "bg-[#D4AF37] text-black shadow"
                   : "text-gray-300 hover:text-white"
@@ -292,41 +292,47 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
 
         {/* Form Selection based on Category */}
         {category === "gpib" ? (
-          <div className="space-y-3 p-3 bg-black/50 rounded-xl border border-white/10">
+          <div className="space-y-3 p-3 bg-black/45 rounded-2xl border border-white/10">
             <div className="space-y-1.5">
               <Label className="text-xs text-gray-300">Pilih Mupel GPIB *</Label>
-              <select
-                value={selectedMupel}
-                onChange={(e) => {
-                  setSelectedMupel(e.target.value);
-                  setSelectedChurchName("");
-                }}
-                className="w-full rounded-md border border-white/20 bg-black/80 p-2.5 text-xs text-white focus:border-[#D4AF37] focus:outline-none"
-              >
-                <option value="">-- Pilih MUPEL --</option>
-                {mupelList.map((mupel) => (
-                  <option key={mupel} value={mupel}>
-                    {mupel}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={selectedMupel}
+                  onChange={(e) => {
+                    setSelectedMupel(e.target.value);
+                    setSelectedChurchName("");
+                  }}
+                  className="w-full rounded-xl border border-white/10 bg-black/60 px-3.5 py-2.5 text-xs sm:text-sm text-white focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 focus:outline-none h-11 appearance-none cursor-pointer pr-10 transition-all hover:border-white/20"
+                >
+                  <option value="">-- Pilih MUPEL --</option>
+                  {mupelList.map((mupel) => (
+                    <option key={mupel} value={mupel}>
+                      {mupel}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-gray-300">Pilih Jemaat GPIB *</Label>
-              <select
-                disabled={!selectedMupel}
-                value={selectedChurchName}
-                onChange={(e) => setSelectedChurchName(e.target.value)}
-                className="w-full rounded-md border border-white/20 bg-black/80 p-2.5 text-xs text-white focus:border-[#D4AF37] focus:outline-none disabled:opacity-40"
-              >
-                <option value="">-- Pilih Jemaat GPIB --</option>
-                {filteredChurches.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  disabled={!selectedMupel}
+                  value={selectedChurchName}
+                  onChange={(e) => setSelectedChurchName(e.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-black/60 px-3.5 py-2.5 text-xs sm:text-sm text-white focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 focus:outline-none h-11 appearance-none cursor-pointer pr-10 transition-all hover:border-white/20 disabled:opacity-40"
+                >
+                  <option value="">-- Pilih Jemaat GPIB --</option>
+                  {filteredChurches.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
         ) : (
@@ -339,7 +345,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
               value={customChurchText}
               onChange={(e) => setCustomChurchText(e.target.value)}
               placeholder="Contoh: GKI Kayu Putih Jakarta / Simpatisan Umum"
-              className="bg-black/50 border-white/20 text-white"
+              className="bg-black/60 border-white/10 hover:border-white/20 text-white text-xs sm:text-sm h-11 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/40 focus-visible:border-[#D4AF37]/40 rounded-xl transition-all"
             />
           </div>
         )}
@@ -361,7 +367,7 @@ export function GuestbookForm({ churches }: GuestbookFormProps) {
             rows={4}
             maxLength={300}
             placeholder="Tuliskan ucapan selamat dan doa untuk HUT ke-16 PKLU GPIB..."
-            className="w-full rounded-md border border-white/20 bg-black/50 p-3 text-sm text-white focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] resize-none"
+            className="w-full rounded-xl border border-white/10 hover:border-white/20 bg-black/60 p-3.5 text-xs sm:text-sm text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50 resize-none transition-all"
             {...register("message")}
           />
           {errors.message && <p className="text-xs text-red-400">{errors.message.message}</p>}

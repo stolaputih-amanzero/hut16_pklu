@@ -5,7 +5,7 @@ import { fetchMerchProducts, saveMerchProduct, deleteMerchProduct, fetchMerchOrd
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getSizeSurcharge } from "@/lib/utils";
+import { getSizeSurcharge, splitItemType } from "@/lib/utils";
 import {
   ShoppingBag,
   Plus,
@@ -138,8 +138,7 @@ export default function AdminMerchPage() {
   };
 
   const parseOrderItems = (itemTypeStr: string) => {
-    if (!itemTypeStr) return [];
-    return itemTypeStr.split(itemTypeStr.includes("; ") ? "; " : ", ").map((part) => {
+    return splitItemType(itemTypeStr).map((part) => {
       const qtyMatch = part.match(/\s+x(\d+)$/);
       const quantity = qtyMatch ? parseInt(qtyMatch[1]) : 1;
       let cleanItemName = qtyMatch ? part.replace(/\s+x\d+$/, "") : part;

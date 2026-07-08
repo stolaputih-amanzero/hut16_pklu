@@ -11,7 +11,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getSizeSurcharge } from "@/lib/utils";
+import { getSizeSurcharge, splitItemType } from "@/lib/utils";
 import { fetchMerchProducts } from "@/app/(admin)/admin/merch/actions";
 import { submitMerchOrder, CartItemInput, getMerchOrderByCodeOrWa } from "@/app/(public)/merch/actions";
 import { QRCodeSVG } from "qrcode.react";
@@ -573,7 +573,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             <div className="pt-2 border-t border-white/10 space-y-1.5">
               <span className="text-gray-400 font-semibold block">Rincian Item yang Dibeli:</span>
               <div className="bg-black/40 p-3 rounded-lg border border-white/5 space-y-1.5 font-mono text-[10px] text-gray-200">
-                {successData.item_type?.split(successData.item_type.includes("; ") ? "; " : ", ").map((item: string, idx: number) => (
+                {splitItemType(successData.item_type).map((item: string, idx: number) => (
                   <div key={idx} className="flex items-start gap-1.5">
                     <span className="text-[#D4AF37] shrink-0">•</span>
                     <span className="text-white font-semibold">{item}</span>
@@ -1785,7 +1785,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                       <div className="pt-2 border-t border-white/5">
                         <span className="text-gray-400 block mb-1.5 font-semibold text-[10px] uppercase tracking-wider">Rincian Item Pembelian:</span>
                         <div className="bg-black/40 p-3 rounded-lg border border-white/5 space-y-1.5 font-mono text-[10px] text-gray-200">
-                          {order.item_type?.split(order.item_type.includes("; ") ? "; " : ", ").map((item: string, idx: number) => (
+                          {splitItemType(order.item_type).map((item: string, idx: number) => (
                             <div key={idx} className="flex items-start gap-1.5">
                               <span className="text-[#D4AF37] shrink-0">•</span>
                               <span className="text-white font-semibold">{item}</span>

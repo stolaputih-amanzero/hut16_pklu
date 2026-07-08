@@ -36,9 +36,16 @@ export interface ParsedItem {
   quantity: number;
 }
 
-export function parseOrderItemType(itemTypeStr: string): ParsedItem[] {
+export function splitItemType(itemTypeStr: string | null | undefined): string[] {
   if (!itemTypeStr) return []
-  return itemTypeStr.split(itemTypeStr.includes("; ") ? "; " : ", ").map((part) => {
+  if (itemTypeStr.includes("; ")) {
+    return itemTypeStr.split("; ")
+  }
+  return itemTypeStr.split(/(?<=x\d+),\s+/)
+}
+
+export function parseOrderItemType(itemTypeStr: string): ParsedItem[] {
+  return splitItemType(itemTypeStr).map((part) => {
     const qtyMatch = part.match(/\s+x(\d+)$/)
     const quantity = qtyMatch ? parseInt(qtyMatch[1]) : 1
     let cleanItemName = qtyMatch ? part.replace(/\s+x\d+$/, "") : part

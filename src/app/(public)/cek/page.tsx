@@ -8,6 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download, ShoppingBag } from "lucide-react";
+import { splitItemType } from "@/lib/utils";
 
 function CheckContent() {
   const searchParams = useSearchParams();
@@ -330,7 +331,7 @@ function CheckContent() {
                     <div className="pt-2 border-t border-white/5">
                       <span className="text-gray-400 block mb-1.5 font-semibold">Rincian Souvenir:</span>
                       <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono text-[11px] text-gray-200 space-y-1.5">
-                        {order.item_type?.split(order.item_type.includes("; ") ? "; " : ", ").map((item: string, idx: number) => (
+                        {splitItemType(order.item_type).map((item: string, idx: number) => (
                           <div key={idx} className="flex items-start gap-1.5">
                             <span className="text-[#D4AF37] shrink-0">•</span>
                             <span>{item}</span>

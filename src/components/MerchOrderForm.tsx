@@ -1563,7 +1563,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting || cartItems.length === 0}
-            className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-auto py-4 px-4 text-sm sm:text-base whitespace-normal rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all disabled:opacity-50 flex items-center justify-center"
+            className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-auto py-3.5 px-4 text-sm whitespace-normal rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
@@ -1571,10 +1571,15 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 <span>Memproses Pembelian...</span>
               </span>
             ) : (
-              <span className="flex items-center justify-center gap-2">
-                <Send className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                <span>Kirim Pembelian ({grandTotalQty} Pcs • Rp {grandTotalPrice.toLocaleString("id-ID")})</span>
-              </span>
+              <div className="flex items-center justify-between w-full sm:px-1 gap-2">
+                <span className="flex items-center gap-2 text-xs sm:text-sm">
+                  <Send className="w-4 h-4 shrink-0" />
+                  <span>Kirim Pembelian</span>
+                </span>
+                <span className="bg-black/10 text-black/85 text-[10px] sm:text-xs px-2.5 py-1 rounded-lg font-mono font-black shrink-0">
+                  {grandTotalQty} Pcs • Rp {grandTotalPrice.toLocaleString("id-ID")}
+                </span>
+              </div>
             )}
           </Button>
         </form>

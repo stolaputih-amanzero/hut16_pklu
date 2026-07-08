@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles, ShieldCheck, Lock } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 import { supabase } from '@/lib/supabase/client'
 import { getNextNumber } from '@/lib/numbering'
@@ -133,6 +133,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [activeServiceTab, setActiveServiceTab] = useState<number>(0)
   const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null)
+  const [isOpenPolicyModal, setIsOpenPolicyModal] = useState<'umum' | 'privasi' | null>(null)
 
   // Scroll-Spy sections definition
   const sections = [
@@ -1300,7 +1301,166 @@ export default function Home() {
           </div>
         </motion.div>
 
+        {/* Kebijakan Umum & Privasi Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="w-full max-w-4xl mb-16 text-center px-4"
+        >
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 text-xs text-[#D4AF37]/75">
+            <button
+              onClick={() => setIsOpenPolicyModal('umum')}
+              className="hover:text-[#FDFBF7] hover:underline transition-colors cursor-pointer flex items-center gap-2 focus:outline-none"
+            >
+              <ShieldCheck className="w-4.5 h-4.5" /> Kebijakan Umum
+            </button>
+            <span className="hidden sm:inline text-white/20">|</span>
+            <button
+              onClick={() => setIsOpenPolicyModal('privasi')}
+              className="hover:text-[#FDFBF7] hover:underline transition-colors cursor-pointer flex items-center gap-2 focus:outline-none"
+            >
+              <Lock className="w-4.5 h-4.5" /> Kebijakan Privasi
+            </button>
+          </div>
+        </motion.div>
+
       </div>
+
+      {/* Modal Kebijakan Umum & Privasi */}
+      <AnimatePresence>
+        {isOpenPolicyModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-2xl bg-[#022c22] border border-[#D4AF37]/35 rounded-2xl p-6 md:p-8 shadow-2xl max-h-[85vh] flex flex-col"
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setIsOpenPolicyModal(null)}
+                className="absolute top-4 right-4 p-1.5 rounded-full border border-[#D4AF37]/20 text-[#D4AF37] hover:text-[#FDFBF7] hover:bg-[#D4AF37]/10 transition-all cursor-pointer z-10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Modal Header */}
+              <div className="mb-4 pr-8 border-b border-[#D4AF37]/20 pb-3 flex-shrink-0">
+                <h3 className={`text-xl md:text-2xl font-bold text-[#FDFBF7] flex items-center gap-2 ${playfair.className}`}>
+                  {isOpenPolicyModal === 'umum' ? (
+                    <>
+                      <ShieldCheck className="w-6 h-6 text-[#D4AF37]" />
+                      Kebijakan Umum
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-6 h-6 text-[#D4AF37]" />
+                      Kebijakan Privasi
+                    </>
+                  )}
+                </h3>
+                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-mono">
+                  HUT ke-16 Pelkat PKLU GPIB Tahun 2026
+                </p>
+              </div>
+
+              {/* Modal Body / Scrollable Content */}
+              <div className="flex-1 overflow-y-auto pr-2 space-y-6 text-sm text-gray-300 font-light leading-relaxed scrollbar-thin scrollbar-thumb-[#D4AF37]/35 scrollbar-track-transparent">
+                {isOpenPolicyModal === 'umum' ? (
+                  <>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">1. Pendaftaran &amp; Kepesertaan</h4>
+                      <p>
+                        Pendaftaran peserta HUT ke-16 Pelkat PKLU GPIB dilakukan secara mandiri atau rombongan melalui formulir registrasi online di platform ini. Data pendaftaran harus diisi dengan lengkap dan benar untuk mempermudah koordinasi akomodasi, konsumsi, dan distribusi atribut kegiatan.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">2. Ketentuan Kontribusi &amp; Pembayaran</h4>
+                      <p>
+                        Kontribusi keikutsertaan terbagi menjadi Kategori Umum (Rp 475.000) dan Kategori Jemaat Tuan Rumah (Rp 350.000). Semua pembayaran wajib ditransfer ke rekening resmi panitia dan disertai bukti unggah transfer yang valid. Kontribusi yang telah dibayarkan bersifat non-refundable (tidak dapat dikembalikan), namun kepesertaan dapat dialihkan kepada orang lain dengan pemberitahuan tertulis kepada panitia selambat-lambatnya 7 hari sebelum acara dimulai.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">3. Merchandise &amp; Atribut</h4>
+                      <p>
+                        Pemesanan merchandise resmi (kaos, pin, pouch, dll.) diproses setelah pembayaran terverifikasi oleh panitia. Klaim ukuran kaos dan pembagian merchandise akan dilakukan pada saat registrasi ulang di lokasi puncak acara (Bekasi Convention Center). Perubahan detail pesanan hanya diizinkan selama periode pendaftaran masih dibuka.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">4. Hak &amp; Kewajiban Peserta</h4>
+                      <p>
+                        Setiap peserta berhak mengikuti seluruh ibadah, seminar/webinar, dan perayaan sesuai jadwal. Peserta berkewajiban menjaga ketertiban, kebersihan, mengikuti protokol keamanan lokasi, serta memperlakukan sesama peserta, panitia, dan pengisi acara dengan hormat.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">5. Pembatalan atau Perubahan Acara</h4>
+                      <p>
+                        Apabila terjadi keadaan kahar (force majeure) yang mengharuskan panitia mengubah jadwal atau membatalkan rangkaian acara tertentu, panitia akan segera mengumumkan hal tersebut melalui saluran komunikasi resmi. Panitia tidak bertanggung jawab atas kerugian materiil berupa biaya perjalanan pribadi yang telah dipesan oleh peserta.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">1. Informasi yang Kami Kumpulkan</h4>
+                      <p>
+                        Kami mengumpulkan data pribadi yang Anda berikan secara sukarela saat mendaftar, membeli merchandise, menyalurkan donasi, atau mengisi ucapan selamat. Informasi ini mencakup: nama lengkap, alamat email, nomor telepon/WhatsApp aktif, kota/asal jemaat, data ukuran kaos, bukti pembayaran bank, serta dokumen surat tugas jemaat.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">2. Tujuan Penggunaan Data</h4>
+                      <p>
+                        Data pribadi Anda digunakan secara eksklusif untuk kepentingan administratif kepanitiaan HUT ke-16 Pelkat PKLU GPIB, meliputi: verifikasi bukti pembayaran, pembuatan tanda pengenal peserta (badge), koordinasi konsumsi dan ukuran kaos, konfirmasi penerimaan dukungan kasih/donasi, serta pengiriman pesan pengingat acara (reminders) via WhatsApp/Email.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">3. Penyimpanan &amp; Perlindungan Data</h4>
+                      <p>
+                        Kami berkomitmen untuk menjaga keamanan data Anda dengan menerapkan standar pengamanan teknis dan organisasi yang memadai. File sensitif seperti bukti transfer dan surat tugas disimpan secara terenkripsi pada basis data yang dikelola secara aman, mencegah akses tidak sah, pengubahan, atau kebocoran data.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">4. Kerahasiaan &amp; Pihak Ketiga</h4>
+                      <p>
+                        Data Anda tidak akan pernah dijual, disewakan, atau dibagikan kepada pihak ketiga untuk kepentingan komersial. Data hanya dapat diakses oleh panitia pelaksana yang berwenang dan mitra teknologi resmi kami (seperti AMAN Ecosystem) untuk kebutuhan integrasi sistem pendaftaran dan notifikasi otomatis.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-white">5. Hak Akses &amp; Perubahan</h4>
+                      <p>
+                        Anda memiliki hak untuk memeriksa status verifikasi, meminta pembaruan data jika terjadi kesalahan penulisan, atau meminta penghapusan ucapan selamat Anda di buku tamu digital. Silakan hubungi nomor kontak resmi panitia yang tertera di website untuk permohonan tersebut.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="mt-6 border-t border-[#D4AF37]/20 pt-4 flex justify-end flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsOpenPolicyModal(null)}
+                  className="px-6 py-2 bg-[#D4AF37] hover:bg-[#B3932D] text-[#022c22] rounded-full text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Saya Mengerti
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Modal Form Calon Donatur */}
       <AnimatePresence>

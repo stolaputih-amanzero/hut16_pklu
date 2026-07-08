@@ -57,7 +57,6 @@ export async function GuestbookList() {
           <MessageSquareQuote className="h-5 w-5 text-[#D4AF37]" />
           Ucapan Selamat ({totalCount})
         </h3>
-        <span className="text-xs text-gray-400">Terverifikasi Panitia</span>
       </div>
 
       <GuestbookLoadMore initialMessages={messages} totalCount={totalCount} />

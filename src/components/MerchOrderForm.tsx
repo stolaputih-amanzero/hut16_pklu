@@ -11,6 +11,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getSizeSurcharge } from "@/lib/utils";
 import { fetchMerchProducts } from "@/app/(admin)/admin/merch/actions";
 import { submitMerchOrder, CartItemInput, getMerchOrderByCodeOrWa } from "@/app/(public)/merch/actions";
 import { QRCodeSVG } from "qrcode.react";
@@ -78,7 +79,7 @@ export type CartItemState = {
   quantity: number;
 };
 
-const SHIRT_SIZES = ["S", "M", "L", "XL", "XXL", "3XL"];
+const SHIRT_SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL"];
 
 interface MerchOrderFormProps {
   churches: ChurchItem[];
@@ -411,7 +412,10 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
   // Calculations
   const grandTotalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const grandTotalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const grandTotalPrice = cartItems.reduce((sum, item) => {
+    const effectivePrice = item.price + (item.has_size ? getSizeSurcharge(item.size) : 0);
+    return sum + effectivePrice * item.quantity;
+  }, 0);
 
   const onSubmit = async (data: MerchFormValues) => {
     if (cartItems.length === 0) {
@@ -434,7 +438,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
     const payloadItems = cartItems.map((item) => ({
       name: item.name,
-      price: item.price,
+      price: item.price + (item.has_size ? getSizeSurcharge(item.size) : 0),
       size: item.has_size ? item.size : undefined,
       quantity: item.quantity,
     }));
@@ -892,7 +896,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     </div>
                   </div>
                   <span className="text-base font-mono font-black text-[#D4AF37] shrink-0">
-                    {previewProduct.price > 0 ? `Rp ${previewProduct.price.toLocaleString("id-ID")}` : "Cenderamata"}
+                    {previewProduct.price > 0 
+                      ? `Rp ${(previewProduct.price + (previewProduct.has_size ? getSizeSurcharge(previewSize) : 0)).toLocaleString("id-ID")}` 
+                      : "Cenderamata"}
                   </span>
                 </div>
 
@@ -906,23 +912,56 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                 {/* Size Selector in Modal */}
                 {!isOutOfStock && previewProduct.has_size && (
                   <div className="space-y-2 p-2.5 bg-purple-500/5 rounded-xl border border-purple-500/20">
-                    <span className="text-[11px] font-semibold text-purple-300 flex items-center gap-1.5">
-                      <Shirt className="w-3.5 h-3.5 text-purple-400 shrink-0" /> Pilih Ukuran Kaos:
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-purple-300 flex items-center gap-1.5">
+                        <Shirt className="w-3.5 h-3.5 text-purple-400 shrink-0" /> Pilih Ukuran Kaos:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setLightboxImage("/sizechart.jpeg")}
+                        className="text-[10px] text-purple-400 hover:text-purple-300 underline font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" /> Lihat Size Chart
+                      </button>
+                    </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {SHIRT_SIZES.map((sz) => (
+                      {SHIRT_SIZES.map((sz) => {
+                        const surcharge = getSizeSurcharge(sz);
+                        return (
+                          <button
+                            key={sz}
+                            type="button"
+                            onClick={() => setPreviewSize(sz)}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-mono font-bold transition-all border cursor-pointer ${previewSize === sz
+                              ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300"
+                              : "bg-white/5 text-gray-400 hover:bg-white/10 border-white/10"
+                              }`}
+                          >
+                            {sz}{surcharge > 0 ? ` (+${surcharge / 1000}k)` : ""}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-2.5 overflow-hidden rounded-xl border border-purple-500/10 bg-black/40">
+                      <div className="p-2 border-b border-purple-500/10 text-[9px] text-gray-400 font-semibold flex justify-between items-center bg-purple-950/20">
+                        <span>Pratinjau Ukuran Kaos (Size Chart)</span>
                         <button
-                          key={sz}
                           type="button"
-                          onClick={() => setPreviewSize(sz)}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all border cursor-pointer ${previewSize === sz
-                            ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300"
-                            : "bg-white/5 text-gray-400 hover:bg-white/10 border-white/10"
-                            }`}
+                          onClick={() => setLightboxImage("/sizechart.jpeg")}
+                          className="text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-0.5 text-[9px]"
                         >
-                          {sz}
+                          Perbesar 🔍
                         </button>
-                      ))}
+                      </div>
+                      <div className="relative h-44 w-full cursor-zoom-in overflow-hidden" onClick={() => setLightboxImage("/sizechart.jpeg")}>
+                        <Image
+                          src="/sizechart.jpeg"
+                          alt="Size Chart"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 400px"
+                          className="object-contain p-1"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1339,24 +1378,43 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                           {/* Size selector if shirt */}
                           {cartItem.has_size ? (
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[11px] text-purple-300 font-semibold flex items-center gap-1 shrink-0">
-                                <Shirt className="w-3.5 h-3.5" /> Ukuran Kaos:
-                              </span>
-                              <div className="flex flex-wrap gap-1">
-                                {SHIRT_SIZES.map((sz) => (
-                                  <button
-                                    key={sz}
-                                    type="button"
-                                    onClick={() => updateCartSize(cartItem.cartItemId, sz)}
-                                    className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border cursor-pointer ${cartItem.size === sz
-                                      ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300"
-                                      : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
-                                      }`}
-                                  >
-                                    {sz}
-                                  </button>
-                                ))}
+                              <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                                <span className="text-[11px] text-purple-300 font-semibold flex items-center gap-1 shrink-0">
+                                  <Shirt className="w-3.5 h-3.5" /> Ukuran Kaos:
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setLightboxImage("/sizechart.jpeg")}
+                                  className="text-[10px] text-purple-400 hover:text-purple-300 underline font-semibold flex items-center gap-0.5 ml-auto sm:hidden cursor-pointer"
+                                >
+                                  <Eye className="w-3 h-3" /> Size Chart
+                                </button>
                               </div>
+                              <div className="flex flex-wrap gap-1">
+                                {SHIRT_SIZES.map((sz) => {
+                                  const surcharge = getSizeSurcharge(sz);
+                                  return (
+                                    <button
+                                      key={sz}
+                                      type="button"
+                                      onClick={() => updateCartSize(cartItem.cartItemId, sz)}
+                                      className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border cursor-pointer ${cartItem.size === sz
+                                        ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300"
+                                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
+                                        }`}
+                                    >
+                                      {sz}{surcharge > 0 ? ` (+${surcharge / 1000}k)` : ""}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setLightboxImage("/sizechart.jpeg")}
+                                className="hidden sm:inline-flex text-[10px] text-purple-400 hover:text-purple-300 underline font-semibold items-center gap-0.5 ml-1 cursor-pointer"
+                              >
+                                <Eye className="w-3 h-3" /> Size Chart
+                              </button>
                             </div>
                           ) : (
                             <span className="text-[11px] text-gray-400 italic">Ukuran All Size / Standar</span>
@@ -1386,7 +1444,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
                             <div className="flex items-center gap-3.5">
                               <span className="font-mono font-black text-emerald-400 text-xs min-w-[70px] text-right">
-                                Rp {(cartItem.price * cartItem.quantity).toLocaleString("id-ID")}
+                                Rp {((cartItem.price + (cartItem.has_size ? getSizeSurcharge(cartItem.size) : 0)) * cartItem.quantity).toLocaleString("id-ID")}
                               </span>
 
                               <button

@@ -79,7 +79,7 @@ export async function submitMerchOrder(formData: FormData) {
     const cleanPaymentDate = payment_date ? sanitizeText(payment_date) : null;
 
     if (!cleanName || !cleanChurchCity || !cleanWa) {
-      return { success: false, error: "Nama Pemesan, Asal Jemaat, dan WhatsApp wajib diisi." };
+      return { success: false, error: "Nama Pembeli, Asal Jemaat, dan WhatsApp wajib diisi." };
     }
 
     if (!paymentProofFile || paymentProofFile.size === 0 || paymentProofFile.name === "undefined") {

@@ -5,6 +5,7 @@ import { fetchMerchProducts, saveMerchProduct, deleteMerchProduct, fetchMerchOrd
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getSizeSurcharge } from "@/lib/utils";
 import {
   ShoppingBag,
   Plus,
@@ -952,7 +953,9 @@ export default function AdminMerchPage() {
                     return (
                       <>
                         {parsedItems.map((item, idx) => {
-                          const subtotal = item.product ? item.product.price * item.quantity : 0;
+                          const surcharge = item.product?.has_size ? getSizeSurcharge(item.size) : 0;
+                          const effectivePrice = item.product ? item.product.price + surcharge : 0;
+                          const subtotal = effectivePrice * item.quantity;
                           computedGrandTotal += subtotal;
                           return (
                             <div key={idx} className={`pt-2.5 first:pt-0 flex items-start gap-3 text-xs`}>
@@ -990,7 +993,7 @@ export default function AdminMerchPage() {
                                 </div>
                                 {item.product && (
                                   <div className="flex justify-between items-center text-[10px] text-gray-400 pt-0.5">
-                                    <span>Rp {item.product.price.toLocaleString("id-ID")} / pcs</span>
+                                    <span>Rp {effectivePrice.toLocaleString("id-ID")} / pcs</span>
                                     <span className="font-mono font-bold text-emerald-400">
                                       Subtotal: Rp {subtotal.toLocaleString("id-ID")}
                                     </span>

@@ -5,6 +5,7 @@ import fs from 'fs'
 import path from 'path'
 import { MerchOrdersPDF } from '@/components/pdf/MerchOrdersPDF'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSizeSurcharge, parseOrderItemType } from '@/lib/utils'
 
 export const runtime = 'nodejs'
 
@@ -23,6 +24,35 @@ export async function GET(req: NextRequest) {
         if (error) throw error
 
         let orders = allOrders || []
+
+        // Fetch merch products to get base prices and check has_size
+        const { data: productsData } = await supabaseAdmin
+            .from('merch_products')
+            .select('name, price, has_size')
+
+        // Clean up entity names inside items and compute total price dynamically
+        orders = orders.map((o) => {
+            const parsedItems = parseOrderItemType(o.item_type)
+            let calculatedTotalPrice = 0
+
+            parsedItems.forEach((item) => {
+                const matchedProd = productsData?.find(
+                    p => p.name.toLowerCase().trim() === item.name.toLowerCase().trim()
+                )
+                if (matchedProd) {
+                    const surcharge = matchedProd.has_size ? getSizeSurcharge(item.size) : 0
+                    calculatedTotalPrice += (matchedProd.price + surcharge) * item.quantity
+                }
+            })
+
+            return {
+                ...o,
+                buyer_name: o.buyer_name?.replaceAll("&amp;", "&"),
+                church_city: o.church_city?.replaceAll("&amp;", "&"),
+                item_type: o.item_type?.replaceAll("&amp;", "&"),
+                total_price: calculatedTotalPrice
+            }
+        })
 
         // 1. Calculate stats (before visual filter application for completeness)
         let totalOrders = orders.length
@@ -64,14 +94,6 @@ export async function GET(req: NextRequest) {
                 return o.payment_status === statusFilter
             })
         }
-
-        // Clean up entity names inside items
-        orders = orders.map((o) => ({
-            ...o,
-            buyer_name: o.buyer_name?.replaceAll("&amp;", "&"),
-            church_city: o.church_city?.replaceAll("&amp;", "&"),
-            item_type: o.item_type?.replaceAll("&amp;", "&"),
-        }))
 
         // Get Base64 logo for the PDF
         const getBase64Logo = () => {

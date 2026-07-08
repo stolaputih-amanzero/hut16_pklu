@@ -417,19 +417,34 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     return sum + effectivePrice * item.quantity;
   }, 0);
 
+  const onInvalid = (errors: any) => {
+    const firstError = Object.values(errors)[0] as any;
+    if (firstError?.message) {
+      toast.error(`Wajib diisi: ${firstError.message}`);
+    } else {
+      toast.error("Harap lengkapi semua data wajib (*) dengan benar!");
+    }
+  };
+
   const onSubmit = async (data: MerchFormValues) => {
     if (cartItems.length === 0) {
-      setErrorMsg("Silakan pilih minimal 1 item produk.");
+      const msg = "Silakan pilih minimal 1 item produk.";
+      setErrorMsg(msg);
+      toast.error(msg);
       return;
     }
 
     if (!paymentProofFile) {
-      setErrorMsg("Bukti transfer wajib diunggah.");
+      const msg = "Bukti transfer wajib diunggah.";
+      setErrorMsg(msg);
+      toast.error(msg);
       return;
     }
 
     if (!paymentDate) {
-      setErrorMsg("Tanggal transfer wajib diisi.");
+      const msg = "Tanggal transfer wajib diisi.";
+      setErrorMsg(msg);
+      toast.error(msg);
       return;
     }
 
@@ -1077,7 +1092,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
 
 
           {/* Section: Data Pembeli */}

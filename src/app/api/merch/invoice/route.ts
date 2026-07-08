@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
             status: 200,
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `inline; filename="${invCode}.pdf"`
+                'Content-Disposition': `attachment; filename="${invCode}.pdf"`
             }
         })
     } catch (err: any) {

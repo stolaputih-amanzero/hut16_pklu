@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getSizeSurcharge, splitItemType } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   ShoppingBag,
   Plus,
@@ -215,8 +216,9 @@ export default function AdminMerchPage() {
     if (res.success) {
       setIsModalOpen(false);
       loadCatalog();
+      toast.success("Produk berhasil disimpan!");
     } else {
-      alert(res.error || "Gagal menyimpan produk.");
+      toast.error(res.error || "Gagal menyimpan produk.");
     }
   };
 
@@ -1112,11 +1114,11 @@ export default function AdminMerchPage() {
                     const res = await updateMerchOrderStatus(selectedOrder.id, adminPaymentStatus, adminNotesText);
                     setSavingStatus(false);
                     if (res.success) {
-                      alert("Status pembelian berhasil diperbarui!");
+                      toast.success("Status pembelian berhasil diperbarui!");
                       loadOrders();
                       setSelectedOrder((prev) => prev ? { ...prev, payment_status: adminPaymentStatus, admin_notes: adminNotesText } : null);
                     } else {
-                      alert(res.error || "Gagal memperbarui status.");
+                      toast.error(res.error || "Gagal memperbarui status.");
                     }
                   }}
                   disabled={savingStatus}
@@ -1132,8 +1134,9 @@ export default function AdminMerchPage() {
               <div className="flex flex-col sm:flex-row gap-2.5 mt-4 pt-4 border-t border-[#D4AF37]/35 no-export">
                 <a
                   href={`/api/merch/invoice?id=${selectedOrder.id}`}
-                  target="_blank"
-                  rel="noreferrer"
+                  onClick={() => {
+                    toast.success("Memulai pengunduhan Invoice PDF...");
+                  }}
                   className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/40 text-white font-bold rounded-xl transition-all shadow-md h-10 text-xs"
                 >
                   <FileText className="w-4 h-4" /> Unduh Invoice PDF

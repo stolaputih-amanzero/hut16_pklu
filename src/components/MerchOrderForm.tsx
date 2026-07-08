@@ -1805,8 +1805,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                         <div className="pt-3 border-t border-white/5 no-export">
                           <a
                             href={`/api/merch/invoice?id=${order.id}`}
-                            target="_blank"
-                            rel="noreferrer"
+                            onClick={() => {
+                              toast.success("Memulai pengunduhan Invoice PDF...");
+                            }}
                             className="block w-full"
                           >
                             <Button
@@ -1845,6 +1846,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                               link.download = `Bukti-Pembelian-Merch-${orderCode}.png`;
                               link.href = dataUrl;
                               link.click();
+                              toast.success("Gambar bukti pembelian berhasil disimpan!");
                             } catch (err) {
                               console.error("Gagal menyimpan gambar:", err);
                               toast.error("Gagal menyimpan gambar bukti pembelian.");

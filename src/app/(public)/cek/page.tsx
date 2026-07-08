@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download, ShoppingBag } from "lucide-react";
 import { splitItemType } from "@/lib/utils";
+import { toast } from "sonner";
 
 function CheckContent() {
   const searchParams = useSearchParams();
@@ -50,9 +51,10 @@ function CheckContent() {
       link.download = `PKLU-Registration-${code}.png`;
       link.href = dataUrl;
       link.click();
+      toast.success("Gambar tiket berhasil disimpan di perangkat Anda!");
     } catch (err) {
       console.error("Gagal menyimpan gambar:", err);
-      alert("Gagal menyimpan gambar. Silakan coba screenshot layar Anda.");
+      toast.error("Gagal menyimpan gambar. Silakan coba screenshot layar Anda.");
     } finally {
       setDownloadingCode(null);
     }
@@ -389,8 +391,9 @@ function CheckContent() {
                         </div>
                         <a
                           href={`/api/merch/invoice?id=${order.id}`}
-                          target="_blank"
-                          rel="noreferrer"
+                          onClick={() => {
+                            toast.success("Memulai pengunduhan Invoice PDF...");
+                          }}
                           className="block w-full"
                         >
                           <Button

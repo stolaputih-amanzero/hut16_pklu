@@ -1801,6 +1801,24 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                         </div>
                       )}
 
+                      {order.payment_status === "verified" && (
+                        <div className="pt-3 border-t border-white/5 no-export">
+                          <a
+                            href={`/api/merch/invoice?id=${order.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block w-full"
+                          >
+                            <Button
+                              type="button"
+                              className="w-full bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 text-white font-bold text-xs h-10 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <Download className="w-4 h-4" /> Unduh Invoice Resmi (PDF)
+                            </Button>
+                          </a>
+                        </div>
+                      )}
+
                       {/* QR Code and Save Button (Exactly styled like registration check status) */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-3.5 border-t border-white/10 no-export">
                         <div className="flex flex-col items-center justify-center p-3 bg-white rounded-xl text-black space-y-1">

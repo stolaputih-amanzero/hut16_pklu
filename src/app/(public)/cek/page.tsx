@@ -380,6 +380,28 @@ function CheckContent() {
                         </div>
                       </div>
                     )}
+
+                    {order.payment_status === "verified" && (
+                      <div className="pt-3.5 border-t border-white/10 space-y-2">
+                        <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[11px] uppercase tracking-wider">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span>Pembayaran Terverifikasi (Lunas)</span>
+                        </div>
+                        <a
+                          href={`/api/merch/invoice?id=${order.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block w-full"
+                        >
+                          <Button
+                            type="button"
+                            className="bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 text-white font-bold text-xs rounded-xl inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.2)] w-full h-10 transition-all active:scale-[0.98]"
+                          >
+                            <Download className="w-4 h-4" /> Unduh Invoice Resmi (PDF)
+                          </Button>
+                        </a>
+                      </div>
+                    )}
                   </div>
                 );
               })}

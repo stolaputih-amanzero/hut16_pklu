@@ -3,6 +3,7 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import React from 'react'
 import fs from 'fs'
 import path from 'path'
+import QRCode from 'qrcode'
 import { MerchInvoicePDF } from '@/components/pdf/MerchInvoicePDF'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getSizeSurcharge, parseOrderItemType } from '@/lib/utils'
@@ -71,12 +72,24 @@ export async function GET(req: NextRequest) {
 
         const logoUrl = getBase64Logo()
 
+        // Generate verification QR Code pointing to the verification page
+        const verificationUrl = `${req.nextUrl.origin}/cek?merch_id=${order.id}`
+        const qrCodeUrl = await QRCode.toDataURL(verificationUrl, {
+            margin: 1,
+            width: 150,
+            color: {
+                dark: '#022c22', // Match GPIB theme green
+                light: '#ffffff'
+            }
+        })
+
         // Render to Buffer
         const buffer = await renderToBuffer(
             React.createElement(MerchInvoicePDF, {
                 order,
                 items,
-                logoUrl
+                logoUrl,
+                qrCodeUrl
             }) as any
         )
 

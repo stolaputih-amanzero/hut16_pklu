@@ -195,26 +195,54 @@ const styles = StyleSheet.create({
         lineHeight: 1.3,
     },
     footer: {
-        marginTop: 30,
+        marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         borderTop: '1pt solid #e2e8f0',
         paddingTop: 15,
     },
     footerText: {
-        fontSize: 7.5,
+        fontSize: 7,
         color: '#9ca3af',
-        width: '60%',
+        width: '40%',
+        lineHeight: 1.3,
+    },
+    verificationBox: {
+        width: '28%',
+        alignItems: 'center',
+        border: '0.5pt solid #059669',
+        borderRadius: 4,
+        padding: 5,
+        backgroundColor: '#f0fdf4',
+    },
+    qrCode: {
+        width: 45,
+        height: 45,
+        marginBottom: 3,
+    },
+    verificationText: {
+        fontSize: 5.5,
+        color: '#047857',
+        fontFamily: 'Helvetica-Bold',
+        textAlign: 'center',
+        lineHeight: 1.2,
+    },
+    authenticSealText: {
+        fontSize: 5,
+        color: '#059669',
+        fontFamily: 'Helvetica-Bold',
+        marginTop: 2,
+        textTransform: 'uppercase',
     },
     signatureBox: {
-        width: '30%',
+        width: '28%',
         alignItems: 'center',
     },
     signatureTitle: {
         fontSize: 8,
         color: '#4b5563',
-        marginBottom: 35,
+        marginBottom: 25,
     },
     signatureLine: {
         width: '100%',
@@ -236,9 +264,10 @@ interface Props {
     order: any
     items: any[]
     logoUrl?: string
+    qrCodeUrl?: string
 }
 
-export function MerchInvoicePDF({ order, items, logoUrl = "/logo_hut16_pklu.png" }: Props) {
+export function MerchInvoicePDF({ order, items, logoUrl = "/logo_hut16_pklu.png", qrCodeUrl }: Props) {
     const invCode = `INV/MB/${order.id.slice(0, 6).toUpperCase()}`
     const orderDate = new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
     const paymentDateStr = order.payment_date 
@@ -368,6 +397,16 @@ export function MerchInvoicePDF({ order, items, logoUrl = "/logo_hut16_pklu.png"
                     <Text style={styles.footerText}>
                         Terima kasih atas partisipasi dan dukungan Anda dalam menyukseskan perayaan HUT ke-16 Pelayanan Kategorial Lanjut Usia (PKLU) GPIB. Dokumen ini sah dan diterbitkan secara elektronik oleh sistem.
                     </Text>
+
+                    {/* QR Code Verification Box */}
+                    {qrCodeUrl && (
+                        <View style={styles.verificationBox}>
+                            <Image src={qrCodeUrl} style={styles.qrCode} />
+                            <Text style={styles.verificationText}>INVOICE LUNAS &amp; VALID</Text>
+                            <Text style={styles.authenticSealText}>TANDA TANGAN OTENTIK</Text>
+                        </View>
+                    )}
+
                     <View style={styles.signatureBox}>
                         <Text style={styles.signatureTitle}>Menyetujui,</Text>
                         <View style={styles.signatureLine} />

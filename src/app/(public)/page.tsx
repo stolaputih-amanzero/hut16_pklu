@@ -1347,14 +1347,14 @@ export default function Home() {
                   <span className="text-[10px] text-emerald-400 font-medium">Bank Resmi</span>
                 </div>
 
-                <div className="flex items-start justify-between gap-4 text-[#FDFBF7]">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 text-[#FDFBF7]">
                   <div className="shrink-0">
                     <span className="text-white/50 block text-[10px] uppercase">Bank</span>
                     <span className="font-semibold text-sm">Bank BTN</span>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <span className="text-white/50 block text-[10px] uppercase">Atas Nama</span>
-                    <span className="font-semibold text-[11px] sm:text-xs block leading-tight text-white" title="PANITIA MUPEL GPIB BEKASI">PANITIA MUPEL GPIB BEKASI</span>
+                    <span className="font-semibold text-xs block leading-tight text-white" title="PANITIA MUPEL GPIB BEKASI">PANITIA MUPEL GPIB BEKASI</span>
                   </div>
                 </div>
 

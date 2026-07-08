@@ -52,45 +52,47 @@ export function GuestbookLoadMore({ initialMessages, totalCount }: GuestbookLoad
             key={item.id}
             className="rounded-xl border border-white/10 bg-black/50 p-4 sm:p-5 backdrop-blur-md text-[#FDFBF7] space-y-3 shadow-md hover:border-[#D4AF37]/40 transition-colors"
           >
-            <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
-              <div className="flex items-center gap-3">
-                {item.avatar_url ? (
-                  <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-[#D4AF37]/50 shadow">
-                    <Image
-                      src={item.avatar_url}
-                      alt={item.name}
-                      width={40}
-                      height={40}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/20 text-[#D4AF37] font-bold border border-[#D4AF37]/40 text-sm">
-                    {item.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div>
-                  <h4 className="font-bold text-white text-sm flex items-center gap-1.5">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+              {item.avatar_url ? (
+                <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-[#D4AF37]/50 shadow">
+                  <Image
+                    src={item.avatar_url}
+                    alt={item.name}
+                    width={40}
+                    height={40}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/20 text-[#D4AF37] font-bold border border-[#D4AF37]/40 text-sm">
+                  {item.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h4 className="font-bold text-white text-sm leading-tight">
                     {item.name}
-                    <span title="Pesan Terverifikasi">
-                      <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
-                    </span>
                   </h4>
-                  <p className="text-xs text-[#D4AF37] flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
+                  <span title="Pesan Terverifikasi" className="shrink-0">
+                    <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                  <span className="text-[#D4AF37] flex items-center gap-1 font-semibold text-[11px] sm:text-xs">
+                    <MapPin className="h-3 w-3 shrink-0 text-[#D4AF37]" />
                     {item.church_city}
-                  </p>
+                  </span>
+                  <span className="text-gray-500 text-[10px] sm:text-xs">•</span>
+                  <span className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-400">
+                    <Calendar className="h-3 w-3 text-gray-500 shrink-0" />
+                    {new Date(item.created_at).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
               </div>
-
-              <span className="text-[11px] text-gray-400 flex items-center gap-1 shrink-0">
-                <Calendar className="h-3 w-3 text-gray-500" />
-                {new Date(item.created_at).toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
             </div>
 
             <p className="text-xs text-gray-200 leading-relaxed italic whitespace-pre-line">

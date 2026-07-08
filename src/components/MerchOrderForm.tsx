@@ -717,26 +717,44 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
 
   const renderPanduanContent = () => (
     <div className="space-y-4 pt-2 text-left font-normal leading-relaxed">
-      <ol className="list-decimal list-inside space-y-3 text-xs text-gray-300 leading-relaxed font-semibold">
+      <ol className="list-decimal list-inside space-y-3.5 text-xs text-gray-300 leading-relaxed font-semibold">
         <li>
-          <span className="font-bold text-[#D4AF37]">Pilih Produk Merchandise:</span>
-          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Pilih produk yang Anda inginkan dari daftar produk di bawah, atur ukuran (bila ada) dan jumlah (quantity), lalu klik <strong>"Tambahkan ke Pembelian"</strong>.</p>
+          <span className="font-bold text-[#D4AF37]">Pilih Produk &amp; Paket Bundling:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">
+            Pilih produk yang Anda inginkan dari katalog di bawah. Anda dapat memanfaatkan **Paket Bundling Hemat** (bila tersedia) untuk mendapatkan harga spesial. Atur ukuran (bila ada) dan jumlah (quantity), lalu klik <strong>"Tambahkan ke Pembelian"</strong>. Anda dapat menggabungkan beberapa item berbeda dalam satu transaksi pembelian.
+          </p>
         </li>
         <li>
-          <span className="font-bold text-[#D4AF37]">Isi Formulir Data Pembeli:</span>
-          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Lengkapi Nama Lengkap, pilih asal jemaat GPIB (Mupel &amp; Jemaat) atau pilih kategori Umum/Lainnya, serta masukkan nomor WhatsApp aktif.</p>
+          <span className="font-bold text-[#D4AF37]">Isi Formulir Identitas &amp; Pengiriman:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">
+            Lengkapi data diri Anda seperti Nama Lengkap, pilih asal jemaat GPIB (Mupel &amp; Jemaat) atau pilih kategori Umum/Lainnya, serta masukkan nomor WhatsApp aktif yang dapat dihubungi untuk konfirmasi.
+          </p>
         </li>
         <li>
           <span className="font-bold text-[#D4AF37]">Transfer Biaya Pembelian:</span>
-          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Lakukan pembayaran via transfer ke rekening panitia: <strong>Bank BTN 00179-01-88-000447-9 a.n. Panitia MUPEL GPIB BEKASI</strong> sesuai total tagihan belanja Anda.</p>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">
+            Lakukan pembayaran transfer antar bank ke rekening resmi panitia pelaksana: <br />
+            <strong className="text-white">Bank BTN: 00179-01-88-000447-9 a.n. PANITIA MUPEL GPIB BEKASI</strong> <br />
+            Pastikan nominal transfer sesuai dengan total tagihan belanja Anda dalam satu kali transfer akumulatif.
+          </p>
         </li>
         <li>
-          <span className="font-bold text-[#D4AF37]">Unggah Bukti Pembayaran:</span>
-          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Isi Tanggal Transfer, unggah foto/screenshot bukti transfer, lalu klik tombol <strong>"Kirim Formulir Pembelian"</strong>.</p>
+          <span className="font-bold text-[#D4AF37]">Unggah Bukti &amp; Kirim Form:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">
+            Masukkan tanggal transfer Anda, unggah file foto/screenshot bukti transfer bank yang sah, lalu klik tombol <strong>"Kirim Formulir Pembelian"</strong> untuk memproses pesanan Anda.
+          </p>
         </li>
         <li>
-          <span className="font-bold text-[#D4AF37]">Simpan Tanda Terima &amp; QR Code:</span>
-          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">Setelah sukses, simpan gambar tiket bukti pembelian dan scan/tunjukkan QR Code tersebut ke meja pengambilan pada hari H acara.</p>
+          <span className="font-bold text-[#D4AF37]">Cek Status &amp; Unduh Invoice PDF Resmi:</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">
+            Setelah formulir dikirim, Anda dapat menggunakan tombol <strong>"Cek Status / QR Code Pembelian"</strong> di bagian atas halaman dengan memasukkan nomor WhatsApp Anda. Setelah pembayaran Anda diverifikasi dan disetujui (status **Lunas**) oleh panitia, tombol **"Unduh Invoice Resmi (PDF)"** akan aktif secara otomatis pada panel cek status tersebut.
+          </p>
+        </li>
+        <li>
+          <span className="font-bold text-[#D4AF37]">Pengambilan Barang (On-Venue):</span>
+          <p className="pl-5 text-[11px] text-gray-300 font-normal leading-relaxed mt-1">
+            Seluruh merchandise yang Anda pesan dapat diambil di **Meja Khusus Pengambilan Merchandise** pada hari-H acara (**Senin, 12 Oktober 2026** di venue **Bekasi Convention Center**) dengan menunjukkan QR Code tanda terima atau membawa salinan cetak Invoice PDF yang telah lunas.
+          </p>
         </li>
       </ol>
     </div>

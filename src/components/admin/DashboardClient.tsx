@@ -73,7 +73,7 @@ export default function DashboardClient({
   const getOrderPrice = useMemo(() => {
     return (itemTypeStr: string) => {
       if (!itemTypeStr) return 0;
-      const parts = itemTypeStr.split(", ");
+      const parts = itemTypeStr.includes("; ") ? itemTypeStr.split("; ") : itemTypeStr.split(", ");
       let total = 0;
       parts.forEach((part) => {
         const qtyMatch = part.match(/\s+x(\d+)$/);
@@ -275,7 +275,7 @@ export default function DashboardClient({
     const counts: { [key: string]: number } = {};
     merchOrders.forEach((o) => {
       if (o.payment_status === "rejected") return; // Exclude rejected orders from popularity
-      const parts = o.item_type.split(", ");
+      const parts = o.item_type.includes("; ") ? o.item_type.split("; ") : o.item_type.split(", ");
       parts.forEach((part: string) => {
         const qtyMatch = part.match(/\s+x(\d+)$/);
         const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;

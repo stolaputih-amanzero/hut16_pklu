@@ -330,7 +330,7 @@ function CheckContent() {
                     <div className="pt-2 border-t border-white/5">
                       <span className="text-gray-400 block mb-1.5 font-semibold">Rincian Souvenir:</span>
                       <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono text-[11px] text-gray-200 space-y-1.5">
-                        {order.item_type?.split(", ").map((item: string, idx: number) => (
+                        {order.item_type?.split(order.item_type.includes("; ") ? "; " : ", ").map((item: string, idx: number) => (
                           <div key={idx} className="flex items-start gap-1.5">
                             <span className="text-[#D4AF37] shrink-0">•</span>
                             <span>{item}</span>

@@ -38,7 +38,7 @@ export interface ParsedItem {
 
 export function parseOrderItemType(itemTypeStr: string): ParsedItem[] {
   if (!itemTypeStr) return []
-  return itemTypeStr.split(", ").map((part) => {
+  return itemTypeStr.split(itemTypeStr.includes("; ") ? "; " : ", ").map((part) => {
     const qtyMatch = part.match(/\s+x(\d+)$/)
     const quantity = qtyMatch ? parseInt(qtyMatch[1]) : 1
     let cleanItemName = qtyMatch ? part.replace(/\s+x\d+$/, "") : part

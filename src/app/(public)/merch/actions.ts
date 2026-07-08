@@ -110,7 +110,7 @@ export async function submitMerchOrder(formData: FormData) {
       }
     });
 
-    const cleanItemType = itemSummaries.join(", ");
+    const cleanItemType = itemSummaries.join("; ");
     const cleanSize = sizesList.length > 0 ? sizesList.join("; ") : null;
 
     // 3. Upload Payment Proof

@@ -81,6 +81,14 @@ export type CartItemState = {
 
 const SHIRT_SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL"];
 
+const getTodayDateString = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const date = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${date}`;
+};
+
 interface MerchOrderFormProps {
   churches: ChurchItem[];
 }
@@ -165,7 +173,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   };
 
   // Payment states
-  const [paymentDate, setPaymentDate] = useState("");
+  const [paymentDate, setPaymentDate] = useState(getTodayDateString());
   const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
   const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
 
@@ -489,7 +497,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setSelectedJemaat("");
     setCustomChurch("");
 
-    setPaymentDate("");
+    setPaymentDate(getTodayDateString());
     setPaymentProofFile(null);
     setPaymentProofPreview(null);
 

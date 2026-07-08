@@ -18,7 +18,8 @@ import {
   UserCog,
   Key,
   Loader2,
-  Check
+  Check,
+  CheckCircle2
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -99,6 +100,7 @@ export function Sidebar({ fullName, role }: SidebarProps) {
 
   const navItems = [
     { name: "Dashboard Overview", path: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Cek In Panitia", path: "/admin/checkin", icon: CheckCircle2 },
     { name: "Data Pendaftaran", path: "/admin/registrations", icon: Users },
     { name: "Pembelian Merchandise", path: "/admin/merch", icon: ShoppingBag },
     { name: "Buku Tamu Moderasi", path: "/admin/guestbook", icon: MessageSquareQuote },

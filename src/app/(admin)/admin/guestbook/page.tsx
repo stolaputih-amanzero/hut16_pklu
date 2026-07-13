@@ -85,43 +85,51 @@ export default function AdminGuestbookPage() {
     if (!editingMessage) return;
     setIsSavingEdit(true);
 
-    const fd = new FormData();
-    fd.append("id", editingMessage.id);
-    fd.append("name", editName);
-    fd.append("church_city", editChurchCity);
-    fd.append("message", editMessageText);
-    fd.append("removeAvatar", editRemoveAvatar ? "true" : "false");
-    if (editAvatarFile) {
-      fd.append("avatar", editAvatarFile, editAvatarFile.name);
-    }
+    try {
+      const fd = new FormData();
+      fd.append("id", editingMessage.id);
+      fd.append("name", editName);
+      fd.append("church_city", editChurchCity);
+      fd.append("message", editMessageText);
+      fd.append("removeAvatar", editRemoveAvatar ? "true" : "false");
+      if (editAvatarFile) {
+        fd.append("avatar", editAvatarFile, editAvatarFile.name);
+      }
 
-    const res = await updateGuestbookMessage(fd);
-    setIsSavingEdit(false);
+      console.log("Submitting edit form data keys:", Array.from(fd.keys()));
+      const res = await updateGuestbookMessage(fd);
+      console.log("Response from update action:", res);
 
-    if (res.success) {
-      setMessages((prev) =>
-        prev.map((m) => {
-          if (m.id === editingMessage.id) {
-            let nextAvatar = m.avatar_url;
-            if (res.avatarRemoved) {
-              nextAvatar = null;
-            } else if (res.avatar_url) {
-              nextAvatar = res.avatar_url;
+      if (res.success) {
+        setMessages((prev) =>
+          prev.map((m) => {
+            if (m.id === editingMessage.id) {
+              let nextAvatar = m.avatar_url;
+              if (res.avatarRemoved) {
+                nextAvatar = null;
+              } else if (res.avatar_url) {
+                nextAvatar = res.avatar_url;
+              }
+              return {
+                ...m,
+                name: editName,
+                church_city: editChurchCity,
+                message: editMessageText,
+                avatar_url: nextAvatar,
+              };
             }
-            return {
-              ...m,
-              name: editName,
-              church_city: editChurchCity,
-              message: editMessageText,
-              avatar_url: nextAvatar,
-            };
-          }
-          return m;
-        })
-      );
-      setEditingMessage(null);
-    } else {
-      alert(res.error || "Gagal mengupdate ucapan.");
+            return m;
+          })
+        );
+        setEditingMessage(null);
+      } else {
+        alert(res.error || "Gagal mengupdate ucapan.");
+      }
+    } catch (err: any) {
+      console.error("Exception in handleSaveEdit client side:", err);
+      alert("Error: " + (err.message || err));
+    } finally {
+      setIsSavingEdit(false);
     }
   };
 

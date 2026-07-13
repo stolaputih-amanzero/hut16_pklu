@@ -1400,13 +1400,24 @@ export default function Home() {
               </div>
 
               {/* Photo Container */}
-              <div className="relative w-64 h-64 sm:w-80 sm:h-80 mx-auto rounded-2xl overflow-hidden border border-[#D4AF37]/45 bg-black/25 shadow-inner flex items-center justify-center">
+              <div className="relative w-64 h-64 sm:w-80 sm:h-80 mx-auto rounded-2xl overflow-hidden border border-[#D4AF37]/45 bg-black/50 shadow-inner flex items-center justify-center">
+                {/* Blurred background for non-1:1 images */}
+                <div className="absolute inset-0 select-none pointer-events-none scale-110 blur-xl opacity-40">
+                  <Image
+                    src={selectedAvatar.url}
+                    alt=""
+                    fill
+                    sizes="(max-w-md) 100vw, 320px"
+                    className="object-cover"
+                  />
+                </div>
+                {/* Actual image */}
                 <Image
                   src={selectedAvatar.url}
                   alt={selectedAvatar.name}
                   fill
                   sizes="(max-w-md) 100vw, 320px"
-                  className="object-contain"
+                  className="object-contain relative z-10"
                 />
               </div>
 

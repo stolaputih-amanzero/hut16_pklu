@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles, ShieldCheck, Lock } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight, Quote, CheckCircle2, Star, Clock, Copy, Check, MessageSquare, Loader2, X, UserCheck, ShoppingBag, HeartHandshake, Sparkles, ShieldCheck, Lock, ZoomIn } from 'lucide-react'
 import { Playfair_Display } from 'next/font/google'
 import { supabase } from '@/lib/supabase/client'
 import { getNextNumber } from '@/lib/numbering'
@@ -134,6 +134,7 @@ export default function Home() {
   const [activeServiceTab, setActiveServiceTab] = useState<number>(0)
   const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null)
   const [isOpenPolicyModal, setIsOpenPolicyModal] = useState<'umum' | 'privasi' | null>(null)
+  const [selectedAvatar, setSelectedAvatar] = useState<{ url: string; name: string; church: string } | null>(null)
 
   // Scroll-Spy sections definition
   const sections = [
@@ -1115,13 +1116,48 @@ export default function Home() {
                     </p>
 
                     {/* Author block details */}
-                    <div className="space-y-1 select-none">
-                      <h4 className="font-extrabold text-sm md:text-base text-[#D4AF37] tracking-wider uppercase font-sans">
-                        {wishes[currentSlide].name}
-                      </h4>
-                      <p className="text-[10px] md:text-xs text-gray-400 tracking-[0.2em] uppercase font-mono">
-                        {wishes[currentSlide].church_city}
-                      </p>
+                    <div className="flex flex-col items-center space-y-3 select-none">
+                      {/* Avatar preview element */}
+                      <div
+                        onClick={() => {
+                          if (wishes[currentSlide].avatar_url) {
+                            setSelectedAvatar({
+                              url: wishes[currentSlide].avatar_url,
+                              name: wishes[currentSlide].name,
+                              church: wishes[currentSlide].church_city,
+                            });
+                          }
+                        }}
+                        className={`relative group ${wishes[currentSlide].avatar_url ? 'cursor-pointer' : 'cursor-default'}`}
+                      >
+                        {wishes[currentSlide].avatar_url ? (
+                          <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full overflow-hidden border-2 border-[#D4AF37]/60 shadow-[0_0_15px_rgba(212,175,55,0.2)] group-hover:border-[#D4AF37] group-hover:scale-105 transition-all duration-300">
+                            <Image
+                              src={wishes[currentSlide].avatar_url}
+                              alt={wishes[currentSlide].name}
+                              fill
+                              sizes="(max-w-md) 80px, 80px"
+                              className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                              <ZoomIn className="w-5 h-5 text-[#D4AF37]" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-[#D4AF37]/10 text-[#D4AF37] font-bold border-2 border-[#D4AF37]/40 text-xl md:text-2xl shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+                            {wishes[currentSlide].name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <h4 className="font-extrabold text-sm md:text-base text-[#D4AF37] tracking-wider uppercase font-sans">
+                          {wishes[currentSlide].name}
+                        </h4>
+                        <p className="text-[10px] md:text-xs text-gray-400 tracking-[0.2em] uppercase font-mono">
+                          {wishes[currentSlide].church_city}
+                        </p>
+                      </div>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -1327,6 +1363,66 @@ export default function Home() {
         </motion.div>
 
       </div>
+
+      {/* Modal Preview Foto Profil */}
+      <AnimatePresence>
+        {selectedAvatar && (
+          <div
+            onClick={() => setSelectedAvatar(null)}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md cursor-zoom-out"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md bg-[#022c22]/95 border border-[#D4AF37]/35 rounded-3xl p-5 md:p-6 shadow-2xl overflow-hidden flex flex-col items-center text-center cursor-default"
+            >
+              {/* Gold light effects inside modal */}
+              <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[#047857]/10 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedAvatar(null)}
+                className="absolute top-4 right-4 p-1.5 rounded-full border border-[#D4AF37]/20 text-[#D4AF37] hover:text-[#FDFBF7] hover:bg-[#D4AF37]/10 transition-all cursor-pointer z-10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Header text / Title */}
+              <div className="mb-4 w-full border-b border-[#D4AF37]/20 pb-2">
+                <h4 className="text-xs text-gray-400 uppercase tracking-widest font-mono">
+                  Foto Profil Pengirim
+                </h4>
+              </div>
+
+              {/* Photo Container */}
+              <div className="relative w-64 h-64 sm:w-80 sm:h-80 mx-auto rounded-2xl overflow-hidden border border-[#D4AF37]/45 bg-black/25 shadow-inner flex items-center justify-center">
+                <Image
+                  src={selectedAvatar.url}
+                  alt={selectedAvatar.name}
+                  fill
+                  sizes="(max-w-md) 100vw, 320px"
+                  className="object-contain"
+                />
+              </div>
+
+              {/* User Details */}
+              <div className="mt-4 space-y-1">
+                <h3 className={`text-lg font-bold text-white ${playfair.className}`}>
+                  {selectedAvatar.name}
+                </h3>
+                <p className="text-xs text-[#D4AF37] font-semibold flex items-center justify-center gap-1">
+                  <MapPin className="w-3.5 h-3.5" /> {selectedAvatar.church}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Modal Kebijakan Umum & Privasi */}
       <AnimatePresence>

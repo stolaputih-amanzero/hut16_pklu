@@ -78,11 +78,52 @@ export async function deleteGuestbookMessage(id: string) {
   }
 }
 
-export async function updateGuestbookMessage(
-  id: string,
-  updates: { name?: string; church_city?: string; message: string }
-) {
+export async function updateGuestbookMessage(formData: FormData) {
   try {
+    const id = formData.get("id") as string;
+    const name = formData.get("name") as string;
+    const church_city = formData.get("church_city") as string;
+    const message = formData.get("message") as string;
+    const avatarFile = formData.get("avatar") as File | null;
+    const removeAvatar = formData.get("removeAvatar") === "true";
+
+    if (!id || !name || !church_city || !message) {
+      return { success: false, error: "Semua field wajib diisi." };
+    }
+
+    const updates: any = {
+      name,
+      church_city,
+      message,
+    };
+
+    if (removeAvatar) {
+      updates.avatar_url = null;
+    } else if (avatarFile && avatarFile.size > 0 && avatarFile.name !== "undefined") {
+      const ext = avatarFile.name.split(".").pop() || "jpg";
+      const fileName = `guestbook/avatar_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      
+      const arrayBuffer = await avatarFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const { error: uploadErr } = await supabaseAdmin.storage
+        .from("registrations")
+        .upload(fileName, buffer, { 
+          contentType: avatarFile.type || "image/jpeg", 
+          upsert: true 
+        });
+
+      if (!uploadErr) {
+        const { data: urlData } = supabaseAdmin.storage
+          .from("registrations")
+          .getPublicUrl(fileName);
+        updates.avatar_url = urlData.publicUrl;
+      } else {
+        console.error("Upload Avatar Error:", uploadErr);
+        return { success: false, error: `Gagal mengunggah foto: ${uploadErr.message}` };
+      }
+    }
+
     const { error } = await supabaseAdmin
       .from("guestbook_messages")
       .update(updates)
@@ -94,7 +135,11 @@ export async function updateGuestbookMessage(
 
     revalidatePath("/admin/guestbook");
     revalidatePath("/ucapan");
-    return { success: true };
+    return { 
+      success: true, 
+      avatar_url: updates.avatar_url !== undefined ? updates.avatar_url : undefined,
+      avatarRemoved: removeAvatar
+    };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal mengedit ucapan" };
   }

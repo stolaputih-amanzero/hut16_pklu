@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { 
   fetchAdminGuestbookMessages, 
   approveGuestbookMessage, 
@@ -24,7 +24,10 @@ import {
   MapPin, 
   Calendar,
   Edit3,
-  FileText
+  FileText,
+  Camera,
+  X,
+  User
 } from "lucide-react";
 
 const decodeHTMLEntities = (str: string) => {
@@ -61,13 +64,20 @@ export default function AdminGuestbookPage() {
   const [editName, setEditName] = useState("");
   const [editChurchCity, setEditChurchCity] = useState("");
   const [editMessageText, setEditMessageText] = useState("");
+  const [editAvatarFile, setEditAvatarFile] = useState<File | null>(null);
+  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
+  const [editRemoveAvatar, setEditRemoveAvatar] = useState(false);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleOpenEdit = (item: GuestbookItem) => {
     setEditingMessage(item);
     setEditName(item.name);
     setEditChurchCity(item.church_city);
     setEditMessageText(decodeHTMLEntities(item.message));
+    setEditAvatarFile(null);
+    setEditAvatarPreview(item.avatar_url || null);
+    setEditRemoveAvatar(false);
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -75,20 +85,39 @@ export default function AdminGuestbookPage() {
     if (!editingMessage) return;
     setIsSavingEdit(true);
 
-    const res = await updateGuestbookMessage(editingMessage.id, {
-      name: editName,
-      church_city: editChurchCity,
-      message: editMessageText,
-    });
+    const fd = new FormData();
+    fd.append("id", editingMessage.id);
+    fd.append("name", editName);
+    fd.append("church_city", editChurchCity);
+    fd.append("message", editMessageText);
+    fd.append("removeAvatar", editRemoveAvatar ? "true" : "false");
+    if (editAvatarFile) {
+      fd.append("avatar", editAvatarFile, editAvatarFile.name);
+    }
+
+    const res = await updateGuestbookMessage(fd);
     setIsSavingEdit(false);
 
     if (res.success) {
       setMessages((prev) =>
-        prev.map((m) =>
-          m.id === editingMessage.id
-            ? { ...m, name: editName, church_city: editChurchCity, message: editMessageText }
-            : m
-        )
+        prev.map((m) => {
+          if (m.id === editingMessage.id) {
+            let nextAvatar = m.avatar_url;
+            if (res.avatarRemoved) {
+              nextAvatar = null;
+            } else if (res.avatar_url) {
+              nextAvatar = res.avatar_url;
+            }
+            return {
+              ...m,
+              name: editName,
+              church_city: editChurchCity,
+              message: editMessageText,
+              avatar_url: nextAvatar,
+            };
+          }
+          return m;
+        })
       );
       setEditingMessage(null);
     } else {
@@ -433,6 +462,75 @@ export default function AdminGuestbookPage() {
             </div>
 
             <form onSubmit={handleSaveEdit} className="space-y-4">
+              {/* Optional Avatar Upload Area */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-300">Foto Profil / Diri</label>
+                
+                <div className="flex items-center gap-4 p-3 bg-black/50 rounded-xl border border-white/10">
+                  <div className="relative">
+                    {editAvatarPreview ? (
+                      <div className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-[#D4AF37] shadow-md">
+                        <img src={editAvatarPreview} alt="Preview Foto" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditAvatarFile(null);
+                            setEditAvatarPreview(null);
+                            setEditRemoveAvatar(true);
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = "";
+                            }
+                          }}
+                          className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full p-0.5 hover:bg-red-700 shadow"
+                          title="Hapus foto"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="h-14 w-14 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37]">
+                        <User className="w-7 h-7" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert("Ukuran foto maksimal 5MB");
+                          return;
+                        }
+
+                        setEditAvatarFile(file);
+                        setEditRemoveAvatar(false);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setEditAvatarPreview(event.target?.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                      className="hidden"
+                      id="edit-gb-avatar-input"
+                    />
+                    <label
+                      htmlFor="edit-gb-avatar-input"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-semibold rounded-lg cursor-pointer transition-all"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      {editAvatarPreview ? "Ganti Foto" : "Unggah Foto"}
+                    </label>
+                    <p className="text-[10px] text-gray-400">Format: JPG, PNG, WEBP (Maks 5MB)</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-gray-300">Nama Pengirim</label>
                 <Input

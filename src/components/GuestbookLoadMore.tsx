@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getApprovedMessagesAction } from "@/app/(public)/ucapan/actions";
 import { GuestbookMessage } from "@/components/GuestbookList";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, UserCheck, ChevronDown, Loader2 } from "lucide-react";
+import { Calendar, MapPin, ChevronDown, Loader2 } from "lucide-react";
 import Image from "next/image";
 
 const decodeHTMLEntities = (str: string) => {
@@ -73,9 +73,7 @@ export function GuestbookLoadMore({ initialMessages, totalCount }: GuestbookLoad
                   <h4 className="font-bold text-white text-sm leading-tight">
                     {item.name}
                   </h4>
-                  <span title="Pesan Terverifikasi" className="shrink-0">
-                    <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  </span>
+                  {/* Verified check badge removed for cleaner styling */}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                   <span className="text-[#D4AF37] flex items-center gap-1 font-semibold text-[11px] sm:text-xs">

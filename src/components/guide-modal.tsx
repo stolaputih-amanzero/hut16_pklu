@@ -44,9 +44,9 @@ export function GuideModal() {
             <ol className="list-decimal list-inside space-y-2 text-xs text-gray-300 leading-relaxed">
               <li>Pilih <strong>Kategori</strong> dan <strong>Asal Jemaat</strong> Anda.</li>
               <li>Isi data diri Anda di bagian <strong>Pendaftar (Mandiri)</strong>.</li>
-              <li>Jika Anda adalah <span className="text-blue-400">Peserta</span>, Anda wajib memilih peran dan surat tugas. (Unggah surat tugas pribadi Anda di kolom <em>Surat Tugas</em> di bagian bawah).</li>
-              <li>Lakukan pembayaran sesuai nominal kategori Anda (Umum: Rp 475.000, Tuan Rumah: Rp 350.000).</li>
-              <li>Unggah <strong>Bukti Transfer</strong> di bagian bawah form.</li>
+              <li>Jika Anda adalah <span className="text-blue-400">Peserta Kategori Umum</span>, Anda wajib memilih peran dan surat tugas. (Untuk Kategori Tuan Rumah, surat tugas bersifat opsional. Unggah surat tugas di kolom <em>Surat Tugas</em> di bagian bawah jika ada).</li>
+              <li>Lakukan pembayaran sesuai nominal kategori Anda (Umum: Rp 475.000, Tuan Rumah: Rp 350.000). Untuk Kategori Umum, bukti transfer wajib diunggah; sedangkan untuk Kategori Tuan Rumah bersifat opsional.</li>
+              <li>Unggah <strong>Bukti Transfer</strong> di bagian bawah form (jika ada).</li>
               <li>Klik tombol <strong>Kirim Formulir Pendaftaran</strong>.</li>
             </ol>
           </div>
@@ -64,7 +64,7 @@ export function GuideModal() {
               <li>Isi <strong>Kuantitas Ukuran Kaos</strong> rombongan di kotak yang disediakan. Pastikan total kaos sama dengan jumlah orang.</li>
               <li>Unggah <strong>File Daftar Nama (Excel/PDF)</strong> yang memuat nama-nama anggota rombongan.</li>
               <li>Lakukan pembayaran <span className="font-semibold text-white">secara kumulatif / total</span> untuk semua orang dalam 1 kali transfer.</li>
-              <li>Unggah 1 Bukti Transfer dan 1 Surat Tugas Kolektif (jika ada *Peserta*).</li>
+              <li>Unggah 1 Bukti Transfer dan 1 Surat Tugas Kolektif (jika ada *Peserta* Kategori Umum). Untuk Kategori Tuan Rumah, kedua dokumen ini bersifat opsional.</li>
               <li>Klik tombol <strong>Kirim Formulir Pendaftaran</strong>.</li>
             </ol>
           </div>

@@ -43,10 +43,7 @@ const formSchema = z.object({
   mupel: z.string().min(1, "Pilih Mupel"),
   church_name: z.string().min(1, "Pilih Jemaat"),
   whatsapp_number: z.string().min(5, "Nomor WhatsApp tidak valid"),
-  proof_of_transfer: z.any()
-    .refine((files) => files?.length === 1, "Bukti transfer wajib diunggah")
-    .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, "Maks. 2MB")
-    .refine((files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type), "Harus JPG/PNG/PDF"),
+  proof_of_transfer: z.any().optional(),
 
   // Khusus Mandiri
   type: z.enum(["Peserta", "Pendamping"]).optional(),
@@ -70,6 +67,52 @@ const formSchema = z.object({
   }).optional(),
   participant_list: z.any().optional(),
 }).superRefine((data, ctx) => {
+  // Validate proof_of_transfer
+  if (data.category === "Umum") {
+    if (!data.proof_of_transfer || data.proof_of_transfer.length !== 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Bukti transfer wajib diunggah",
+        path: ["proof_of_transfer"]
+      });
+    } else {
+      const file = data.proof_of_transfer[0];
+      if (file.size > MAX_FILE_SIZE) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Maks. 2MB",
+          path: ["proof_of_transfer"]
+        });
+      }
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Harus JPG/PNG/PDF",
+          path: ["proof_of_transfer"]
+        });
+      }
+    }
+  } else {
+    // Tuan Rumah - optional, but validate size/type if uploaded
+    if (data.proof_of_transfer && data.proof_of_transfer.length === 1) {
+      const file = data.proof_of_transfer[0];
+      if (file.size > MAX_FILE_SIZE) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Maks. 2MB",
+          path: ["proof_of_transfer"]
+        });
+      }
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Harus JPG/PNG/PDF",
+          path: ["proof_of_transfer"]
+        });
+      }
+    }
+  }
+
   if (data.registration_mode === "Mandiri") {
     if (!data.full_name || data.full_name.trim() === "") {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Wajib diisi", path: ["full_name"] });
@@ -81,8 +124,16 @@ const formSchema = z.object({
         if (!data.role) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Wajib dipilih", path: ["role"] });
         }
-        if (!data.assignment_letter || data.assignment_letter.length === 0) {
+        if (data.category !== "Tuan Rumah" && (!data.assignment_letter || data.assignment_letter.length === 0)) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Wajib diunggah", path: ["assignment_letter"] });
+        } else if (data.assignment_letter && data.assignment_letter.length === 1) {
+          const file = data.assignment_letter[0];
+          if (file.size > MAX_FILE_SIZE) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Maks. 2MB", path: ["assignment_letter"] });
+          }
+          if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus JPG/PNG/PDF", path: ["assignment_letter"] });
+          }
         }
       }
       if (data.type === "Pendamping") {
@@ -112,8 +163,16 @@ const formSchema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Wajib diunggah", path: ["participant_list"] });
     }
 
-    if (pCount > 0 && (!data.assignment_letter || data.assignment_letter.length === 0)) {
+    if (data.category !== "Tuan Rumah" && pCount > 0 && (!data.assignment_letter || data.assignment_letter.length === 0)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Wajib diunggah jika ada Peserta", path: ["assignment_letter"] });
+    } else if (data.assignment_letter && data.assignment_letter.length === 1) {
+      const file = data.assignment_letter[0];
+      if (file.size > MAX_FILE_SIZE) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Maks. 2MB", path: ["assignment_letter"] });
+      }
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus JPG/PNG/PDF", path: ["assignment_letter"] });
+      }
     }
 
     if (!IS_PAST_DEADLINE && data.shirt_sizes) {
@@ -760,7 +819,9 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
         <div className="grid gap-6 md:grid-cols-2">
           {/* Bukti Transfer */}
           <div className="space-y-2">
-            <Label htmlFor="proof_of_transfer">Bukti Transfer Total (Wajib) *</Label>
+            <Label htmlFor="proof_of_transfer">
+              Bukti Transfer Total {category === "Tuan Rumah" ? "(Opsional)" : "(Wajib) *"}
+            </Label>
             <Input id="proof_of_transfer" type="file" accept=".jpg,.jpeg,.png,.pdf" className="bg-black/50 cursor-pointer" {...register("proof_of_transfer")} />
             <p className="text-xs text-muted-foreground mt-1">Satu bukti transfer. (Max. 2MB)</p>
             {errors.proof_of_transfer && <p className="text-sm text-red-500">{errors.proof_of_transfer.message as string}</p>}
@@ -781,7 +842,9 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
           {/* Surat Tugas - Muncul kondisional */}
           {((mode === "Mandiri" && type === "Peserta") || (mode === "Rombongan" && pCount > 0)) && (
             <div className="space-y-2">
-              <Label htmlFor="assignment_letter">Surat Tugas (Wajib) *</Label>
+              <Label htmlFor="assignment_letter">
+                Surat Tugas {category === "Tuan Rumah" ? "(Opsional)" : "(Wajib) *"}
+              </Label>
               <div className="flex items-center justify-center w-full">
                 <label htmlFor="assignment_letter" className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer hover:bg-black/40 border-blue-500/40 bg-black/20">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
@@ -866,9 +929,17 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
               <div className="bg-white/5 p-3 rounded-lg border border-white/10 space-y-2">
                 <p className="text-[#D4AF37] font-semibold text-base border-b border-white/10 pb-1">3. Dokumen & Pembayaran</p>
                 <div className="space-y-1 text-xs">
-                  <p><span className="text-gray-400">Bukti Transfer:</span> <span className="text-emerald-400">✓ Attached ({pendingData.proof_of_transfer?.[0]?.name})</span></p>
-                  {pendingData.assignment_letter?.[0] && (
-                    <p><span className="text-gray-400">Surat Tugas:</span> <span className="text-emerald-400">✓ Attached ({pendingData.assignment_letter[0].name})</span></p>
+                  {pendingData.proof_of_transfer?.[0] ? (
+                    <p><span className="text-gray-400">Bukti Transfer:</span> <span className="text-emerald-400">✓ Terlampir ({pendingData.proof_of_transfer[0].name})</span></p>
+                  ) : (
+                    <p><span className="text-gray-400">Bukti Transfer:</span> <span className="text-gray-500">Tidak diunggah (Opsional)</span></p>
+                  )}
+                  {pendingData.assignment_letter?.[0] ? (
+                    <p><span className="text-gray-400">Surat Tugas:</span> <span className="text-emerald-400">✓ Terlampir ({pendingData.assignment_letter[0].name})</span></p>
+                  ) : (
+                    ((pendingData.registration_mode === "Mandiri" && pendingData.type === "Peserta") || (pendingData.registration_mode === "Rombongan" && (pendingData.participant_count || 0) > 0)) && (
+                      <p><span className="text-gray-400">Surat Tugas:</span> <span className="text-gray-500">Tidak diunggah (Opsional)</span></p>
+                    )
                   )}
                   {pendingData.participant_list?.[0] && (
                     <p><span className="text-gray-400">File Daftar Nama:</span> <span className="text-emerald-400">✓ Attached ({pendingData.participant_list[0].name})</span></p>

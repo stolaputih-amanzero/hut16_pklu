@@ -32,35 +32,38 @@ export async function submitRegistration(formData: FormData) {
     const church_name = formData.get("church_name") as string;
     const whatsapp_number = formData.get("whatsapp_number") as string;
 
-    const proofFile = formData.get("proof_of_transfer") as File;
+    const proofFile = formData.get("proof_of_transfer") as File | null;
     const assignmentFile = formData.get("assignment_letter") as File | null;
     const listFile = formData.get("participant_list") as File | null;
 
-    if (!proofFile || proofFile.size === 0) {
+    if (category !== "Tuan Rumah" && (!proofFile || proofFile.size === 0)) {
       return { success: false, error: "Bukti transfer wajib diunggah" };
     }
 
     const code = generateRegistrationCode();
 
-    // 1. Upload Bukti Transfer
-    const proofExt = proofFile.name.split(".").pop();
-    const proofPath = `proofs/${code}_${Date.now()}.${proofExt}`;
-    const { error: proofErr } = await supabaseAdmin.storage
-      .from("registrations")
-      .upload(proofPath, proofFile, {
-        contentType: proofFile.type,
-        upsert: true,
-      });
+    // 1. Upload Bukti Transfer (jika ada)
+    let proof_of_transfer_url: string | null = null;
+    if (proofFile && proofFile.size > 0) {
+      const proofExt = proofFile.name.split(".").pop();
+      const proofPath = `proofs/${code}_${Date.now()}.${proofExt}`;
+      const { error: proofErr } = await supabaseAdmin.storage
+        .from("registrations")
+        .upload(proofPath, proofFile, {
+          contentType: proofFile.type,
+          upsert: true,
+        });
 
-    if (proofErr) {
-      console.error("Upload proof error:", proofErr);
-      return { success: false, error: `Gagal mengunggah bukti transfer: ${proofErr.message}` };
+      if (proofErr) {
+        console.error("Upload proof error:", proofErr);
+        return { success: false, error: `Gagal mengunggah bukti transfer: ${proofErr.message}` };
+      }
+
+      const { data: proofUrlData } = supabaseAdmin.storage
+        .from("registrations")
+        .getPublicUrl(proofPath);
+      proof_of_transfer_url = proofUrlData.publicUrl;
     }
-
-    const { data: proofUrlData } = supabaseAdmin.storage
-      .from("registrations")
-      .getPublicUrl(proofPath);
-    const proof_of_transfer_url = proofUrlData.publicUrl;
 
     // 2. Upload Surat Tugas (jika ada)
     let assignment_letter_url: string | null = null;

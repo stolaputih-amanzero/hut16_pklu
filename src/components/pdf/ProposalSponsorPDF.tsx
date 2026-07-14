@@ -530,11 +530,11 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
 
                     <View style={styles.coverDetails}>
-                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, fontSize: 8, marginBottom: 4, textAlign: 'center', letterSpacing: 1 }]}>
+                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, fontSize: 12, marginBottom: 4, textAlign: 'center', letterSpacing: 1 }]}>
                             {data.number}
                         </Text>
                         {data.committees?.name && (
-                            <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 500, fontSize: 8, marginBottom: 4, textAlign: 'center', letterSpacing: 0.5 }]}>
+                            <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 500, fontSize: 6.0, marginBottom: 4, textAlign: 'center', letterSpacing: 0.5 }]}>
                                 {data.committees.name.toUpperCase()}
                             </Text>
                         )}
@@ -1085,9 +1085,39 @@ export function ProposalSponsorPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     )}
                 </View>
 
-                {/* IX. PENUTUP & Signatures - FORCED BREAK */}
+                {/* IX. INFORMasi TRANSFER */}
+                <View wrap={false} style={{ marginTop: 15 }}>
+                    <Text style={styles.sectionTitle}>{isId ? 'IX. Informasi Transfer' : 'IX. Transfer Information'}</Text>
+                    <Text style={styles.bodyText}>{isId ? 'Dukungan dana sponsorship dapat disampaikan melalui rekening Panitia berikut:' : 'Sponsorship financial support can be sent via the following Committee account:'}</Text>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, marginBottom: 12 }}>
+                        {/* Bank Box */}
+                        <View style={{ width: '54%', backgroundColor: '#022c22', padding: 10, borderLeft: '3pt solid #D4AF37', borderRadius: 2 }}>
+                            <Text style={{ fontFamily: 'Times-Roman', fontSize: 11, color: '#D4AF37', fontWeight: 'bold', marginBottom: 3 }}>BANK BTN</Text>
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 8, color: '#A0AEC0', marginBottom: 1 }}>{isId ? 'Nomor Rekening:' : 'Account Number:'}</Text>
+                            <Text style={{ fontFamily: 'Times-Roman', fontSize: 14, color: '#D4AF37', fontWeight: 'bold', marginBottom: 3 }}>00179-01-88-000447-9</Text>
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 8, color: '#A0AEC0', marginBottom: 1 }}>{isId ? 'Atas Nama:' : 'Account Name:'}</Text>
+                            <Text style={{ fontFamily: 'Times-Roman', fontSize: 9.5, color: '#FDFBF7' }}>PANITIA MUPEL GPIB BEKASI</Text>
+                        </View>
+
+                        {/* Contact Box */}
+                        <View style={{ width: '43%', border: '0.5pt solid rgba(2, 44, 34, 0.15)', backgroundColor: '#FFFFFF', padding: 10, borderRadius: 2, justifyContent: 'center' }}>
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 7.5, fontWeight: 'bold', color: '#022c22', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>
+                                {isId ? 'Konfirmasi ke (WA):' : 'Confirm to (WA):'}
+                            </Text>
+                            <Text style={{ fontFamily: 'Times-Roman', fontSize: 9.0, fontWeight: 'bold', color: '#022c22', marginBottom: 2 }}>
+                                ANASTASIA CHRISTINE DOLO
+                            </Text>
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 9, color: '#4A5568', fontWeight: 'bold' }}>
+                                +62 812-9145-1945
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* X. PENUTUP & Signatures - FORCED BREAK */}
                 <View wrap={false} break>
-                    <Text style={styles.sectionTitle}>{isId ? 'IX. Penutup' : 'IX. Closing'}</Text>
+                    <Text style={styles.sectionTitle}>{isId ? 'X. Penutup' : 'X. Closing'}</Text>
                     <Text style={styles.bodyText}>
                         {isId ? 'Demikian proposal sponsorship ini disusun sebagai dasar permohonan dukungan dan kerja sama dalam rangka Perayaan dan Ibadah Memperingati HUT ke-16 Pelkat PKLU GPIB.' : 'Thus this sponsorship proposal is prepared as a basis for requesting support and cooperation in the context of the Celebration and Worship Commemorating the 16th Anniversary of Pelkat PKLU GPIB.'}
                     </Text>

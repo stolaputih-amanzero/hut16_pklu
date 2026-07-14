@@ -530,11 +530,11 @@ export function ProposalDonaturPDF({ data, lang, logoUrl = "/logo_hut16_pklu.png
                     </View>
 
                     <View style={styles.coverDetails}>
-                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, fontSize: 8, marginBottom: 4, textAlign: 'center', letterSpacing: 1 }]}>
+                        <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 700, fontSize: 12, marginBottom: 4, textAlign: 'center', letterSpacing: 1 }]}>
                             {data.number}
                         </Text>
                         {data.committees?.name && (
-                            <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 500, fontSize: 8, marginBottom: 4, textAlign: 'center', letterSpacing: 0.5 }]}>
+                            <Text style={[styles.coverDetailText, { color: '#D4AF37', fontWeight: 500, fontSize: 6.0, marginBottom: 4, textAlign: 'center', letterSpacing: 0.5 }]}>
                                 {data.committees.name.toUpperCase()}
                             </Text>
                         )}

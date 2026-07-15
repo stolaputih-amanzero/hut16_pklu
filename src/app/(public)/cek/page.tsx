@@ -7,9 +7,10 @@ import { getMerchOrderByCodeOrWa } from "@/app/(public)/merch/actions";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download, ShoppingBag } from "lucide-react";
+import { Search, CheckCircle2, AlertCircle, Calendar, MapPin, ShieldCheck, Download, ShoppingBag, Camera, CameraOff, QrCode } from "lucide-react";
 import { splitItemType } from "@/lib/utils";
 import { toast } from "sonner";
+import { Html5Qrcode } from "html5-qrcode";
 
 function CheckContent() {
   const searchParams = useSearchParams();
@@ -23,6 +24,8 @@ function CheckContent() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const [downloadingCode, setDownloadingCode] = useState<string | null>(null);
+  const [scannerActive, setScannerActive] = useState(false);
+  const [scannerError, setScannerError] = useState<string | null>(null);
 
   const downloadTicketImage = async (code: string) => {
     const element = document.getElementById(`ticket-${code}`);
@@ -60,11 +63,82 @@ function CheckContent() {
     }
   };
 
+  const parseScannedCode = (input: string): string => {
+    const cleanInput = (input || "").trim();
+    if (!cleanInput) return "";
+    try {
+      if (cleanInput.startsWith("http://") || cleanInput.startsWith("https://")) {
+        const url = new URL(cleanInput);
+        const code = url.searchParams.get("code");
+        if (code) return code.trim();
+        const merchId = url.searchParams.get("merch_id");
+        if (merchId) return merchId.trim();
+      }
+    } catch (e) {
+      // Fallback
+    }
+    return cleanInput;
+  };
+
+  const handleScanSuccess = (decodedText: string) => {
+    setScannerActive(false);
+    const code = parseScannedCode(decodedText);
+    setQuery(code);
+    handleSearch(code);
+  };
+
+  const toggleScanner = () => {
+    setScannerActive((prev) => !prev);
+    setScannerError(null);
+  };
+
+  useEffect(() => {
+    let qrScanner: Html5Qrcode | null = null;
+
+    if (scannerActive) {
+      const timer = setTimeout(() => {
+        qrScanner = new Html5Qrcode("public-qr-reader-container");
+        qrScanner
+          .start(
+            { facingMode: "environment" },
+            {
+              fps: 10,
+              qrbox: (width, height) => {
+                const size = Math.min(width, height) * 0.7;
+                return { width: size, height: size };
+              },
+            },
+            (decodedText) => {
+              handleScanSuccess(decodedText);
+            },
+            () => {
+              // Ignore verbose warnings
+            }
+          )
+          .catch((err) => {
+            console.error("Gagal start camera scanner:", err);
+            setScannerError("Gagal mengakses kamera. Pastikan izin akses kamera diberikan.");
+            setScannerActive(false);
+          });
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+        if (qrScanner) {
+          if (qrScanner.isScanning) {
+            qrScanner.stop().catch((e) => console.error("Error stopping camera:", e));
+          }
+        }
+      };
+    }
+  }, [scannerActive]);
+
   const handleSearch = async (codeToSearch?: string, merchIdToSearch?: string) => {
     const q = (codeToSearch !== undefined ? codeToSearch : query).trim();
     const merchId = merchIdToSearch || initialMerchId;
 
     if (!q && !merchId) return;
+    setScannerActive(false);
     setLoading(true);
     setErrorMsg("");
     setResults(null);
@@ -136,18 +210,82 @@ function CheckContent() {
           <p className="text-xs sm:text-sm text-gray-300 max-w-md mx-auto leading-relaxed">{subtext}</p>
         </div>
 
-        {/* Search Bar */}
-        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col sm:flex-row gap-3">
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={placeholderText}
-            className="bg-black/50 text-white border-[#D4AF37]/30 py-3.5 px-4 h-12 text-sm focus-visible:ring-1 focus-visible:ring-[#D4AF37]/50 rounded-xl"
-          />
-          <Button type="submit" disabled={loading} className="bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-12 py-3 px-6 shrink-0 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5">
-            {loading ? "Mencari..." : <><Search className="w-4 h-4 mr-1.5" /> Cari</>}
-          </Button>
-        </form>
+        {/* Search Bar & QR Scanner */}
+        <div className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={placeholderText}
+                className="bg-black/50 text-white border-[#D4AF37]/30 py-3.5 pl-4 pr-11 h-12 text-sm focus-visible:ring-1 focus-visible:ring-[#D4AF37]/50 rounded-xl w-full"
+              />
+              <button
+                type="button"
+                onClick={toggleScanner}
+                className={`absolute right-3.5 top-3 text-gray-400 hover:text-[#D4AF37] transition-colors p-1.5 rounded-lg hover:bg-white/5 ${scannerActive ? "text-[#D4AF37] bg-white/10" : ""}`}
+                title="Scan QR Code"
+              >
+                <QrCode className="w-4.5 h-4.5" />
+              </button>
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button
+                type="button"
+                onClick={toggleScanner}
+                className={`sm:hidden flex-1 border border-[#D4AF37]/35 font-bold h-12 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+                  scannerActive 
+                    ? "bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30" 
+                    : "bg-[#022c22] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                }`}
+              >
+                {scannerActive ? <CameraOff className="w-4 h-4" /> : <QrCode className="w-4 h-4" />}
+                Scan QR
+              </Button>
+              <Button type="submit" disabled={loading} className="flex-1 sm:flex-none bg-[#D4AF37] hover:bg-[#B3932D] text-black font-bold h-12 py-3 px-6 shrink-0 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5">
+                {loading ? "Mencari..." : <><Search className="w-4 h-4 mr-1.5" /> Cari</>}
+              </Button>
+            </div>
+          </form>
+
+          {/* Public QR Camera Scanner Viewport */}
+          {scannerActive && (
+            <div className="bg-[#022c22]/10 border border-[#D4AF37]/30 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-1.5">
+                  <Camera className="w-3.5 h-3.5" />
+                  QR Scanner Kamera
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setScannerActive(false)}
+                  className="text-red-400 hover:text-red-300 text-xs font-bold transition-colors"
+                >
+                  Tutup Kamera
+                </button>
+              </div>
+
+              <div className="relative border-2 border-[#D4AF37]/50 rounded-2xl overflow-hidden bg-black/80 aspect-square w-full max-w-[280px] mx-auto shadow-inner flex items-center justify-center">
+                <div id="public-qr-reader-container" className="w-full h-full" />
+                <div className="absolute inset-0 border-4 border-transparent pointer-events-none flex items-center justify-center">
+                  <div className="w-[70%] h-[70%] border-2 border-[#D4AF37] border-dashed rounded-xl opacity-60 animate-pulse relative">
+                    <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-[#D4AF37]"></div>
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-[#D4AF37]"></div>
+                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-[#D4AF37]"></div>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-[#D4AF37]"></div>
+                  </div>
+                </div>
+              </div>
+
+              {scannerError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{scannerError}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {errorMsg && (
           <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 text-red-400 text-xs sm:text-sm">

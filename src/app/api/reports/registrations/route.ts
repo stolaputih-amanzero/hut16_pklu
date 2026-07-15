@@ -76,8 +76,8 @@ export async function GET(req: NextRequest) {
             )
         }
 
-        if (categoryFilter !== 'all') {
-            registrations = registrations.filter(r => r.category === categoryFilter)
+        if (categoryFilter.toLowerCase() !== 'all') {
+            registrations = registrations.filter(r => r.category?.toLowerCase() === categoryFilter.toLowerCase())
         }
 
         // Get Base64 logo for the PDF

@@ -128,6 +128,20 @@ export async function submitCheckIn(
   try {
     if (!id) return { success: false, error: "ID Registrasi tidak valid" };
 
+    const { data: reg, error: fetchErr } = await supabaseAdmin
+      .from("registrations")
+      .select("payment_status")
+      .eq("id", id)
+      .single();
+
+    if (fetchErr || !reg) {
+      return { success: false, error: "Registrasi tidak ditemukan" };
+    }
+
+    if (reg.payment_status !== "verified") {
+      return { success: false, error: "Pembayaran registrasi belum diverifikasi Lunas!" };
+    }
+
     const { data, error } = await supabaseAdmin
       .from("registrations")
       .update({
@@ -179,6 +193,20 @@ export async function undoCheckIn(id: string) {
 export async function submitMerchCollection(id: string) {
   try {
     if (!id) return { success: false, error: "ID Pembelian tidak valid" };
+
+    const { data: order, error: fetchErr } = await supabaseAdmin
+      .from("merch_orders")
+      .select("payment_status")
+      .eq("id", id)
+      .single();
+
+    if (fetchErr || !order) {
+      return { success: false, error: "Pembelian tidak ditemukan" };
+    }
+
+    if (order.payment_status !== "verified") {
+      return { success: false, error: "Pembayaran merchandise belum diverifikasi Lunas!" };
+    }
 
     const { data, error } = await supabaseAdmin
       .from("merch_orders")

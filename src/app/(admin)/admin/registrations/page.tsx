@@ -31,6 +31,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function RekapRegistrasiPage() {
   const confirm = useConfirm();
@@ -827,64 +828,77 @@ export default function RekapRegistrasiPage() {
 
           {selectedRecord && (
             <div className="space-y-5 py-4 max-h-[70vh] overflow-y-auto text-sm pr-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
-                <div>
-                  <span className="text-xs text-gray-400 block">Mode Pendaftaran</span>
-                  <strong className="text-white text-base">{selectedRecord.registration_mode}</strong>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-400 block">Kategori</span>
-                  <strong className="text-white text-base">{selectedRecord.category}</strong>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-400 block">Asal Mupel</span>
-                  <strong className="text-white">{selectedRecord.mupel}</strong>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-400 block">Nama Jemaat</span>
-                  <strong className="text-white">{selectedRecord.church_name}</strong>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-400 block">Waktu Pendaftaran</span>
-                  <strong className="text-white">
-                    {new Date(selectedRecord.created_at).toLocaleDateString("id-ID")} {new Date(selectedRecord.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
-                  </strong>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-400 block mb-1">Status Pembayaran</span>
-                  <div className="flex items-center gap-2">
-                    {selectedRecord.payment_status === "verified" ? (
-                      <>
-                        <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                          Lunas
-                        </span>
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          disabled={verifyingId === selectedRecord.id}
-                          onClick={() => handleUpdatePaymentStatus(selectedRecord.id, "pending")}
-                          className="h-6 text-[10px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/20 rounded-md px-2 font-bold cursor-pointer transition-colors"
-                        >
-                          Batal Lunas
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="inline-flex items-center gap-1 text-[11px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                          Pending
-                        </span>
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          disabled={verifyingId === selectedRecord.id}
-                          onClick={() => handleUpdatePaymentStatus(selectedRecord.id, "verified")}
-                          className="h-6 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 rounded-md px-2 font-bold cursor-pointer transition-colors"
-                        >
-                          Verifikasi Lunas
-                        </Button>
-                      </>
-                    )}
+              <div className="flex flex-col md:flex-row gap-4 items-stretch">
+                {/* Left Side: General Info */}
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                  <div>
+                    <span className="text-xs text-gray-400 block">Mode Pendaftaran</span>
+                    <strong className="text-white text-base">{selectedRecord.registration_mode}</strong>
                   </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block">Kategori</span>
+                    <strong className="text-white text-base">{selectedRecord.category}</strong>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block">Asal Mupel</span>
+                    <strong className="text-white">{selectedRecord.mupel}</strong>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block">Nama Jemaat</span>
+                    <strong className="text-white">{selectedRecord.church_name}</strong>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block">Waktu Pendaftaran</span>
+                    <strong className="text-white">
+                      {new Date(selectedRecord.created_at).toLocaleDateString("id-ID")} {new Date(selectedRecord.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">Status Pembayaran</span>
+                    <div className="flex items-center gap-2">
+                      {selectedRecord.payment_status === "verified" ? (
+                        <>
+                          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            Lunas
+                          </span>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            disabled={verifyingId === selectedRecord.id}
+                            onClick={() => handleUpdatePaymentStatus(selectedRecord.id, "pending")}
+                            className="h-6 text-[10px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/20 rounded-md px-2 font-bold cursor-pointer transition-colors"
+                          >
+                            Batal Lunas
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="inline-flex items-center gap-1 text-[11px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            Pending
+                          </span>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            disabled={verifyingId === selectedRecord.id}
+                            onClick={() => handleUpdatePaymentStatus(selectedRecord.id, "verified")}
+                            className="h-6 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 rounded-md px-2 font-bold cursor-pointer transition-colors"
+                          >
+                            Verifikasi Lunas
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side: QR Code Card */}
+                <div className="w-full md:w-[150px] shrink-0 flex flex-col items-center justify-center bg-white p-3 rounded-xl border border-white/20 text-black shadow-lg min-h-[150px]">
+                  <QRCodeSVG 
+                    value={typeof window !== "undefined" ? `${window.location.origin}/cek?code=${selectedRecord.registration_code}` : selectedRecord.registration_code} 
+                    size={110} 
+                    level="H" 
+                  />
+                  <span className="text-[9px] font-bold text-gray-500 tracking-tight text-center mt-2.5">PINDAI KODE VERIFIKASI</span>
                 </div>
               </div>
 

@@ -173,10 +173,17 @@ function CheckContent() {
                       <span className="text-[10px] uppercase tracking-wider text-gray-400 block mb-0.5">Kode Registrasi</span>
                       <h2 className="text-2xl font-black text-[#D4AF37] font-mono tracking-wider">{reg.registration_code}</h2>
                     </div>
-                    <div className="flex items-center gap-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-3 py-1.5 rounded-full text-xs font-semibold">
-                      <CheckCircle2 className="w-4 h-4" />
-                      Status: TEREKAM &amp; VALID
-                    </div>
+                    {reg.payment_status === "verified" ? (
+                      <div className="flex items-center gap-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-3 py-1.5 rounded-full text-xs font-semibold">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        Status: LUNAS &amp; TERVERIFIKASI
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 bg-amber-500/20 text-amber-400 border border-amber-500/40 px-3 py-1.5 rounded-full text-xs font-semibold">
+                        <CheckCircle2 className="w-4 h-4 text-amber-400 animate-pulse" />
+                        Status: PENDING / VERIFIKASI
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-6 md:grid-cols-3 items-center">

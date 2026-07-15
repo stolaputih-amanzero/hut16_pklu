@@ -572,6 +572,15 @@ export default function CheckInAdminPage() {
                         <strong className="text-white font-mono">{reg.whatsapp_number}</strong>
                       </div>
 
+                      <div className="flex justify-between py-1 items-center border-b border-white/5">
+                        <span className="text-gray-400">Status Pembayaran:</span>
+                        {reg.payment_status === "verified" ? (
+                          <span className="bg-emerald-500/15 text-emerald-400 font-extrabold border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] uppercase">LUNAS</span>
+                        ) : (
+                          <span className="bg-amber-500/15 text-amber-400 font-extrabold border border-amber-500/20 px-2 py-0.5 rounded text-[10px] uppercase">PENDING</span>
+                        )}
+                      </div>
+
                       {reg.checked_in && (
                         <div className="bg-emerald-950/20 border border-emerald-500/20 p-3 rounded-xl space-y-1">
                           <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Informasi Kedatangan</p>
@@ -584,7 +593,7 @@ export default function CheckInAdminPage() {
                     </div>
 
                     {/* Group check-in controls */}
-                    {!reg.checked_in && isRombongan && (
+                    {!reg.checked_in && isRombongan && reg.payment_status === "verified" && (
                       <div className="bg-black/50 p-4 rounded-xl border border-white/5 space-y-3">
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Input Kehadiran Aktual</span>
                         <div className="grid grid-cols-2 gap-3">
@@ -616,7 +625,11 @@ export default function CheckInAdminPage() {
 
                     {/* Action buttons */}
                     <div className="pt-2">
-                      {!reg.checked_in ? (
+                      {reg.payment_status !== "verified" ? (
+                        <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-[10px] text-center font-bold">
+                          Pembayaran belum diverifikasi! Peserta/Rombongan TIDAK boleh melakukan cek in.
+                        </div>
+                      ) : !reg.checked_in ? (
                         <Button 
                           onClick={() => executeCheckIn(reg)}
                           className="w-full bg-[#D4AF37] hover:bg-[#B3932D] text-black font-extrabold py-3 rounded-xl shadow-lg flex items-center justify-center gap-1.5 transition-all text-xs"

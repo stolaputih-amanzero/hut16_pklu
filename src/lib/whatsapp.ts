@@ -31,10 +31,13 @@ Panitia HUT ke-16 Pelayanan Kategorial Persekutuan Kaum Lanjut Usia (Pelkat PKLU
 *Dokumen Terlampir:*
 Proposal Dukungan (Reg. No: ${d.number})
  
+Dukungan kasih dapat disalurkan melalui transfer ke rekening resmi Panitia:
+*Bank BTN: 00179-01-88-000447-9* (a.n. PANITIA MUPEL GPIB BEKASI)
+ 
 Dukungan kasih yang Bapak/Ibu berikan adalah wujud nyata pelayanan bersama demi kaum lanjut usia. Kiranya kasih karunia Tuhan Yesus Kristus senantiasa menyertai Bapak/Ibu beserta keluarga.
  
 Hormat kami,
-*Panitia Pelaksana HUT 16 PKLU GPIB*`,
+*Panitia Pelaksana HUT 16 PKLU GPIB & BP Mupel Bekasi*`,
  
         token: (d) =>
             `*Yth. Bapak/Ibu ${d.display_name}*
@@ -50,7 +53,7 @@ Sebagai wujud apresiasi mendalam kami, berikut dilampirkan dokumen penghargaan r
 Kiranya Tuhan Yesus Kristus senantiasa memberkati pelayanan dan kebaikan Bapak/Ibu beserta keluarga.
  
 Hormat kami,
-*Panitia Pelaksana HUT 16 PKLU GPIB*`,
+*Panitia Pelaksana HUT 16 PKLU GPIB & BP Mupel Bekasi*`,
  
         confirmation: (d) =>
             `*Yth. Bapak/Ibu ${d.name}*
@@ -64,7 +67,7 @@ Dokumen Tanda Penghargaan resmi saat ini sedang dalam proses penerbitan oleh Pan
 Apresiasi setinggi-tingginya kami haturkan atas kepedulian Bapak/Ibu dalam menyukseskan Perayaan HUT ke-16 Pelkat PKLU GPIB.
  
 Hormat kami,
-*Panitia Pelaksana HUT 16 PKLU GPIB*`,
+*Panitia Pelaksana HUT 16 PKLU GPIB & BP Mupel Bekasi*`,
  
         commitment: (d) =>
             `*Yth. Bapak/Ibu ${d.name}*
@@ -80,7 +83,7 @@ Berikut kami lampirkan dokumen konfirmasi resmi atas partisipasi Bapak/Ibu:
 Kiranya Tuhan Yesus Kristus memberkati kebaikan serta pelayanan Bapak/Ibu beserta keluarga.
  
 Hormat kami,
-*Panitia Pelaksana HUT 16 PKLU GPIB*`,
+*Panitia Pelaksana HUT 16 PKLU GPIB & BP Mupel Bekasi*`,
      },
  
      en: {
@@ -99,10 +102,13 @@ The Organizing Committee of the 16th Anniversary of the Categorical Fellowship o
 *Attached Document:*
 Support Proposal (Reg. No: ${d.number})
  
+Contributions can be transferred to the Committee's official account:
+*Bank BTN: 00179-01-88-000447-9* (a.n. PANITIA MUPEL GPIB BEKASI)
+ 
 Your support is a profound blessing to our senior members' ministry. May the grace of our Lord Jesus Christ be with you and your family.
  
 Sincerely,
-*The 16th PKLU GPIB Anniversary Committee*`,
+*The 16th PKLU GPIB Anniversary Committee & BP Mupel Bekasi*`,
  
         token: (d) =>
             `*Dear Mr./Ms. ${d.display_name},*
@@ -118,7 +124,7 @@ In recognition of your contribution, we are pleased to attach your official toke
 May the Lord Jesus Christ continuously bless you, your family, and your ministries.
  
 Sincerely,
-*The 16th PKLU GPIB Anniversary Committee*`,
+*The 16th PKLU GPIB Anniversary Committee & BP Mupel Bekasi*`,
  
         confirmation: (d) =>
             `*Dear Mr./Ms. ${d.name},*
@@ -132,7 +138,7 @@ Your official Token of Appreciation is being processed and will be delivered to 
 Thank you for your outstanding generosity in supporting the 16th Anniversary of Pelkat PKLU GPIB.
  
 Sincerely,
-*The 16th PKLU GPIB Anniversary Committee*`,
+*The 16th PKLU GPIB Anniversary Committee & BP Mupel Bekasi*`,
  
         commitment: (d) =>
             `*Dear Mr./Ms. ${d.name},*
@@ -148,7 +154,7 @@ Please find the official confirmation of your participation attached below:
 May the Lord Jesus Christ bless your kindness and ministries.
  
 Sincerely,
-*The 16th PKLU GPIB Anniversary Committee*`,
+*The 16th PKLU GPIB Anniversary Committee & BP Mupel Bekasi*`,
      },
  }
 

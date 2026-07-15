@@ -1,11 +1,10 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import DashboardClient from "@/components/admin/DashboardClient";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies();
   const headerList = await headers();
   const userId = headerList.get("x-user-id");
   const userRole = headerList.get("x-user-role");
@@ -20,19 +19,6 @@ export default async function DashboardPage() {
     role: userRole,
   };
 
-  // 1. Initialize Supabase Server Client
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-      },
-    }
-  );
-
   // 2. Fetch all necessary data lists in parallel
   let registrations: any[] = [];
   let merchOrders: any[] = [];
@@ -43,14 +29,14 @@ export default async function DashboardPage() {
 
   try {
     const [regRes, merchRes, guestbookRes, proposalRes, productRes] = await Promise.all([
-      supabase.from("registrations").select("*"),
-      supabase.from("merch_orders").select("*"),
-      supabase
+      supabaseAdmin.from("registrations").select("*"),
+      supabaseAdmin.from("merch_orders").select("*"),
+      supabaseAdmin
         .from("guestbook_messages")
         .select("id", { count: "exact", head: true })
         .eq("is_approved", false),
-      supabase.from("proposals").select("*"),
-      supabase.from("merch_products").select("*"),
+      supabaseAdmin.from("proposals").select("*"),
+      supabaseAdmin.from("merch_products").select("*"),
     ]);
 
     if (regRes.error) throw regRes.error;

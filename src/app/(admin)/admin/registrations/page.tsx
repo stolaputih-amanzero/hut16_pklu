@@ -1,7 +1,7 @@
 "use client";
-
+ 
 import { useEffect, useState, useMemo } from "react";
-import { getAllRegistrations, deleteRegistration } from "./actions";
+import { getAllRegistrations, deleteRegistration, updateRegistrationPaymentStatus } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,6 +30,7 @@ import {
   Building,
   RotateCcw
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function RekapRegistrasiPage() {
   const confirm = useConfirm();
@@ -43,6 +44,7 @@ export default function RekapRegistrasiPage() {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [selectedType, setSelectedType] = useState("ALL");
   const [selectedMupel, setSelectedMupel] = useState("ALL");
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("ALL");
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -52,11 +54,50 @@ export default function RekapRegistrasiPage() {
     setSelectedCategory("ALL");
     setSelectedType("ALL");
     setSelectedMupel("ALL");
+    setSelectedPaymentStatus("ALL");
   };
 
   // Selected Detail Modal
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [activePreview, setActivePreview] = useState<{ url: string; type: string; title: string } | null>(null);
+
+  const getFileType = (url: string) => {
+    if (!url) return null;
+    const cleanUrl = url.split("?")[0];
+    const ext = cleanUrl.split(".").pop()?.toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext || "")) return "image";
+    if (ext === "pdf") return "pdf";
+    if (["doc", "docx", "xls", "xlsx", "csv"].includes(ext || "")) return "office";
+    return null;
+  };
+
+  const handlePreviewFile = (url: string, title: string) => {
+    const type = getFileType(url);
+    if (type) {
+      setActivePreview({ url, type, title });
+    } else {
+      window.open(url, "_blank");
+    }
+  };
+
+  const handleUpdatePaymentStatus = async (id: string, newStatus: "pending" | "verified") => {
+    setVerifyingId(id);
+    const res = await updateRegistrationPaymentStatus(id, newStatus);
+    setVerifyingId(null);
+    if (res.success) {
+      toast.success(newStatus === "verified" ? "Registrasi berhasil diverifikasi (Lunas)!" : "Status registrasi dikembalikan ke Pending.");
+      setData((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, payment_status: newStatus } : item))
+      );
+      if (selectedRecord && selectedRecord.id === id) {
+        setSelectedRecord((prev: any) => ({ ...prev, payment_status: newStatus }));
+      }
+    } else {
+      toast.error(`Gagal mengubah status: ${res.error}`);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -108,6 +149,11 @@ export default function RekapRegistrasiPage() {
       const modeMatch = selectedMode === "ALL" || item.registration_mode === selectedMode;
       const catMatch = selectedCategory === "ALL" || item.category === selectedCategory;
       const mupelMatch = selectedMupel === "ALL" || item.mupel === selectedMupel;
+      
+      const paymentMatch =
+        selectedPaymentStatus === "ALL" ||
+        (selectedPaymentStatus === "verified" && item.payment_status === "verified") ||
+        (selectedPaymentStatus === "pending" && (!item.payment_status || item.payment_status === "pending"));
 
       let typeMatch = true;
       if (selectedType !== "ALL") {
@@ -134,9 +180,9 @@ export default function RekapRegistrasiPage() {
         (item.role && item.role.toLowerCase().includes(q)) ||
         (item.companion_for && item.companion_for.toLowerCase().includes(q));
 
-      return modeMatch && catMatch && typeMatch && mupelMatch && keywordMatch;
+      return modeMatch && catMatch && typeMatch && mupelMatch && paymentMatch && keywordMatch;
     });
-  }, [data, selectedMode, selectedCategory, selectedType, selectedMupel, search]);
+  }, [data, selectedMode, selectedCategory, selectedType, selectedMupel, selectedPaymentStatus, search]);
 
   // Sorted Data
   const sortedData = useMemo(() => {
@@ -201,6 +247,8 @@ export default function RekapRegistrasiPage() {
     let totalFormCount = filteredData.length;
     let totalHeadcount = 0;
     let totalRevenue = 0;
+    let verifiedRevenue = 0;
+    let pendingRevenue = 0;
     let totalUmumCount = 0;
     let totalTuanRumahCount = 0;
     let totalPesertaCount = 0;
@@ -225,7 +273,14 @@ export default function RekapRegistrasiPage() {
       totalHeadcount += head;
 
       const price = item.category === "Umum" ? 475000 : 350000;
-      totalRevenue += head * price;
+      const rev = head * price;
+      totalRevenue += rev;
+      
+      if (item.payment_status === "verified") {
+        verifiedRevenue += rev;
+      } else {
+        pendingRevenue += rev;
+      }
 
       if (item.category === "Umum") totalUmumCount += head;
       if (item.category === "Tuan Rumah") totalTuanRumahCount += head;
@@ -251,6 +306,8 @@ export default function RekapRegistrasiPage() {
       totalFormCount,
       totalHeadcount,
       totalRevenue,
+      verifiedRevenue,
+      pendingRevenue,
       totalUmumCount,
       totalTuanRumahCount,
       totalPesertaCount,
@@ -381,8 +438,11 @@ export default function RekapRegistrasiPage() {
           </div>
           <div className="mt-3">
             <p className="text-3xl font-extrabold text-emerald-400">Rp {stats.totalRevenue.toLocaleString("id-ID")}</p>
-            <p className="text-xs text-emerald-300 font-semibold mt-1">Umum: {stats.totalUmumCount} | Tuan Rumah: {stats.totalTuanRumahCount}</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">@ Rp475k (Umum) / Rp350k (TR)</p>
+            <div className="flex flex-col sm:flex-row sm:justify-between text-xs font-bold gap-0.5 mt-1">
+              <span className="text-emerald-300">Lunas: Rp {stats.verifiedRevenue.toLocaleString("id-ID")}</span>
+              <span className="text-amber-400">Pending: Rp {stats.pendingRevenue.toLocaleString("id-ID")}</span>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1">Umum: {stats.totalUmumCount} | Tuan Rumah: {stats.totalTuanRumahCount}</p>
           </div>
         </div>
 
@@ -412,7 +472,7 @@ export default function RekapRegistrasiPage() {
 
       {/* Filter Bar */}
       <div className="rounded-xl border border-white/10 bg-black/40 p-4 space-y-4 shadow-lg backdrop-blur-sm">
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
           {/* Keyword Search */}
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-3.5 text-gray-400" />
@@ -473,12 +533,24 @@ export default function RekapRegistrasiPage() {
             </SelectContent>
           </Select>
 
+          {/* Payment Status Filter */}
+          <Select value={selectedPaymentStatus} onValueChange={setSelectedPaymentStatus}>
+            <SelectTrigger className="h-11 bg-black/50 border-white/20 text-white rounded-lg focus:border-[#D4AF37]">
+              <SelectValue placeholder="Status Bayar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Pembayaran</SelectItem>
+              <SelectItem value="verified">Lunas / Terverifikasi</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
           {/* Reset Filters Button */}
           <Button 
             type="button" 
             onClick={resetFilters}
             variant="outline"
-            className="h-11 border-red-500/30 hover:border-red-500/60 text-red-400 hover:bg-red-950/20 font-bold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-colors"
+            className="h-11 border-red-500/30 hover:border-red-500/60 text-red-400 hover:bg-red-950/20 font-bold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-colors w-full"
           >
             <RotateCcw className="w-4 h-4" />
             Reset Filter
@@ -516,6 +588,9 @@ export default function RekapRegistrasiPage() {
                       </span>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${item.category === "Tuan Rumah" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"}`}>
                         {item.category}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${item.payment_status === "verified" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-amber-500/20 text-amber-300 border border-amber-500/30"}`}>
+                        {item.payment_status === "verified" ? "Lunas" : "Pending"}
                       </span>
                     </div>
                     <span className="font-mono text-sm font-bold text-[#D4AF37] block">{item.registration_code}</span>
@@ -605,6 +680,7 @@ export default function RekapRegistrasiPage() {
                   Orang {renderSortArrow("headcount")}
                 </th>
                 <th className="py-3 px-4">Baju / Rekap</th>
+                <th className="py-3 px-4 text-center">Status</th>
                 <th className="py-3 px-4 text-center">Berkas</th>
                 <th className="py-3 px-4 text-center">Aksi</th>
               </tr>
@@ -612,11 +688,11 @@ export default function RekapRegistrasiPage() {
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-gray-400">Memuat data registrasi...</td>
+                  <td colSpan={10} className="py-12 text-center text-gray-400">Memuat data registrasi...</td>
                 </tr>
               ) : sortedData.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-gray-400">Tidak ada data pendaftaran ditemukan.</td>
+                  <td colSpan={10} className="py-12 text-center text-gray-400">Tidak ada data pendaftaran ditemukan.</td>
                 </tr>
               ) : (
                 sortedData.map((item) => {
@@ -689,6 +765,17 @@ export default function RekapRegistrasiPage() {
                         )}
                       </td>
                       <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                        {item.payment_status === "verified" ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Lunas
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            Pending
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1.5">
                           {item.proof_of_transfer_url && (
                             <a href={item.proof_of_transfer_url} target="_blank" rel="noreferrer" title="Bukti Transfer" className="p-1 rounded hover:bg-white/10 text-emerald-400">
@@ -727,7 +814,7 @@ export default function RekapRegistrasiPage() {
       </div>
 
       {/* Detail Dialog */}
-      <Dialog open={!!selectedRecord} onOpenChange={() => setSelectedRecord(null)}>
+      <Dialog open={!!selectedRecord} onOpenChange={() => { setSelectedRecord(null); setActivePreview(null); }}>
         <DialogContent className="max-w-2xl bg-black/90 border-[#D4AF37]/40 text-[#FDFBF7]">
           <DialogHeader>
             <DialogTitle className="text-2xl text-[#D4AF37] font-mono">
@@ -764,10 +851,40 @@ export default function RekapRegistrasiPage() {
                   </strong>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-400 block">Status Pendaftaran</span>
-                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                    Terekam &amp; Valid
-                  </span>
+                  <span className="text-xs text-gray-400 block mb-1">Status Pembayaran</span>
+                  <div className="flex items-center gap-2">
+                    {selectedRecord.payment_status === "verified" ? (
+                      <>
+                        <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          Lunas
+                        </span>
+                        <Button
+                          size="xs"
+                          variant="ghost"
+                          disabled={verifyingId === selectedRecord.id}
+                          onClick={() => handleUpdatePaymentStatus(selectedRecord.id, "pending")}
+                          className="h-6 text-[10px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/20 rounded-md px-2 font-bold cursor-pointer transition-colors"
+                        >
+                          Batal Lunas
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="inline-flex items-center gap-1 text-[11px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                          Pending
+                        </span>
+                        <Button
+                          size="xs"
+                          variant="ghost"
+                          disabled={verifyingId === selectedRecord.id}
+                          onClick={() => handleUpdatePaymentStatus(selectedRecord.id, "verified")}
+                          className="h-6 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 rounded-md px-2 font-bold cursor-pointer transition-colors"
+                        >
+                          Verifikasi Lunas
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -809,34 +926,120 @@ export default function RekapRegistrasiPage() {
               {/* Tautan Berkas */}
               <div className="bg-white/5 p-4 rounded-xl border border-white/10 space-y-3">
                 <p className="font-semibold text-[#D4AF37] border-b border-white/10 pb-1">Lampiran Berkas (Supabase Storage)</p>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2.5">
                   {selectedRecord.proof_of_transfer_url ? (
-                    <a href={selectedRecord.proof_of_transfer_url} target="_blank" rel="noreferrer" className="flex items-center justify-between bg-emerald-500/10 text-emerald-400 p-2.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20">
-                      <span className="flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Bukti Transfer</span>
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  ) : <span className="text-xs text-gray-500">Bukti transfer tidak tersedia</span>}
+                    <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/30">
+                      <span className="flex items-center gap-2 text-emerald-400 font-semibold text-xs sm:text-sm">
+                        <ImageIcon className="w-4 h-4" /> Bukti Transfer
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="xs"
+                          variant="ghost"
+                          onClick={() => handlePreviewFile(selectedRecord.proof_of_transfer_url!, "Bukti Transfer")}
+                          className="text-xs bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-md px-2.5 py-1 cursor-pointer font-bold transition-all"
+                        >
+                          Pratinjau
+                        </Button>
+                        <a href={selectedRecord.proof_of_transfer_url} target="_blank" rel="noreferrer" className="flex items-center justify-center p-1.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300">
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-gray-500 bg-white/5 p-2 rounded-lg border border-white/5">Bukti transfer tidak tersedia</span>
+                  )}
 
                   {selectedRecord.assignment_letter_url && (
-                    <a href={selectedRecord.assignment_letter_url} target="_blank" rel="noreferrer" className="flex items-center justify-between bg-blue-500/10 text-blue-400 p-2.5 rounded-lg border border-blue-500/30 hover:bg-blue-500/20">
-                      <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Surat Tugas Kolektif</span>
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                    <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/30">
+                      <span className="flex items-center gap-2 text-blue-400 font-semibold text-xs sm:text-sm">
+                        <FileText className="w-4 h-4" /> 
+                        {selectedRecord.registration_mode === "Mandiri" ? "Surat Tugas Utusan" : "Surat Tugas Kolektif"}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="xs"
+                          variant="ghost"
+                          onClick={() => handlePreviewFile(selectedRecord.assignment_letter_url!, selectedRecord.registration_mode === "Mandiri" ? "Surat Tugas Utusan" : "Surat Tugas Kolektif")}
+                          className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 rounded-md px-2.5 py-1 cursor-pointer font-bold transition-all"
+                        >
+                          Pratinjau
+                        </Button>
+                        <a href={selectedRecord.assignment_letter_url} target="_blank" rel="noreferrer" className="flex items-center justify-center p-1.5 rounded-md bg-blue-500/10 hover:bg-blue-500/25 border border-blue-500/30 text-blue-300">
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
                   )}
 
                   {selectedRecord.participant_list_url && (
-                    <a href={selectedRecord.participant_list_url} target="_blank" rel="noreferrer" className="flex items-center justify-between bg-purple-500/10 text-purple-400 p-2.5 rounded-lg border border-purple-500/30 hover:bg-purple-500/20">
-                      <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> File Lampiran Daftar Nama</span>
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                    <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between bg-purple-500/10 p-2.5 rounded-lg border border-purple-500/30">
+                      <span className="flex items-center gap-2 text-purple-400 font-semibold text-xs sm:text-sm">
+                        <FileText className="w-4 h-4" /> File Lampiran Daftar Nama
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="xs"
+                          variant="ghost"
+                          onClick={() => handlePreviewFile(selectedRecord.participant_list_url!, "File Lampiran Daftar Nama")}
+                          className="text-xs bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 rounded-md px-2.5 py-1 cursor-pointer font-bold transition-all"
+                        >
+                          Pratinjau
+                        </Button>
+                        <a href={selectedRecord.participant_list_url} target="_blank" rel="noreferrer" className="flex items-center justify-center p-1.5 rounded-md bg-purple-500/10 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300">
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
                   )}
                 </div>
+
+                {activePreview && (
+                  <div className="bg-black/60 p-4 rounded-xl border border-[#D4AF37]/35 space-y-3 mt-4 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                      <span className="font-mono text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
+                        Pratinjau: {activePreview.title}
+                      </span>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => setActivePreview(null)}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-950/20 cursor-pointer h-6 px-2 rounded-md font-bold transition-all"
+                      >
+                        Tutup Pratinjau
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-center bg-black/40 rounded-lg p-2 min-h-[300px] border border-white/5 relative overflow-hidden">
+                      {activePreview.type === "image" && (
+                        <img
+                          src={activePreview.url}
+                          alt={activePreview.title}
+                          className="max-w-full max-h-[450px] object-contain rounded border border-white/10 shadow-lg"
+                        />
+                      )}
+                      {activePreview.type === "pdf" && (
+                        <iframe
+                          src={activePreview.url}
+                          title={activePreview.title}
+                          className="w-full h-[450px] rounded border border-white/10 bg-white"
+                        />
+                      )}
+                      {activePreview.type === "office" && (
+                        <iframe
+                          src={`https://docs.google.com/gview?url=${encodeURIComponent(activePreview.url)}&embedded=true`}
+                          title={activePreview.title}
+                          className="w-full h-[450px] rounded border border-white/10 bg-white"
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedRecord(null)} className="border-white/20 text-white">
+            <Button variant="outline" onClick={() => { setSelectedRecord(null); setActivePreview(null); }} className="border-white/20 text-white">
               Tutup
             </Button>
           </DialogFooter>

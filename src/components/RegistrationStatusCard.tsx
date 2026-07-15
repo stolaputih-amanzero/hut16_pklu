@@ -34,6 +34,7 @@ export type RegistrationData = {
   proof_of_transfer_url?: string | null;
   assignment_letter_url?: string | null;
   participant_list_url?: string | null;
+  payment_status?: string | null;
   created_at: string;
 };
 
@@ -61,10 +62,17 @@ export function RegistrationStatusCard({ data }: CardProps) {
         </div>
 
         {/* Verification Badge */}
-        <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-emerald-300 font-bold text-xs shadow-sm">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Terekam &amp; Valid</span>
-        </div>
+        {data.payment_status === "verified" ? (
+          <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-emerald-300 font-bold text-xs shadow-sm">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Lunas / Terverifikasi</span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/40 px-3.5 py-1.5 rounded-full text-amber-300 font-bold text-xs shadow-sm">
+            <CheckCircle2 className="w-4 h-4 text-amber-300 shrink-0 animate-pulse" />
+            <span>Pending / Verifikasi</span>
+          </div>
+        )}
       </div>
 
       {/* Code Banner */}

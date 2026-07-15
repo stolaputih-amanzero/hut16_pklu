@@ -31,7 +31,15 @@ export type Church = {
 };
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+const EXTS_IMAGE_PDF = [".pdf", ".jpg", ".jpeg", ".png"];
+const EXTS_SURAT_TUGAS = [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"];
+const EXTS_DAFTAR_NAMA = [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx", ".xls", ".xlsx", ".csv"];
+
+const hasValidExtension = (fileName: string, allowedExtensions: string[]) => {
+  const ext = "." + fileName.split(".").pop()?.toLowerCase();
+  return allowedExtensions.includes(ext);
+};
+
 const DEADLINE_BAJU = new Date("2026-07-31T23:59:59+07:00");
 const IS_PAST_DEADLINE = new Date() > DEADLINE_BAJU;
 
@@ -85,7 +93,7 @@ const formSchema = z.object({
           path: ["proof_of_transfer"]
         });
       }
-      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      if (!hasValidExtension(file.name, EXTS_IMAGE_PDF)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Harus JPG/PNG/PDF",
@@ -104,7 +112,7 @@ const formSchema = z.object({
           path: ["proof_of_transfer"]
         });
       }
-      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      if (!hasValidExtension(file.name, EXTS_IMAGE_PDF)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Harus JPG/PNG/PDF",
@@ -132,8 +140,8 @@ const formSchema = z.object({
           if (file.size > MAX_FILE_SIZE) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Maks. 2MB", path: ["assignment_letter"] });
           }
-          if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus JPG/PNG/PDF", path: ["assignment_letter"] });
+          if (!hasValidExtension(file.name, EXTS_SURAT_TUGAS)) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus JPG/PNG/PDF/DOC/DOCX", path: ["assignment_letter"] });
           }
         }
       }
@@ -162,6 +170,14 @@ const formSchema = z.object({
 
     if (!data.participant_list || data.participant_list.length === 0) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Wajib diunggah", path: ["participant_list"] });
+    } else if (data.participant_list && data.participant_list.length === 1) {
+      const file = data.participant_list[0];
+      if (file.size > MAX_FILE_SIZE) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Maks. 2MB", path: ["participant_list"] });
+      }
+      if (!hasValidExtension(file.name, EXTS_DAFTAR_NAMA)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus PDF/DOC/DOCX/XLS/XLSX/CSV/Gambar", path: ["participant_list"] });
+      }
     }
 
     if (data.category !== "Tuan Rumah" && pCount > 0 && (!data.assignment_letter || data.assignment_letter.length === 0)) {
@@ -171,8 +187,8 @@ const formSchema = z.object({
       if (file.size > MAX_FILE_SIZE) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Maks. 2MB", path: ["assignment_letter"] });
       }
-      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus JPG/PNG/PDF", path: ["assignment_letter"] });
+      if (!hasValidExtension(file.name, EXTS_SURAT_TUGAS)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Harus JPG/PNG/PDF/DOC/DOCX", path: ["assignment_letter"] });
       }
     }
 
@@ -773,8 +789,8 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
           </div>
 
           <div className="pt-4 border-t border-white/10 space-y-2">
-            <Label>Daftar Nama Peserta & Pendamping (Excel / PDF) *</Label>
-            <Input type="file" accept=".xlsx,.xls,.csv,.pdf" className="bg-black/50 cursor-pointer" {...register("participant_list")} />
+            <Label>Daftar Nama Peserta & Pendamping (Excel / PDF / Word / Gambar) *</Label>
+            <Input type="file" accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png" className="bg-black/50 cursor-pointer" {...register("participant_list")} />
             <p className="text-xs text-muted-foreground">Pastikan daftar memuat info: Nama, Status (Peserta/Pendamping), dan Ukuran Baju masing-masing.</p>
             {errors.participant_list && <p className="text-sm text-red-500">{errors.participant_list.message as string}</p>}
           </div>
@@ -851,9 +867,9 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
                   <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
                     <Upload className="w-8 h-8 mb-3 text-blue-400" />
                     <p className="mb-2 text-sm text-gray-300"><span className="font-semibold">Klik untuk upload surat tugas</span></p>
-                    <p className="text-xs text-gray-500">JPG, PNG, PDF (Max. 2MB)</p>
+                    <p className="text-xs text-gray-500">JPG, PNG, PDF, DOC, DOCX (Max. 2MB)</p>
                   </div>
-                  <input id="assignment_letter" type="file" className="hidden" accept=".jpg,.jpeg,.png,.pdf" {...register("assignment_letter")} />
+                  <input id="assignment_letter" type="file" className="hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" {...register("assignment_letter")} />
                 </label>
               </div>
               {watch("assignment_letter")?.[0] && (

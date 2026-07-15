@@ -102,12 +102,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#022c22',
     },
     tableColNo: { width: '5%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    tableColCode: { width: '12%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    tableColMode: { width: '10%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    tableColName: { width: '22%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    tableColChurch: { width: '23%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    tableColContact: { width: '12%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
-    tableColQty: { width: '6%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColCode: { width: '11%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColMode: { width: '9%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColName: { width: '19%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColChurch: { width: '19%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColContact: { width: '11%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColQty: { width: '5%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
+    tableColCost: { width: '11%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
     tableColStatus: { width: '10%', borderStyle: 'solid', borderWidth: 1, borderColor: '#022c22', borderLeftWidth: 0, borderTopWidth: 0 },
     
     tableCellHeader: { margin: 4, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#ffffff', textAlign: 'center' },
@@ -184,6 +185,19 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
     const qrImageUrl = `https://quickchart.io/qr?size=150&text=${encodeURIComponent(origin + '/admin/registrations')}`
     const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
+    const totalRevenue = registrations.reduce((sum, r) => {
+        const qty = r.registration_mode === "Mandiri" ? 1 : ((r.participant_count || 0) + (r.companion_count || 0));
+        const price = r.category === "Umum" ? 475000 : 350000;
+        return sum + (qty * price);
+    }, 0);
+
+    const lunasRevenue = registrations.reduce((sum, r) => {
+        if (r.payment_status !== "verified") return sum;
+        const qty = r.registration_mode === "Mandiri" ? 1 : ((r.participant_count || 0) + (r.companion_count || 0));
+        const price = r.category === "Umum" ? 475000 : 350000;
+        return sum + (qty * price);
+    }, 0);
+
     return (
         <Document>
             <Page size="A4" style={styles.page} orientation="landscape">
@@ -230,9 +244,17 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                             <Text style={styles.summaryValue}>{stats.tuanRumahCount} Orang</Text>
                         </View>
                         <View style={styles.summaryRow}>
-                            <Text style={styles.summaryLabel}>Ukuran Kaos Polo Terdistribusi</Text>
-                            <Text style={[styles.summaryValue, { fontSize: 8, fontFamily: 'Helvetica' }]}>
-                                S: {stats.shirtSizes.S || 0} • M: {stats.shirtSizes.M || 0} • L: {stats.shirtSizes.L || 0} • XL: {stats.shirtSizes.XL || 0} • XXL+: { (stats.shirtSizes.XXL || 0) + (stats.shirtSizes.XXXL || 0) + (stats.shirtSizes.XXXXL || 0) }
+                            <Text style={styles.summaryLabel}>Total Estimasi Pendapatan</Text>
+                            <Text style={styles.summaryValue}>Rp {totalRevenue.toLocaleString('id-ID')}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Terverifikasi (Lunas)</Text>
+                            <Text style={[styles.summaryValue, { color: '#047857' }]}>Rp {lunasRevenue.toLocaleString('id-ID')}</Text>
+                        </View>
+                        <View style={[styles.summaryRow, { borderBottom: 'none', paddingBottom: 0 }]}>
+                            <Text style={styles.summaryLabel}>Ukuran Kaos Terdistribusi</Text>
+                            <Text style={[styles.summaryValue, { fontSize: 7, fontFamily: 'Helvetica' }]}>
+                                S:{stats.shirtSizes.S || 0} • M:{stats.shirtSizes.M || 0} • L:{stats.shirtSizes.L || 0} • XL:{stats.shirtSizes.XL || 0} • XXL:{stats.shirtSizes.XXL || 0} • 3XL:{stats.shirtSizes.XXXL || 0} • 4XL:{stats.shirtSizes.XXXXL || 0}
                             </Text>
                         </View>
                     </View>
@@ -250,6 +272,7 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                             <View style={styles.tableColChurch}><Text style={styles.tableCellHeader}>Asal Jemaat (Mupel)</Text></View>
                             <View style={styles.tableColContact}><Text style={styles.tableCellHeader}>WhatsApp</Text></View>
                             <View style={styles.tableColQty}><Text style={styles.tableCellHeader}>Qty</Text></View>
+                            <View style={styles.tableColCost}><Text style={styles.tableCellHeader}>Biaya (Rp)</Text></View>
                             <View style={styles.tableColStatus}><Text style={styles.tableCellHeader}>Status</Text></View>
                         </View>
 
@@ -260,6 +283,8 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                                 const name = r.registration_mode === "Mandiri" ? r.full_name : r.pic_name
                                 const church = r.church_name ? `${r.church_name} (${r.mupel || ''})` : '-'
                                 const qty = r.registration_mode === "Mandiri" ? 1 : ((r.participant_count || 0) + (r.companion_count || 0))
+                                const price = r.category === "Umum" ? 475000 : 350000
+                                const cost = qty * price
                                 
                                 return (
                                     <View style={styles.tableRow} key={r.id || idx}>
@@ -270,8 +295,13 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                                         <View style={styles.tableColChurch}><Text style={styles.tableCell}>{church}</Text></View>
                                         <View style={styles.tableColContact}><Text style={styles.tableCellCenter}>{r.whatsapp_number || '-'}</Text></View>
                                         <View style={styles.tableColQty}><Text style={styles.tableCellCenter}>{qty}</Text></View>
+                                        <View style={styles.tableColCost}><Text style={styles.tableCellCenter}>Rp {cost.toLocaleString('id-ID')}</Text></View>
                                         <View style={styles.tableColStatus}>
-                                            <Text style={[styles.tableCellBold, { color: '#047857', textAlign: 'center' }]}>VALID</Text>
+                                            {r.payment_status === "verified" ? (
+                                                <Text style={[styles.tableCellBold, { color: '#047857', textAlign: 'center' }]}>LUNAS</Text>
+                                            ) : (
+                                                <Text style={[styles.tableCellBold, { color: '#d97706', textAlign: 'center' }]}>PENDING</Text>
+                                            )}
                                         </View>
                                     </View>
                                 )

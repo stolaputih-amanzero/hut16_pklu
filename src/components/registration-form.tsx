@@ -64,6 +64,7 @@ const formSchema = z.object({
     XL: z.coerce.number().min(0),
     XXL: z.coerce.number().min(0),
     XXXL: z.coerce.number().min(0),
+    XXXXL: z.coerce.number().min(0),
   }).optional(),
   participant_list: z.any().optional(),
 }).superRefine((data, ctx) => {
@@ -211,7 +212,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
       pic_name: "",
       participant_count: 0,
       companion_count: 0,
-      shirt_sizes: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 },
+      shirt_sizes: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, XXXXL: 0 },
     },
   });
 
@@ -645,7 +646,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
                         <SelectValue placeholder="Pilih Ukuran" />
                       </SelectTrigger>
                       <SelectContent>
-                        {["S", "M", "L", "XL", "XXL", "XXXL"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        {["S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   )}
@@ -747,8 +748,8 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
             ) : (
               <>
                 <p className="text-xs text-muted-foreground mb-4">Masukkan kuantitas masing-masing ukuran. Total angka harus sama dengan jumlah seluruh pendaftar ({totalOrang} orang).</p>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {["S", "M", "L", "XL", "XXL", "XXXL"].map((s) => (
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
+                  {["S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"].map((s) => (
                     <div key={s} className="space-y-1 text-center">
                       <Label className="text-xs font-semibold">{s}</Label>
                       <Input type="number" min="0" className="text-center bg-black/50 px-1" {...register(`shirt_sizes.${s}` as any)} />

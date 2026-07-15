@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         let umumCount = 0
         let tuanRumahCount = 0
         
-        const shirtSizes = { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, Random: 0 }
+        const shirtSizes = { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, XXXXL: 0, Random: 0 }
 
         registrations.forEach((r) => {
             const qty = r.registration_mode === "Mandiri" ? 1 : ((r.participant_count || 0) + (r.companion_count || 0))

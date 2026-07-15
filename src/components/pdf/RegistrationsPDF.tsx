@@ -232,7 +232,7 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                         <View style={styles.summaryRow}>
                             <Text style={styles.summaryLabel}>Ukuran Kaos Polo Terdistribusi</Text>
                             <Text style={[styles.summaryValue, { fontSize: 8, fontFamily: 'Helvetica' }]}>
-                                S: {stats.shirtSizes.S || 0} • M: {stats.shirtSizes.M || 0} • L: {stats.shirtSizes.L || 0} • XL: {stats.shirtSizes.XL || 0} • XXL+: { (stats.shirtSizes.XXL || 0) + (stats.shirtSizes.XXXL || 0) }
+                                S: {stats.shirtSizes.S || 0} • M: {stats.shirtSizes.M || 0} • L: {stats.shirtSizes.L || 0} • XL: {stats.shirtSizes.XL || 0} • XXL+: { (stats.shirtSizes.XXL || 0) + (stats.shirtSizes.XXXL || 0) + (stats.shirtSizes.XXXXL || 0) }
                             </Text>
                         </View>
                     </View>

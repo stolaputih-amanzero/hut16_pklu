@@ -206,7 +206,7 @@ export default function RekapRegistrasiPage() {
     let totalPesertaCount = 0;
     let totalPendampingCount = 0;
 
-    const shirtSummary = { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, Random: 0 };
+    const shirtSummary = { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, XXXXL: 0, Random: 0 };
 
     filteredData.forEach((item) => {
       let head = 1;
@@ -397,7 +397,7 @@ export default function RekapRegistrasiPage() {
               <Shirt className="w-5 h-5" />
             </div>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center mt-4 relative z-10">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-3 text-center mt-4 relative z-10">
             {Object.entries(stats.shirtSummary).map(([sz, qty]) => (
               sz !== "Random" ? (
                 <div key={sz} className="bg-black/50 border border-white/10 rounded-lg p-2">

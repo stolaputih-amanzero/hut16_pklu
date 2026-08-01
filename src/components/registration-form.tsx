@@ -40,8 +40,7 @@ const hasValidExtension = (fileName: string, allowedExtensions: string[]) => {
   return allowedExtensions.includes(ext);
 };
 
-const DEADLINE_BAJU = new Date("2026-07-31T23:59:59+07:00");
-const IS_PAST_DEADLINE = new Date() > DEADLINE_BAJU;
+const IS_PAST_DEADLINE = false;
 
 const formSchema = z.object({
   registration_mode: z.enum(["Mandiri", "Rombongan"], { message: "Pilih mode pendaftaran" }),
@@ -918,7 +917,7 @@ export function RegistrationForm({ churches }: { churches: Church[] }) {
                     <p><span className="text-gray-400">No WhatsApp:</span> <strong className="text-white">{pendingData.whatsapp_number}</strong></p>
                     <p><span className="text-gray-400">Tipe:</span> <strong className="text-white">{pendingData.type}</strong> {pendingData.role ? `(${pendingData.role})` : ""}</p>
                     {pendingData.companion_for && <p><span className="text-gray-400">Mendampingi:</span> <strong className="text-white">{pendingData.companion_for}</strong></p>}
-                    <p><span className="text-gray-400">Ukuran Baju:</span> <strong className="text-white">{pendingData.shirt_size || "Acak"}</strong></p>
+                    <p><span className="text-gray-400">Ukuran Baju:</span> <strong className="text-white">{pendingData.shirt_size || "-"}</strong></p>
                   </div>
                 </div>
               ) : (

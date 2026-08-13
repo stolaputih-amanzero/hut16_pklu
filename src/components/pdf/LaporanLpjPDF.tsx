@@ -280,10 +280,10 @@ interface Props {
 
 
 const renderTable = (title: string, data: any[], showTotalDana: boolean, totalAmount: number = 0, origin: string = '') => (
-    <View style={{ marginBottom: 20 }} wrap={false}>
+    <View style={{ marginBottom: 20 }}>
         <Text style={styles.sectionTitle}>{title}</Text>
         <View style={styles.table}>
-            <View style={styles.tableHeaderRow}>
+            <View style={styles.tableHeaderRow} fixed>
                 <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
                 <View style={styles.tableColNum}><Text style={styles.tableCellHeader}>No. Proposal</Text></View>
                 <View style={styles.tableColType}><Text style={styles.tableCellHeader}>Tipe</Text></View>
@@ -297,7 +297,7 @@ const renderTable = (title: string, data: any[], showTotalDana: boolean, totalAm
                 <Text style={styles.emptyState}>Belum ada data untuk kategori ini.</Text>
             ) : (
                 data.map((p: any, index: number) => (
-                    <View style={styles.tableRow} key={p.id || index}>
+                    <View style={styles.tableRow} key={p.id || index} wrap={false}>
                         <View style={styles.tableColNo}><Text style={styles.tableCell}>{index + 1}</Text></View>
                         <View style={styles.tableColNum}>
                             <Link src={`${origin}/daftar-proposal?q=${encodeURIComponent(p.number)}`} style={{ textDecoration: 'none' }}>
@@ -329,7 +329,7 @@ const renderTable = (title: string, data: any[], showTotalDana: boolean, totalAm
             )}
 
             {showTotalDana && data.length > 0 && (
-                <View style={styles.tableFooterRow}>
+                <View style={styles.tableFooterRow} wrap={false}>
                     <View style={styles.tableFooterLabelCol}>
                         <Text style={styles.tableFooterLabel}>TOTAL KESELURUHAN DANA:</Text>
                     </View>
@@ -527,10 +527,18 @@ export function LaporanLpjPDF({
                 </View>
 
                 
-                {/* Page Break for Details Section */}
+                {/* Group 1: Donatur Proposals */}
                 <View break>
                     {renderTable('Daftar Proposal Donatur', donaturProposals, true, totalDanaDonatur, origin)}
+                </View>
+
+                {/* Group 2: Sponsorship Proposals */}
+                <View break>
                     {renderTable('Daftar Proposal Sponsorship', sponsorProposals, true, totalDanaSponsor, origin)}
+                </View>
+
+                {/* Group 3: Request Proposals */}
+                <View break>
                     {renderTable('Daftar Proposal Request / Calon Dukungan', requestProposals, false, 0, origin)}
                 </View>
 

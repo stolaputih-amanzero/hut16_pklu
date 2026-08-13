@@ -217,7 +217,7 @@ export function GuestbookPDF({ messages, logoUrl = "/logo_hut16_pklu.png", origi
                 <View break>
                     <Text style={styles.sectionTitle}>Rincian Ucapan &amp; Harapan Jemaat</Text>
                     <View style={styles.table}>
-                        <View style={styles.tableHeaderRow}>
+                        <View style={styles.tableHeaderRow} fixed>
                             <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
                             <View style={styles.tableColName}><Text style={styles.tableCellHeader}>Nama Pengirim</Text></View>
                             <View style={styles.tableColChurch}><Text style={styles.tableCellHeader}>Asal Jemaat / Kota</Text></View>
@@ -236,7 +236,7 @@ export function GuestbookPDF({ messages, logoUrl = "/logo_hut16_pklu.png", origi
                                 const statusColor = m.is_approved ? '#047857' : '#d97706'
                                 
                                 return (
-                                    <View style={styles.tableRow} key={m.id || idx}>
+                                    <View style={styles.tableRow} key={m.id || idx} wrap={false}>
                                         <View style={styles.tableColNo}><Text style={styles.tableCellCenter}>{idx + 1}</Text></View>
                                         <View style={styles.tableColName}><Text style={styles.tableCellBold}>{name}</Text></View>
                                         <View style={styles.tableColChurch}><Text style={styles.tableCell}>{church}</Text></View>

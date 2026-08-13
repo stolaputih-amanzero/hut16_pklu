@@ -264,7 +264,7 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                 <View break>
                     <Text style={styles.sectionTitle}>Daftar Rincian Peserta &amp; Rombongan</Text>
                     <View style={styles.table}>
-                        <View style={styles.tableHeaderRow}>
+                        <View style={styles.tableHeaderRow} fixed>
                             <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
                             <View style={styles.tableColCode}><Text style={styles.tableCellHeader}>Kode</Text></View>
                             <View style={styles.tableColMode}><Text style={styles.tableCellHeader}>Mode</Text></View>
@@ -287,7 +287,7 @@ export function RegistrationsPDF({ registrations, logoUrl = "/logo_hut16_pklu.pn
                                 const cost = qty * price
                                 
                                 return (
-                                    <View style={styles.tableRow} key={r.id || idx}>
+                                    <View style={styles.tableRow} key={r.id || idx} wrap={false}>
                                         <View style={styles.tableColNo}><Text style={styles.tableCellCenter}>{idx + 1}</Text></View>
                                         <View style={styles.tableColCode}><Text style={styles.tableCellBold}>{r.registration_code}</Text></View>
                                         <View style={styles.tableColMode}><Text style={styles.tableCell}>{r.registration_mode}</Text></View>

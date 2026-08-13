@@ -252,7 +252,7 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                 <View break>
                     <Text style={styles.sectionTitle}>Daftar Rincian Pembelian Souvenir</Text>
                     <View style={styles.table}>
-                        <View style={styles.tableHeaderRow}>
+                        <View style={styles.tableHeaderRow} fixed>
                             <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
                             <View style={styles.tableColCode}><Text style={styles.tableCellHeader}>Kode Pembelian</Text></View>
                             <View style={styles.tableColBuyer}><Text style={styles.tableCellHeader}>Nama Pembeli</Text></View>
@@ -273,7 +273,7 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                                 const statusColor = o.payment_status === 'verified' ? '#047857' : o.payment_status === 'rejected' ? '#dc2626' : '#d97706'
 
                                 return (
-                                    <View style={styles.tableRow} key={o.id || idx}>
+                                    <View style={styles.tableRow} key={o.id || idx} wrap={false}>
                                         <View style={styles.tableColNo}><Text style={styles.tableCellCenter}>{idx + 1}</Text></View>
                                         <View style={styles.tableColCode}><Text style={styles.tableCellBold}>{o.order_code || `#MB-${o.id.substring(0, 6).toUpperCase()}`}</Text></View>
                                         <View style={styles.tableColBuyer}><Text style={styles.tableCellBold}>{buyer}</Text></View>
@@ -289,7 +289,7 @@ export function MerchOrdersPDF({ orders, logoUrl = "/logo_hut16_pklu.png", origi
                         )}
 
                         {orders.length > 0 && (
-                            <View style={styles.tableFooterRow}>
+                            <View style={styles.tableFooterRow} wrap={false}>
                                 <View style={styles.tableFooterLabelCol}>
                                     <Text style={styles.tableFooterLabel}>TOTAL REALISASI PENERIMAAN SOUVENIR (LUNAS):</Text>
                                 </View>

@@ -219,7 +219,7 @@ export function MerchCollectionReportPDF({ orders, logoUrl = "/logo_hut16_pklu.p
                 <View break>
                     <Text style={styles.sectionTitle}>Daftar Pengambilan Souvenir Resmi</Text>
                     <View style={styles.table}>
-                        <View style={styles.tableHeaderRow}>
+                        <View style={styles.tableHeaderRow} fixed>
                             <View style={styles.tableColNo}><Text style={styles.tableCellHeader}>No.</Text></View>
                             <View style={styles.tableColCode}><Text style={styles.tableCellHeader}>ID Pembelian</Text></View>
                             <View style={styles.tableColRegCode}><Text style={styles.tableCellHeader}>Kode Registrasi</Text></View>
@@ -241,7 +241,7 @@ export function MerchCollectionReportPDF({ orders, logoUrl = "/logo_hut16_pklu.p
                                     : '-'
                                 
                                 return (
-                                    <View style={styles.tableRow} key={o.id || idx}>
+                                    <View style={styles.tableRow} key={o.id || idx} wrap={false}>
                                         <View style={styles.tableColNo}><Text style={styles.tableCellCenter}>{idx + 1}</Text></View>
                                         <View style={styles.tableColCode}><Text style={styles.tableCellBold}>{orderIdStr}</Text></View>
                                         <View style={styles.tableColRegCode}><Text style={styles.tableCellCenter}>{regCodeStr}</Text></View>

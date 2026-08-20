@@ -1028,6 +1028,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                         );
                       })}
                     </div>
+                    <p className="text-[9px] text-purple-300/80 italic pt-1 flex items-center gap-1">
+                      <span>💡</span> Ketersediaan ukuran kaos terintegrasi langsung antara Kaos Eceran &amp; Paket Bundling.
+                    </p>
                     <div className="mt-2.5 overflow-hidden rounded-xl border border-purple-500/10 bg-black/40">
                       <div className="p-2 border-b border-purple-500/10 text-[9px] text-gray-400 font-semibold flex justify-between items-center bg-purple-950/20">
                         <span>Pratinjau Ukuran Kaos (Size Chart)</span>
@@ -1407,6 +1410,33 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                             <Info className="w-3 h-3" /> Detail
                           </span>
                         </div>
+
+                        {/* Per-Size Stock Chips on Public Card */}
+                        {p.has_size && p.size_stocks && (
+                          <div className="pt-1.5 border-t border-white/5">
+                            <span className="text-[8px] text-gray-400 block mb-1">Stok Ukuran:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {SHIRT_SIZES.map((sz) => {
+                                const q = p.size_stocks?.[sz] ?? 0;
+                                return (
+                                  <span
+                                    key={sz}
+                                    className={`text-[8px] font-mono px-1 py-0.5 rounded border ${
+                                      q <= 0
+                                        ? "bg-red-500/10 text-red-400/60 border-red-500/20 line-through"
+                                        : q <= 5
+                                        ? "bg-amber-500/10 text-amber-300 border-amber-500/20 font-bold"
+                                        : "bg-purple-500/10 text-purple-200 border-purple-500/20"
+                                    }`}
+                                    title={`Ukuran ${sz}: ${q} pcs`}
+                                  >
+                                    {sz}:{q}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

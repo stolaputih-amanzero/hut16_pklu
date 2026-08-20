@@ -26,10 +26,30 @@ export async function fetchMerchProducts(onlyActive = false) {
       console.error("Fetch merch products error:", error);
       return { success: false, data: [] };
     }
+    const masterSizedProduct = (data || []).find(
+      (p: any) => p.has_size && Array.isArray(p.available_sizes) && p.available_sizes.some((s: string) => typeof s === "string" && s.includes(":"))
+    );
+    const masterSizeStocks = masterSizedProduct
+      ? parseSizeStocks(masterSizedProduct.available_sizes, masterSizedProduct.stock, (masterSizedProduct as any).size_stocks)
+      : null;
+    const masterTotalStock = masterSizeStocks
+      ? Object.values(masterSizeStocks).reduce((a, b) => a + b, 0)
+      : null;
+
     const cleaned = (data || []).map((p: any) => {
-      const sizeStocks = p.has_size ? parseSizeStocks(p.available_sizes, p.stock, (p as any).size_stocks) : {};
+      let sizeStocks = {};
+      let finalStock = p.stock;
+      if (p.has_size) {
+        if (masterSizeStocks) {
+          sizeStocks = { ...masterSizeStocks };
+          finalStock = masterTotalStock ?? p.stock;
+        } else {
+          sizeStocks = parseSizeStocks(p.available_sizes, p.stock, (p as any).size_stocks);
+        }
+      }
       return {
         ...p,
+        stock: finalStock,
         name: p.name
           ?.replaceAll("&amp;", "&")
           .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")

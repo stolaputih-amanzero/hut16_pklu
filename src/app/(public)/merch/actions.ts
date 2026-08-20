@@ -247,10 +247,15 @@ export async function submitMerchOrder(formData: FormData) {
         whatsapp: data.whatsapp,
         payment_proof_url: data.payment_proof_url,
       },
+      notice: "Pembelian Merchandise Tambahan Anda telah berhasil dicatat! Harap diingat bahwa pembelian ini TERPISAH dari paket pendaftaran acara Anda.",
     };
   } catch (err: any) {
     console.error("submitMerchOrder critical error:", err);
-    return { success: false, error: err.message || "Terjadi kesalahan sistem saat memproses pesanan." };
+    return {
+      success: false,
+      error: err.message || "Terjadi kesalahan sistem saat memproses pesanan.",
+      notice: undefined,
+    };
   }
 }
 

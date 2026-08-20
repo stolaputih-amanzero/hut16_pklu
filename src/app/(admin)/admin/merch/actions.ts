@@ -35,11 +35,11 @@ export async function fetchMerchProducts(onlyActive = false) {
       return { success: false, data: [] };
     }
 
-    // Find master base products
+    // Find master base products (excluding bundles)
     const rawList = data || [];
-    const kaosProd = rawList.find((p: any) => p.has_size && p.name?.toLowerCase().includes("kaos"));
-    const tumblerProd = rawList.find((p: any) => !p.has_size && (p.name?.toLowerCase().includes("tumbler") || p.name?.toLowerCase().includes("mug")));
-    const totebagProd = rawList.find((p: any) => !p.has_size && (p.name?.toLowerCase().includes("tote") || p.name?.toLowerCase().includes("pouch") || p.name?.toLowerCase().includes("bag")));
+    const kaosProd = rawList.find((p: any) => p.has_size && p.name?.toLowerCase().includes("kaos") && !p.name?.toLowerCase().includes("bundling"));
+    const tumblerProd = rawList.find((p: any) => !p.name?.toLowerCase().includes("bundling") && (p.name?.toLowerCase().includes("tumbler") || p.name?.toLowerCase().includes("mug")));
+    const totebagProd = rawList.find((p: any) => !p.name?.toLowerCase().includes("bundling") && (p.name?.toLowerCase().includes("tote") || p.name?.toLowerCase().includes("pouch") || p.name?.toLowerCase().includes("bag")));
 
     const masterSizedProduct = rawList.find(
       (p: any) => p.has_size && Array.isArray(p.available_sizes) && p.available_sizes.some((s: string) => typeof s === "string" && s.includes(":"))
@@ -309,9 +309,9 @@ export async function adjustProductStockFromItems(orderItemTypeStr: string, mode
     const { data: allProducts } = await supabaseAdmin.from("merch_products").select("*");
     if (!allProducts || allProducts.length === 0) return;
 
-    const kaosProd = allProducts.find((p) => p.has_size && p.name.toLowerCase().includes("kaos"));
-    const tumblerProd = allProducts.find((p) => !p.has_size && (p.name.toLowerCase().includes("tumbler") || p.name.toLowerCase().includes("mug")));
-    const totebagProd = allProducts.find((p) => !p.has_size && (p.name.toLowerCase().includes("tote") || p.name.toLowerCase().includes("pouch") || p.name.toLowerCase().includes("bag")));
+    const kaosProd = allProducts.find((p) => p.has_size && p.name.toLowerCase().includes("kaos") && !p.name.toLowerCase().includes("bundling"));
+    const tumblerProd = allProducts.find((p) => !p.name.toLowerCase().includes("bundling") && (p.name.toLowerCase().includes("tumbler") || p.name.toLowerCase().includes("mug")));
+    const totebagProd = allProducts.find((p) => !p.name.toLowerCase().includes("bundling") && (p.name.toLowerCase().includes("tote") || p.name.toLowerCase().includes("pouch") || p.name.toLowerCase().includes("bag")));
     const bundling3Prod = allProducts.find((p) => p.name.toLowerCase().includes("bundling 3"));
     const bundling2Prod = allProducts.find((p) => p.name.toLowerCase().includes("bundling 2"));
 

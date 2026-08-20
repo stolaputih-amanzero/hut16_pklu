@@ -5,12 +5,21 @@ import { revalidatePath } from "next/cache";
 import { parseSizeStocks, serializeSizeStocksToArray } from "@/lib/utils";
 import { adjustProductStockFromItems } from "@/app/(admin)/admin/merch/actions";
 
+function safeRevalidate(path: string) {
+  try {
+    revalidatePath(path);
+  } catch (e) {
+    // Ignore in non-request contexts
+  }
+}
+
 function sanitizeText(str: string): string {
   if (!str) return "";
   return str
     .replace(/<[^>]*>?/gm, "")
     .trim();
 }
+
 
 
 export async function lookupRegistrationForMerch(code: string) {
@@ -223,20 +232,25 @@ export async function submitMerchOrder(formData: FormData) {
       return { success: false, error: `Gagal menyimpan pembelian: ${error.message}` };
     }
 
-    revalidatePath("/merch");
-    revalidatePath("/admin/merch");
+    safeRevalidate("/merch");
+    safeRevalidate("/admin/merch");
 
     return {
       success: true,
       data: {
-        ...data,
-        totalPrice,
-        itemsList: items,
+        id: data.id,
+        buyer_name: data.buyer_name,
+        church_city: data.church_city,
+        item_type: data.item_type,
+        size: data.size,
+        quantity: data.quantity,
+        whatsapp: data.whatsapp,
+        payment_proof_url: data.payment_proof_url,
       },
-      notice: "Pembelian Merchandise Tambahan Anda telah berhasil dicatat! Harap diingat bahwa pembelian ini TERPISAH dari paket pendaftaran acara Anda.",
     };
   } catch (err: any) {
-    return { success: false, error: err.message || "Terjadi kesalahan server" };
+    console.error("submitMerchOrder critical error:", err);
+    return { success: false, error: err.message || "Terjadi kesalahan sistem saat memproses pesanan." };
   }
 }
 

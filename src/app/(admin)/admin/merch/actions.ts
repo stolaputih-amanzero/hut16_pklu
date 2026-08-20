@@ -4,6 +4,14 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { DEFAULT_SIZES, parseOrderItemType, parseSizeStocks, serializeSizeStocksToArray, SizeStockMap } from "@/lib/utils";
 
+function safeRevalidate(path: string) {
+  try {
+    revalidatePath(path);
+  } catch (e) {
+    // Ignore in non-request contexts
+  }
+}
+
 async function ensureBucket() {
   try {
     await supabaseAdmin.storage.createBucket("registrations", {
@@ -266,8 +274,8 @@ export async function saveMerchProduct(formData: FormData) {
       }
     }
 
-    revalidatePath("/merch");
-    revalidatePath("/admin/merch");
+    safeRevalidate("/merch");
+    safeRevalidate("/admin/merch");
 
     return { success: true, data: result.data };
   } catch (err: any) {
@@ -284,8 +292,8 @@ export async function deleteMerchProduct(id: string) {
 
     if (error) return { success: false, error: error.message };
 
-    revalidatePath("/merch");
-    revalidatePath("/admin/merch");
+    safeRevalidate("/merch");
+    safeRevalidate("/admin/merch");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menghapus produk." };
@@ -442,8 +450,8 @@ export async function deleteMerchOrder(id: string) {
 
     if (error) return { success: false, error: error.message };
 
-    revalidatePath("/admin/merch");
-    revalidatePath("/merch");
+    safeRevalidate("/admin/merch");
+    safeRevalidate("/merch");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menghapus pembelian." };
@@ -500,11 +508,11 @@ export async function updateMerchOrderStatus(id: string, status: string, notes: 
       return { success: false, error: `Gagal mengupdate pembelian: ${error.message}` };
     }
 
-    revalidatePath("/admin/merch");
-    revalidatePath("/merch");
+    safeRevalidate("/admin/merch");
+    safeRevalidate("/merch");
+
     return { success: true, data };
   } catch (err: any) {
-    return { success: false, error: err.message || "Terjadi kesalahan server" };
+    return { success: false, error: err.message || "Gagal mengupdate pembelian." };
   }
 }
-

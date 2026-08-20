@@ -194,43 +194,8 @@ export async function submitMerchOrder(formData: FormData) {
       return { success: false, error: "Terjadi kesalahan saat mengunggah bukti bayar." };
     }
 
-    // 6. Deduct stocks in database
-    for (const item of items) {
-      const cleanItemName = sanitizeText(item.name).toLowerCase().trim();
-      const product = allProducts.find(
-        (p) => (item.productId && p.id === item.productId) || p.name.toLowerCase().trim() === cleanItemName
-      );
-      if (!product) continue;
-      const q = Math.max(1, Math.min(50, item.quantity || 1));
-
-      if (product.has_size && item.size) {
-        const cleanSize = item.size.trim().toUpperCase();
-        const sizeStocks = parseSizeStocks(product.available_sizes, product.stock, (product as any).size_stocks);
-        sizeStocks[cleanSize] = Math.max(0, (sizeStocks[cleanSize] || 0) - q);
-        const newStock = Object.values(sizeStocks).reduce((a, b) => a + b, 0);
-        const newAvailableSizes = serializeSizeStocksToArray(sizeStocks);
-
-        // Synchronize across all products with has_size = true (Kaos & Bundling)
-        const { data: allSizedProducts } = await supabaseAdmin
-          .from("merch_products")
-          .select("id")
-          .eq("has_size", true);
-
-        const targetList = allSizedProducts && allSizedProducts.length > 0 ? allSizedProducts : [{ id: product.id }];
-        for (const sp of targetList) {
-          await supabaseAdmin
-            .from("merch_products")
-            .update({ stock: newStock, available_sizes: newAvailableSizes })
-            .eq("id", sp.id);
-        }
-      } else {
-        const newStock = Math.max(0, (product.stock || 0) - q);
-        await supabaseAdmin
-          .from("merch_products")
-          .update({ stock: newStock })
-          .eq("id", product.id);
-      }
-    }
+    // 6. Deduct stocks across individual items and bundles
+    await adjustProductStockFromItems(cleanItemType, "deduct");
 
     // 7. Insert into Supabase DB merch_orders
     const { data, error } = await supabaseAdmin

@@ -26,30 +26,57 @@ export async function fetchMerchProducts(onlyActive = false) {
       console.error("Fetch merch products error:", error);
       return { success: false, data: [] };
     }
-    const masterSizedProduct = (data || []).find(
+
+    // Find master base products
+    const rawList = data || [];
+    const kaosProd = rawList.find((p: any) => p.has_size && p.name?.toLowerCase().includes("kaos"));
+    const tumblerProd = rawList.find((p: any) => !p.has_size && (p.name?.toLowerCase().includes("tumbler") || p.name?.toLowerCase().includes("mug")));
+    const totebagProd = rawList.find((p: any) => !p.has_size && (p.name?.toLowerCase().includes("tote") || p.name?.toLowerCase().includes("pouch") || p.name?.toLowerCase().includes("bag")));
+
+    const masterSizedProduct = rawList.find(
       (p: any) => p.has_size && Array.isArray(p.available_sizes) && p.available_sizes.some((s: string) => typeof s === "string" && s.includes(":"))
-    );
+    ) || kaosProd;
+
     const masterSizeStocks = masterSizedProduct
       ? parseSizeStocks(masterSizedProduct.available_sizes, masterSizedProduct.stock, (masterSizedProduct as any).size_stocks)
       : null;
-    const masterTotalStock = masterSizeStocks
+    const masterTotalKaosStock = masterSizeStocks
       ? Object.values(masterSizeStocks).reduce((a, b) => a + b, 0)
-      : null;
+      : (kaosProd?.stock ?? 100);
 
-    const cleaned = (data || []).map((p: any) => {
-      let sizeStocks = {};
+    const tumblerStock = tumblerProd?.stock ?? 100;
+    const totebagStock = totebagProd?.stock ?? 100;
+
+    const cleaned = rawList.map((p: any) => {
+      const pName = (p.name || "").toLowerCase();
+      let sizeStocks: Record<string, number> = {};
       let finalStock = p.stock;
+
       if (p.has_size) {
         if (masterSizeStocks) {
           sizeStocks = { ...masterSizeStocks };
-          finalStock = masterTotalStock ?? p.stock;
         } else {
           sizeStocks = parseSizeStocks(p.available_sizes, p.stock, (p as any).size_stocks);
         }
+        
+        if (pName.includes("bundling 3")) {
+          // Bundling 3 stock is bottleneck of Kaos, Tumbler, and Tote Bag
+          finalStock = Math.min(masterTotalKaosStock, tumblerStock, totebagStock);
+        } else {
+          finalStock = masterTotalKaosStock;
+        }
+      } else if (pName.includes("bundling 2")) {
+        // Bundling 2 stock is bottleneck of Tumbler and Tote Bag
+        finalStock = Math.min(tumblerStock, totebagStock);
+      } else if (pName.includes("tumbler") || pName.includes("mug")) {
+        finalStock = tumblerStock;
+      } else if (pName.includes("tote") || pName.includes("pouch") || pName.includes("bag")) {
+        finalStock = totebagStock;
       }
+
       return {
         ...p,
-        stock: finalStock,
+        stock: Math.max(0, finalStock),
         name: p.name
           ?.replaceAll("&amp;", "&")
           .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
@@ -125,7 +152,6 @@ export async function saveMerchProduct(formData: FormData) {
         finalStock = computedTotal;
         available_sizes = serializeSizeStocksToArray(cleanSizeStocks);
       } catch (e) {
-        // Fallback to distribute stock
         available_sizes = DEFAULT_SIZES.map(sz => `${sz}:${Math.max(0, Math.floor(finalStock / DEFAULT_SIZES.length))}`);
       }
     }
@@ -161,7 +187,7 @@ export async function saveMerchProduct(formData: FormData) {
       return { success: false, error: result.error.message };
     }
 
-    // If has_size is true, synchronize size stocks to all other shirt/bundling products
+    // Sync sized products (Kaos & Bundling 3)
     if (has_size) {
       const { data: otherSizedProducts } = await supabaseAdmin
         .from("merch_products")
@@ -217,55 +243,86 @@ export async function adjustProductStockFromItems(orderItemTypeStr: string, mode
     const { data: allProducts } = await supabaseAdmin.from("merch_products").select("*");
     if (!allProducts || allProducts.length === 0) return;
 
+    const kaosProd = allProducts.find((p) => p.has_size && p.name.toLowerCase().includes("kaos"));
+    const tumblerProd = allProducts.find((p) => !p.has_size && (p.name.toLowerCase().includes("tumbler") || p.name.toLowerCase().includes("mug")));
+    const totebagProd = allProducts.find((p) => !p.has_size && (p.name.toLowerCase().includes("tote") || p.name.toLowerCase().includes("pouch") || p.name.toLowerCase().includes("bag")));
+    const bundling3Prod = allProducts.find((p) => p.name.toLowerCase().includes("bundling 3"));
+    const bundling2Prod = allProducts.find((p) => p.name.toLowerCase().includes("bundling 2"));
+
     for (const item of parsedItems) {
       const cleanItemName = item.name.toLowerCase().trim();
-      const product = allProducts.find(
-        (p) => p.name.toLowerCase().trim() === cleanItemName
-      );
+      const isBundling3 = cleanItemName.includes("bundling 3");
+      const isBundling2 = cleanItemName.includes("bundling 2");
+      const isKaos = cleanItemName.includes("kaos") || isBundling3;
+      const isTumbler = cleanItemName.includes("tumbler") || cleanItemName.includes("mug") || isBundling3 || isBundling2;
+      const isToteBag = cleanItemName.includes("tote") || cleanItemName.includes("pouch") || cleanItemName.includes("bag") || isBundling3 || isBundling2;
 
-      if (!product) continue;
-
-      if (product.has_size && item.size) {
+      // 1. Adjust Kaos Size Stocks if order contains shirt/bundling 3
+      if (isKaos && item.size) {
         const cleanSize = item.size.trim().toUpperCase();
-        const currentSizeStocks = parseSizeStocks(product.available_sizes, product.stock, (product as any).size_stocks);
+        const baseKaos = kaosProd || bundling3Prod;
+        if (baseKaos) {
+          const currentSizeStocks = parseSizeStocks(baseKaos.available_sizes, baseKaos.stock, (baseKaos as any).size_stocks);
 
+          if (mode === "deduct") {
+            currentSizeStocks[cleanSize] = Math.max(0, (currentSizeStocks[cleanSize] || 0) - item.quantity);
+          } else {
+            currentSizeStocks[cleanSize] = (currentSizeStocks[cleanSize] || 0) + item.quantity;
+          }
+
+          const newTotalStock = Object.values(currentSizeStocks).reduce((a, b) => a + b, 0);
+          const newAvailableSizes = serializeSizeStocksToArray(currentSizeStocks);
+
+          // Update both Kaos & Bundling 3
+          const sizedTargets = [kaosProd, bundling3Prod].filter(Boolean);
+          for (const target of sizedTargets) {
+            if (target) {
+              await supabaseAdmin
+                .from("merch_products")
+                .update({ stock: newTotalStock, available_sizes: newAvailableSizes })
+                .eq("id", target.id);
+            }
+          }
+        }
+      }
+
+      // 2. Adjust Tumbler Stock if order contains Tumbler or Bundling
+      if (isTumbler && tumblerProd) {
+        let newTumblerStock = tumblerProd.stock || 0;
         if (mode === "deduct") {
-          currentSizeStocks[cleanSize] = Math.max(0, (currentSizeStocks[cleanSize] || 0) - item.quantity);
+          newTumblerStock = Math.max(0, newTumblerStock - item.quantity);
         } else {
-          currentSizeStocks[cleanSize] = (currentSizeStocks[cleanSize] || 0) + item.quantity;
+          newTumblerStock = newTumblerStock + item.quantity;
         }
-
-        const newStock = Object.values(currentSizeStocks).reduce((a, b) => a + b, 0);
-        const newAvailableSizes = serializeSizeStocksToArray(currentSizeStocks);
-
-        // Sync size stock across all shirt & bundling products with has_size = true
-        const { data: allSizedProducts } = await supabaseAdmin
-          .from("merch_products")
-          .select("id")
-          .eq("has_size", true);
-
-        const targetList = allSizedProducts && allSizedProducts.length > 0 ? allSizedProducts : [{ id: product.id }];
-        for (const sp of targetList) {
-          await supabaseAdmin
-            .from("merch_products")
-            .update({
-              stock: newStock,
-              available_sizes: newAvailableSizes,
-            })
-            .eq("id", sp.id);
-        }
-      } else {
-        let newStock = product.stock || 0;
-        if (mode === "deduct") {
-          newStock = Math.max(0, newStock - item.quantity);
-        } else {
-          newStock = newStock + item.quantity;
-        }
-
+        tumblerProd.stock = newTumblerStock;
         await supabaseAdmin
           .from("merch_products")
-          .update({ stock: newStock })
-          .eq("id", product.id);
+          .update({ stock: newTumblerStock })
+          .eq("id", tumblerProd.id);
+      }
+
+      // 3. Adjust Tote Bag Stock if order contains Tote Bag or Bundling
+      if (isToteBag && totebagProd) {
+        let newToteStock = totebagProd.stock || 0;
+        if (mode === "deduct") {
+          newToteStock = Math.max(0, newToteStock - item.quantity);
+        } else {
+          newToteStock = newToteStock + item.quantity;
+        }
+        totebagProd.stock = newToteStock;
+        await supabaseAdmin
+          .from("merch_products")
+          .update({ stock: newToteStock })
+          .eq("id", totebagProd.id);
+      }
+
+      // 4. Update Bundling 2 Pcs Stock in DB
+      if (bundling2Prod && tumblerProd && totebagProd) {
+        const bundle2Stock = Math.min(tumblerProd.stock || 0, totebagProd.stock || 0);
+        await supabaseAdmin
+          .from("merch_products")
+          .update({ stock: bundle2Stock })
+          .eq("id", bundling2Prod.id);
       }
     }
   } catch (err) {

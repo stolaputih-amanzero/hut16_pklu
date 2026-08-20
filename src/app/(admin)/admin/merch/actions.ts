@@ -83,6 +83,12 @@ export async function fetchMerchProducts(onlyActive = false) {
           .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
         description: p.description?.replaceAll("&amp;", "&"),
         size_stocks: sizeStocks,
+        component_stocks: {
+          kaos_total: masterTotalKaosStock,
+          kaos_sizes: masterSizeStocks || {},
+          tumbler: tumblerStock,
+          totebag: totebagStock,
+        },
       };
     });
     return { success: true, data: cleaned };
@@ -103,6 +109,8 @@ export async function saveMerchProduct(formData: FormData) {
     const has_size = formData.get("has_size") === "true";
     const is_active = formData.get("is_active") === "true";
     const size_stocks_raw = (formData.get("size_stocks") as string) || "{}";
+    const tumbler_stock_raw = formData.get("tumbler_stock") as string | null;
+    const totebag_stock_raw = formData.get("totebag_stock") as string | null;
     const imageFile = formData.get("image") as File | null;
     let image_url = (formData.get("existing_image_url") as string) || "";
 
@@ -187,7 +195,9 @@ export async function saveMerchProduct(formData: FormData) {
       return { success: false, error: result.error.message };
     }
 
-    // Sync sized products (Kaos & Bundling 3)
+    const lowerName = name.toLowerCase();
+
+    // 1. Sync sized products (Kaos & Bundling 3)
     if (has_size) {
       const { data: otherSizedProducts } = await supabaseAdmin
         .from("merch_products")
@@ -204,6 +214,54 @@ export async function saveMerchProduct(formData: FormData) {
               available_sizes,
             })
             .eq("id", op.id);
+        }
+      }
+    }
+
+    // 2. If Tumbler stock is provided from a bundle or individual product
+    if (tumbler_stock_raw !== null) {
+      const newTumblerVal = Math.max(0, parseInt(tumbler_stock_raw, 10) || 0);
+      const { data: tumblerProds } = await supabaseAdmin
+        .from("merch_products")
+        .select("id")
+        .ilike("name", "%tumbler%");
+      for (const tp of (tumblerProds || [])) {
+        await supabaseAdmin.from("merch_products").update({ stock: newTumblerVal }).eq("id", tp.id);
+      }
+    } else if (lowerName.includes("tumbler") || lowerName.includes("mug")) {
+      // Individual Tumbler edited -> sync
+      const { data: otherTumblers } = await supabaseAdmin
+        .from("merch_products")
+        .select("id")
+        .ilike("name", "%tumbler%")
+        .neq("id", result.data?.id || id);
+      for (const tp of (otherTumblers || [])) {
+        await supabaseAdmin.from("merch_products").update({ stock: finalStock }).eq("id", tp.id);
+      }
+    }
+
+    // 3. If Tote Bag stock is provided from a bundle or individual product
+    if (totebag_stock_raw !== null) {
+      const newToteVal = Math.max(0, parseInt(totebag_stock_raw, 10) || 0);
+      const { data: toteProds } = await supabaseAdmin
+        .from("merch_products")
+        .select("id, name")
+        .or("name.ilike.%tote%,name.ilike.%pouch%,name.ilike.%bag%");
+      for (const tp of (toteProds || [])) {
+        if (!tp.name?.toLowerCase().includes("bundling")) {
+          await supabaseAdmin.from("merch_products").update({ stock: newToteVal }).eq("id", tp.id);
+        }
+      }
+    } else if (lowerName.includes("tote") || lowerName.includes("pouch") || lowerName.includes("bag")) {
+      if (!lowerName.includes("bundling")) {
+        const { data: otherTotes } = await supabaseAdmin
+          .from("merch_products")
+          .select("id, name")
+          .neq("id", result.data?.id || id);
+        for (const tp of (otherTotes || [])) {
+          if (!tp.name?.toLowerCase().includes("bundling") && (tp.name?.toLowerCase().includes("tote") || tp.name?.toLowerCase().includes("bag") || tp.name?.toLowerCase().includes("pouch"))) {
+            await supabaseAdmin.from("merch_products").update({ stock: finalStock }).eq("id", tp.id);
+          }
         }
       }
     }

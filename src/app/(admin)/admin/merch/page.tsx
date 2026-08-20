@@ -37,6 +37,12 @@ type Product = {
   stock: number;
   has_size: boolean;
   size_stocks?: Record<string, number>;
+  component_stocks?: {
+    kaos_total?: number;
+    kaos_sizes?: Record<string, number>;
+    tumbler?: number;
+    totebag?: number;
+  };
   is_active: boolean;
   created_at: string;
 };
@@ -99,6 +105,8 @@ export default function AdminMerchPage() {
   const [price, setPrice] = useState("0");
   const [stock, setStock] = useState("100");
   const [sizeStocks, setSizeStocks] = useState<Record<string, number>>({});
+  const [tumblerStock, setTumblerStock] = useState("50");
+  const [totebagStock, setTotebagStock] = useState("50");
   const [hasSize, setHasSize] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
@@ -182,6 +190,8 @@ export default function AdminMerchPage() {
     const initialSizes: Record<string, number> = {};
     DEFAULT_SIZES.forEach((sz) => (initialSizes[sz] = 15));
     setSizeStocks(initialSizes);
+    setTumblerStock("50");
+    setTotebagStock("50");
     setHasSize(false);
     setIsActive(true);
     setImagePreview(null);
@@ -200,6 +210,8 @@ export default function AdminMerchPage() {
       initialSizes[sz] = p.size_stocks?.[sz] ?? Math.max(0, Math.floor((p.stock ?? 0) / DEFAULT_SIZES.length));
     });
     setSizeStocks(initialSizes);
+    setTumblerStock(String(p.component_stocks?.tumbler ?? 50));
+    setTotebagStock(String(p.component_stocks?.totebag ?? 50));
     setHasSize(p.has_size);
     setIsActive(p.is_active);
     setImagePreview(p.image_url);
@@ -222,6 +234,11 @@ export default function AdminMerchPage() {
       fd.append("stock", String(total));
     } else {
       fd.append("stock", stock);
+    }
+    const isBundle = name.toLowerCase().includes("bundling");
+    if (isBundle) {
+      fd.append("tumbler_stock", tumblerStock);
+      fd.append("totebag_stock", totebagStock);
     }
     fd.append("has_size", String(hasSize));
     fd.append("is_active", String(isActive));
@@ -426,7 +443,59 @@ export default function AdminMerchPage() {
                         )}
                       </div>
 
-                      {item.has_size && item.size_stocks && (
+                      {/* Bundling 3 Pcs Breakdown */}
+                      {item.name.toLowerCase().includes("bundling 3") ? (
+                        <div className="pt-2 bg-purple-950/20 p-2.5 rounded-xl border border-purple-500/20 space-y-1.5">
+                          <span className="text-[10px] font-bold text-purple-300 block">📦 Rincian Stok Eceran Komponen:</span>
+                          <div className="flex flex-wrap gap-1.5 text-[10px]">
+                            <span className="bg-black/40 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                              👕 Kaos: <strong className="text-white">{item.component_stocks?.kaos_total ?? item.stock} pcs</strong>
+                            </span>
+                            <span className="bg-black/40 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                              🥛 Tumbler: <strong className="text-emerald-400">{item.component_stocks?.tumbler ?? 0} pcs</strong>
+                            </span>
+                            <span className="bg-black/40 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                              👜 Tote Bag: <strong className="text-emerald-400">{item.component_stocks?.totebag ?? 0} pcs</strong>
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {DEFAULT_SIZES.map((sz) => {
+                              const q = item.size_stocks?.[sz] ?? 0;
+                              return (
+                                <span
+                                  key={sz}
+                                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                                    q <= 0
+                                      ? "bg-red-500/10 text-red-400 border-red-500/30 font-medium"
+                                      : q <= 5
+                                      ? "bg-amber-500/10 text-amber-300 border-amber-500/30 font-bold"
+                                      : "bg-purple-500/10 text-purple-200 border-purple-500/20"
+                                  }`}
+                                >
+                                  {sz}: <strong className={q <= 0 ? "text-red-400" : q <= 5 ? "text-amber-300" : "text-white"}>{q}</strong>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : item.name.toLowerCase().includes("bundling 2") ? (
+                        /* Bundling 2 Pcs Breakdown */
+                        <div className="pt-2 bg-amber-950/20 p-2.5 rounded-xl border border-amber-500/20 space-y-1.5">
+                          <span className="text-[10px] font-bold text-amber-300 block">📦 Rincian Stok Eceran Komponen:</span>
+                          <div className="flex flex-wrap gap-1.5 text-[10px]">
+                            <span className="bg-black/40 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                              🥛 Tumbler: <strong className="text-emerald-400">{item.component_stocks?.tumbler ?? 0} pcs</strong>
+                            </span>
+                            <span className="bg-black/40 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                              👜 Tote Bag: <strong className="text-emerald-400">{item.component_stocks?.totebag ?? 0} pcs</strong>
+                            </span>
+                          </div>
+                          <span className="text-[9px] text-[#D4AF37] block">
+                            * Sisa paket dihitung dari komponen yang paling sedikit ({item.stock} Paket).
+                          </span>
+                        </div>
+                      ) : item.has_size && item.size_stocks ? (
+                        /* Kaos Satuan */
                         <div className="pt-2">
                           <span className="text-[10px] text-gray-400 font-semibold block mb-1">Rincian Stok Per Ukuran:</span>
                           <div className="flex flex-wrap gap-1">
@@ -449,7 +518,7 @@ export default function AdminMerchPage() {
                             })}
                           </div>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   </div>
 
@@ -954,6 +1023,46 @@ export default function AdminMerchPage() {
                   </div>
                   <p className="text-[10px] text-purple-300/80 italic pt-1 flex items-center gap-1">
                     <span>💡</span> Stok ukuran kaos ini otomatis tersinkronisasi antara produk Kaos Eceran dan Paket Bundling.
+                  </p>
+                </div>
+              )}
+
+              {/* Component Stocks if product is a Bundle */}
+              {name.toLowerCase().includes("bundling") && (
+                <div className="p-3.5 bg-amber-950/25 rounded-xl border border-amber-500/25 space-y-2.5">
+                  <Label className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                    <span>📦</span> Stok Eceran Komponen Lainnya (Pcs):
+                  </Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="tumbler-stock" className="text-[11px] font-bold text-gray-200">
+                        Stok Tumbler
+                      </Label>
+                      <Input
+                        id="tumbler-stock"
+                        type="number"
+                        min="0"
+                        value={tumblerStock}
+                        onChange={(e) => setTumblerStock(e.target.value)}
+                        className="bg-black/60 border-amber-500/30 text-white font-mono text-xs h-8 focus:border-amber-400"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="totebag-stock" className="text-[11px] font-bold text-gray-200">
+                        Stok Tote Bag
+                      </Label>
+                      <Input
+                        id="totebag-stock"
+                        type="number"
+                        min="0"
+                        value={totebagStock}
+                        onChange={(e) => setTotebagStock(e.target.value)}
+                        className="bg-black/60 border-amber-500/30 text-white font-mono text-xs h-8 focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-amber-300/80 italic pt-1 flex items-center gap-1">
+                    <span>💡</span> Mengubah stok komponen di sini otomatis menyinkronkan produk eceran &amp; seluruh paket bundling.
                   </p>
                 </div>
               )}

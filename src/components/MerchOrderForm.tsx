@@ -67,6 +67,12 @@ type MerchProductItem = {
   stock: number;
   has_size: boolean;
   size_stocks?: Record<string, number>;
+  component_stocks?: {
+    kaos_total?: number;
+    kaos_sizes?: Record<string, number>;
+    tumbler?: number;
+    totebag?: number;
+  };
 };
 
 export type CartItemState = {
@@ -986,6 +992,45 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   </p>
                 </div>
 
+                {/* Component Stocks Info in Modal if Bundling */}
+                {previewProduct.name.toLowerCase().includes("bundling 3") ? (
+                  <div className="p-3 bg-purple-950/30 rounded-xl border border-purple-500/25 space-y-1.5 text-xs">
+                    <span className="text-purple-300 font-bold block flex items-center gap-1.5">
+                      <span>📦</span> Ketersediaan Fisik Komponen Paket:
+                    </span>
+                    <div className="grid grid-cols-3 gap-2 text-[11px] pt-0.5">
+                      <div className="bg-black/40 p-2 rounded-lg border border-white/10">
+                        <span className="text-gray-400 block text-[9px]">Total Kaos</span>
+                        <strong className="text-white font-mono">{previewProduct.component_stocks?.kaos_total ?? previewProduct.stock} pcs</strong>
+                      </div>
+                      <div className="bg-black/40 p-2 rounded-lg border border-white/10">
+                        <span className="text-gray-400 block text-[9px]">Tumbler</span>
+                        <strong className="text-emerald-400 font-mono">{previewProduct.component_stocks?.tumbler ?? 0} pcs</strong>
+                      </div>
+                      <div className="bg-black/40 p-2 rounded-lg border border-white/10">
+                        <span className="text-gray-400 block text-[9px]">Tote Bag</span>
+                        <strong className="text-emerald-400 font-mono">{previewProduct.component_stocks?.totebag ?? 0} pcs</strong>
+                      </div>
+                    </div>
+                  </div>
+                ) : previewProduct.name.toLowerCase().includes("bundling 2") ? (
+                  <div className="p-3 bg-amber-950/30 rounded-xl border border-amber-500/25 space-y-1.5 text-xs">
+                    <span className="text-amber-300 font-bold block flex items-center gap-1.5">
+                      <span>📦</span> Ketersediaan Fisik Komponen Paket:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2 text-[11px] pt-0.5">
+                      <div className="bg-black/40 p-2 rounded-lg border border-white/10">
+                        <span className="text-gray-400 block text-[9px]">Tumbler</span>
+                        <strong className="text-emerald-400 font-mono">{previewProduct.component_stocks?.tumbler ?? 0} pcs</strong>
+                      </div>
+                      <div className="bg-black/40 p-2 rounded-lg border border-white/10">
+                        <span className="text-gray-400 block text-[9px]">Tote Bag</span>
+                        <strong className="text-emerald-400 font-mono">{previewProduct.component_stocks?.totebag ?? 0} pcs</strong>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
                 {/* Size Selector in Modal */}
                 {!isOutOfStock && previewProduct.has_size && (
                   <div className="space-y-2 p-2.5 bg-purple-500/5 rounded-xl border border-purple-500/20">
@@ -1411,8 +1456,54 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                           </span>
                         </div>
 
-                        {/* Per-Size Stock Chips on Public Card */}
-                        {p.has_size && p.size_stocks && (
+                        {/* Component & Size Stock Breakdown on Public Cards */}
+                        {p.name.toLowerCase().includes("bundling 3") ? (
+                          <div className="pt-1.5 border-t border-white/5 space-y-1 text-[8px]">
+                            <span className="text-purple-300 font-semibold block">📦 Komponen Eceran:</span>
+                            <div className="flex flex-wrap gap-1 text-gray-300">
+                              <span className="bg-white/5 px-1 py-0.5 rounded border border-white/10">
+                                👕 Kaos: <strong className="text-white">{p.component_stocks?.kaos_total ?? p.stock}</strong>
+                              </span>
+                              <span className="bg-white/5 px-1 py-0.5 rounded border border-white/10">
+                                🥛 Tumbler: <strong className="text-emerald-400">{p.component_stocks?.tumbler ?? 0}</strong>
+                              </span>
+                              <span className="bg-white/5 px-1 py-0.5 rounded border border-white/10">
+                                👜 Tote: <strong className="text-emerald-400">{p.component_stocks?.totebag ?? 0}</strong>
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1 pt-0.5">
+                              {SHIRT_SIZES.map((sz) => {
+                                const q = p.size_stocks?.[sz] ?? 0;
+                                return (
+                                  <span
+                                    key={sz}
+                                    className={`font-mono px-1 py-0.5 rounded border ${
+                                      q <= 0
+                                        ? "bg-red-500/10 text-red-400/60 border-red-500/20 line-through"
+                                        : q <= 5
+                                        ? "bg-amber-500/10 text-amber-300 border-amber-500/20 font-bold"
+                                        : "bg-purple-500/10 text-purple-200 border-purple-500/20"
+                                    }`}
+                                  >
+                                    {sz}:{q}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : p.name.toLowerCase().includes("bundling 2") ? (
+                          <div className="pt-1.5 border-t border-white/5 space-y-1 text-[8px]">
+                            <span className="text-amber-300 font-semibold block">📦 Komponen Eceran:</span>
+                            <div className="flex flex-wrap gap-1 text-gray-300">
+                              <span className="bg-white/5 px-1 py-0.5 rounded border border-white/10">
+                                🥛 Tumbler: <strong className="text-emerald-400">{p.component_stocks?.tumbler ?? 0}</strong>
+                              </span>
+                              <span className="bg-white/5 px-1 py-0.5 rounded border border-white/10">
+                                👜 Tote Bag: <strong className="text-emerald-400">{p.component_stocks?.totebag ?? 0}</strong>
+                              </span>
+                            </div>
+                          </div>
+                        ) : p.has_size && p.size_stocks ? (
                           <div className="pt-1.5 border-t border-white/5">
                             <span className="text-[8px] text-gray-400 block mb-1">Stok Ukuran:</span>
                             <div className="flex flex-wrap gap-1">
@@ -1436,7 +1527,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                               })}
                             </div>
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   );

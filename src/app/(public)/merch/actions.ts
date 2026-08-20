@@ -210,10 +210,19 @@ export async function submitMerchOrder(formData: FormData) {
         const newStock = Object.values(sizeStocks).reduce((a, b) => a + b, 0);
         const newAvailableSizes = serializeSizeStocksToArray(sizeStocks);
 
-        await supabaseAdmin
+        // Synchronize across all products with has_size = true (Kaos & Bundling)
+        const { data: allSizedProducts } = await supabaseAdmin
           .from("merch_products")
-          .update({ stock: newStock, available_sizes: newAvailableSizes })
-          .eq("id", product.id);
+          .select("id")
+          .eq("has_size", true);
+
+        const targetList = allSizedProducts && allSizedProducts.length > 0 ? allSizedProducts : [{ id: product.id }];
+        for (const sp of targetList) {
+          await supabaseAdmin
+            .from("merch_products")
+            .update({ stock: newStock, available_sizes: newAvailableSizes })
+            .eq("id", sp.id);
+        }
       } else {
         const newStock = Math.max(0, (product.stock || 0) - q);
         await supabaseAdmin

@@ -141,6 +141,27 @@ export async function saveMerchProduct(formData: FormData) {
       return { success: false, error: result.error.message };
     }
 
+    // If has_size is true, synchronize size stocks to all other shirt/bundling products
+    if (has_size) {
+      const { data: otherSizedProducts } = await supabaseAdmin
+        .from("merch_products")
+        .select("id")
+        .eq("has_size", true)
+        .neq("id", result.data?.id || id);
+
+      if (otherSizedProducts && otherSizedProducts.length > 0) {
+        for (const op of otherSizedProducts) {
+          await supabaseAdmin
+            .from("merch_products")
+            .update({
+              stock: finalStock,
+              available_sizes,
+            })
+            .eq("id", op.id);
+        }
+      }
+    }
+
     revalidatePath("/merch");
     revalidatePath("/admin/merch");
 
@@ -197,13 +218,22 @@ export async function adjustProductStockFromItems(orderItemTypeStr: string, mode
         const newStock = Object.values(currentSizeStocks).reduce((a, b) => a + b, 0);
         const newAvailableSizes = serializeSizeStocksToArray(currentSizeStocks);
 
-        await supabaseAdmin
+        // Sync size stock across all shirt & bundling products with has_size = true
+        const { data: allSizedProducts } = await supabaseAdmin
           .from("merch_products")
-          .update({
-            stock: newStock,
-            available_sizes: newAvailableSizes,
-          })
-          .eq("id", product.id);
+          .select("id")
+          .eq("has_size", true);
+
+        const targetList = allSizedProducts && allSizedProducts.length > 0 ? allSizedProducts : [{ id: product.id }];
+        for (const sp of targetList) {
+          await supabaseAdmin
+            .from("merch_products")
+            .update({
+              stock: newStock,
+              available_sizes: newAvailableSizes,
+            })
+            .eq("id", sp.id);
+        }
       } else {
         let newStock = product.stock || 0;
         if (mode === "deduct") {

@@ -952,6 +952,9 @@ export default function AdminMerchPage() {
                       </div>
                     ))}
                   </div>
+                  <p className="text-[10px] text-purple-300/80 italic pt-1 flex items-center gap-1">
+                    <span>💡</span> Stok ukuran kaos ini otomatis tersinkronisasi antara produk Kaos Eceran dan Paket Bundling.
+                  </p>
                 </div>
               )}
 

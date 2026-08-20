@@ -30,6 +30,54 @@ export function getSizeSurcharge(size: string | null | undefined): number {
   return 0
 }
 
+export const DEFAULT_SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL"];
+
+export type SizeStockMap = Record<string, number>;
+
+export function parseSizeStocks(available_sizes: string[] | null | undefined, totalStock: number, size_stocks?: any): SizeStockMap {
+  const result: SizeStockMap = {};
+  
+  if (size_stocks && typeof size_stocks === 'object' && Object.keys(size_stocks).length > 0) {
+    DEFAULT_SIZES.forEach(sz => {
+      result[sz] = typeof size_stocks[sz] === 'number' ? Math.max(0, size_stocks[sz]) : 0;
+    });
+    return result;
+  }
+
+  if (Array.isArray(available_sizes) && available_sizes.length > 0) {
+    let hasFormattedSize = false;
+    available_sizes.forEach(item => {
+      if (typeof item === 'string' && item.includes(':')) {
+        const [sz, qtyStr] = item.split(':');
+        const cleanSz = sz.trim().toUpperCase();
+        const qty = parseInt(qtyStr.trim(), 10);
+        if (!isNaN(qty)) {
+          result[cleanSz] = Math.max(0, qty);
+          hasFormattedSize = true;
+        }
+      }
+    });
+
+    if (hasFormattedSize) {
+      DEFAULT_SIZES.forEach(sz => {
+        if (result[sz] === undefined) result[sz] = 0;
+      });
+      return result;
+    }
+  }
+
+  // Fallback for legacy products: distribute totalStock or default
+  const perSize = Math.max(0, Math.floor((totalStock || 0) / (available_sizes?.length || DEFAULT_SIZES.length)));
+  DEFAULT_SIZES.forEach(sz => {
+    result[sz] = perSize;
+  });
+  return result;
+}
+
+export function serializeSizeStocksToArray(sizeStocks: SizeStockMap): string[] {
+  return DEFAULT_SIZES.map(sz => `${sz}:${Math.max(0, sizeStocks[sz] ?? 0)}`);
+}
+
 export interface ParsedItem {
   name: string;
   size: string | null;

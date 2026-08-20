@@ -66,6 +66,7 @@ type MerchProductItem = {
   price: number;
   stock: number;
   has_size: boolean;
+  size_stocks?: Record<string, number>;
 };
 
 export type CartItemState = {
@@ -198,7 +199,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   // Reset preview selections when preview product changes
   useEffect(() => {
     if (previewProduct) {
-      setPreviewSize("L");
+      if (previewProduct.has_size && previewProduct.size_stocks) {
+        const availableSize = SHIRT_SIZES.find((sz) => (previewProduct.size_stocks?.[sz] ?? 0) > 0) || "L";
+        setPreviewSize(availableSize);
+      } else {
+        setPreviewSize("L");
+      }
       setPreviewQty(1);
     }
   }, [previewProduct]);
@@ -265,6 +271,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         setProducts(res.data);
         // Default select first product into cart
         const p0 = res.data[0];
+        const initialSize = p0.has_size && p0.size_stocks
+          ? (SHIRT_SIZES.find((sz) => (p0.size_stocks?.[sz] ?? 0) > 0) || "L")
+          : "L";
         setCartItems([
           {
             cartItemId: `cart_${p0.id}_${Date.now()}`,
@@ -273,7 +282,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             image_url: p0.image_url,
             price: p0.price,
             has_size: p0.has_size,
-            size: "L",
+            size: initialSize,
             quantity: 1,
           },
         ]);
@@ -292,6 +301,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         return prev.filter((item) => item.productId !== p.id);
       } else {
         // Add default variant for this product
+        const initialSize = p.has_size && p.size_stocks
+          ? (SHIRT_SIZES.find((sz) => (p.size_stocks?.[sz] ?? 0) > 0) || "L")
+          : "L";
         return [
           ...prev,
           {
@@ -301,7 +313,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
             image_url: p.image_url,
             price: p.price,
             has_size: p.has_size,
-            size: "L",
+            size: initialSize,
             quantity: 1,
           },
         ];
@@ -313,7 +325,9 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const addSizeVariantRow = (p: MerchProductItem) => {
     // Find next available size not already selected for this product
     const existingSizes = cartItems.filter((i) => i.productId === p.id).map((i) => i.size);
-    const nextSize = SHIRT_SIZES.find((sz) => !existingSizes.includes(sz)) || "XL";
+    const nextSize = SHIRT_SIZES.find((sz) => !existingSizes.includes(sz) && ((p.size_stocks?.[sz] ?? 0) > 0))
+      || SHIRT_SIZES.find((sz) => !existingSizes.includes(sz))
+      || "XL";
 
     setCartItems((prev) => [
       ...prev,
@@ -334,7 +348,11 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setCartItems((prev) =>
       prev.map((item) => {
         if (item.cartItemId === cartItemId) {
-          const newQty = Math.max(1, Math.min(50, item.quantity + delta));
+          const p = products.find((prod) => prod.id === item.productId);
+          const maxStock = p
+            ? (p.has_size ? (p.size_stocks?.[item.size] ?? 50) : (p.stock ?? 50))
+            : 50;
+          const newQty = Math.max(1, Math.min(Math.max(1, maxStock), item.quantity + delta));
           return { ...item, quantity: newQty };
         }
         return item;
@@ -346,7 +364,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setCartItems((prev) =>
       prev.map((item) => {
         if (item.cartItemId === cartItemId) {
-          return { ...item, size: newSize };
+          const p = products.find((prod) => prod.id === item.productId);
+          const maxStock = p
+            ? (p.has_size ? (p.size_stocks?.[newSize] ?? 50) : (p.stock ?? 50))
+            : 50;
+          const clampedQty = Math.max(1, Math.min(Math.max(1, maxStock), item.quantity));
+          return { ...item, size: newSize, quantity: clampedQty };
         }
         return item;
       })
@@ -360,6 +383,17 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
   const handleAddFromPreview = () => {
     if (!previewProduct) return;
 
+    const maxStock = previewProduct.has_size
+      ? (previewProduct.size_stocks?.[previewSize] ?? 50)
+      : (previewProduct.stock ?? 50);
+
+    if (maxStock <= 0) {
+      toast.error("Maaf, stok item ini sudah habis.");
+      return;
+    }
+
+    const safeQty = Math.min(maxStock, previewQty);
+
     setCartItems((prev) => {
       if (previewProduct.has_size) {
         // Check if same size already exists
@@ -369,7 +403,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         if (existsIdx > -1) {
           return prev.map((ci, idx) =>
             idx === existsIdx
-              ? { ...ci, quantity: Math.min(50, ci.quantity + previewQty) }
+              ? { ...ci, quantity: Math.min(maxStock, ci.quantity + safeQty) }
               : ci
           );
         }
@@ -378,7 +412,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
         if (existsIdx > -1) {
           return prev.map((ci, idx) =>
             idx === existsIdx
-              ? { ...ci, quantity: Math.min(50, ci.quantity + previewQty) }
+              ? { ...ci, quantity: Math.min(maxStock, ci.quantity + safeQty) }
               : ci
           );
         }
@@ -395,7 +429,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
           price: previewProduct.price,
           has_size: previewProduct.has_size,
           size: previewProduct.has_size ? previewSize : "L",
-          quantity: previewQty,
+          quantity: safeQty,
         },
       ];
     });
@@ -460,6 +494,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
     setErrorMsg("");
 
     const payloadItems = cartItems.map((item) => ({
+      productId: item.productId,
       name: item.name,
       price: item.price + (item.has_size ? getSizeSurcharge(item.size) : 0),
       size: item.has_size ? item.size : undefined,
@@ -969,17 +1004,26 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                     <div className="flex flex-wrap gap-1.5">
                       {SHIRT_SIZES.map((sz) => {
                         const surcharge = getSizeSurcharge(sz);
+                        const sizeStock = previewProduct.size_stocks?.[sz] ?? 0;
+                        const isSizeOutOfStock = sizeStock <= 0;
                         return (
                           <button
                             key={sz}
                             type="button"
-                            onClick={() => setPreviewSize(sz)}
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-mono font-bold transition-all border cursor-pointer ${previewSize === sz
-                              ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300"
-                              : "bg-white/5 text-gray-400 hover:bg-white/10 border-white/10"
-                              }`}
+                            disabled={isSizeOutOfStock}
+                            onClick={() => !isSizeOutOfStock && setPreviewSize(sz)}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-mono font-bold transition-all border flex flex-col items-center gap-0.5 ${
+                              isSizeOutOfStock
+                                ? "bg-red-500/5 text-gray-500 border-white/5 cursor-not-allowed opacity-50"
+                                : previewSize === sz
+                                ? "bg-purple-600 text-white border-purple-500 shadow ring-1 ring-purple-300 cursor-pointer"
+                                : "bg-white/5 text-gray-300 hover:bg-white/10 border-white/10 cursor-pointer"
+                            }`}
                           >
-                            {sz}{surcharge > 0 ? ` (+${surcharge / 1000}k)` : ""}
+                            <span>{sz}{surcharge > 0 ? ` (+${surcharge / 1000}k)` : ""}</span>
+                            <span className={`text-[8px] ${isSizeOutOfStock ? "text-red-400 font-normal" : sizeStock <= 5 ? "text-amber-300 font-bold" : "text-purple-300"}`}>
+                              {isSizeOutOfStock ? "Habis" : `Sisa ${sizeStock}`}
+                            </span>
                           </button>
                         );
                       })}
@@ -1027,7 +1071,12 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                       </span>
                       <button
                         type="button"
-                        onClick={() => setPreviewQty((q) => Math.min(50, q + 1))}
+                        onClick={() => {
+                          const maxStock = previewProduct.has_size
+                            ? (previewProduct.size_stocks?.[previewSize] ?? 50)
+                            : (previewProduct.stock ?? 50);
+                          setPreviewQty((q) => Math.min(Math.max(1, maxStock), q + 1));
+                        }}
                         className="px-2.5 bg-white/5 hover:bg-white/10 text-white font-bold h-full flex items-center justify-center transition-colors cursor-pointer"
                       >
                         <Plus className="w-3 h-3" />
@@ -1436,17 +1485,27 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                               <div className="flex flex-wrap gap-1">
                                 {SHIRT_SIZES.map((sz) => {
                                   const surcharge = getSizeSurcharge(sz);
+                                  const prod = products.find((p) => p.id === cartItem.productId);
+                                  const sizeStock = prod?.size_stocks?.[sz] ?? 0;
+                                  const isSizeOutOfStock = sizeStock <= 0;
                                   return (
                                     <button
                                       key={sz}
                                       type="button"
-                                      onClick={() => updateCartSize(cartItem.cartItemId, sz)}
-                                      className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border cursor-pointer ${cartItem.size === sz
-                                        ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300"
-                                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
-                                        }`}
+                                      disabled={isSizeOutOfStock}
+                                      onClick={() => !isSizeOutOfStock && updateCartSize(cartItem.cartItemId, sz)}
+                                      className={`px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border flex flex-col items-center gap-0.5 ${
+                                        isSizeOutOfStock
+                                          ? "bg-red-500/5 text-gray-500 border-white/5 cursor-not-allowed opacity-50"
+                                          : cartItem.size === sz
+                                          ? "bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-300 cursor-pointer"
+                                          : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 cursor-pointer"
+                                      }`}
                                     >
-                                      {sz}{surcharge > 0 ? ` (+${surcharge / 1000}k)` : ""}
+                                      <span>{sz}{surcharge > 0 ? ` (+${surcharge / 1000}k)` : ""}</span>
+                                      <span className={`text-[8px] ${isSizeOutOfStock ? "text-red-400 font-normal" : sizeStock <= 5 ? "text-amber-300 font-bold" : "text-purple-300"}`}>
+                                        {isSizeOutOfStock ? "Habis" : `Sisa ${sizeStock}`}
+                                      </span>
                                     </button>
                                   );
                                 })}

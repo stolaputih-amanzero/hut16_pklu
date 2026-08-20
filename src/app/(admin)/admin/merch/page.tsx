@@ -5,7 +5,7 @@ import { fetchMerchProducts, saveMerchProduct, deleteMerchProduct, fetchMerchOrd
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getSizeSurcharge, splitItemType } from "@/lib/utils";
+import { getSizeSurcharge, splitItemType, DEFAULT_SIZES } from "@/lib/utils";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
@@ -36,6 +36,7 @@ type Product = {
   price: number;
   stock: number;
   has_size: boolean;
+  size_stocks?: Record<string, number>;
   is_active: boolean;
   created_at: string;
 };
@@ -97,6 +98,7 @@ export default function AdminMerchPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("0");
   const [stock, setStock] = useState("100");
+  const [sizeStocks, setSizeStocks] = useState<Record<string, number>>({});
   const [hasSize, setHasSize] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
@@ -177,6 +179,9 @@ export default function AdminMerchPage() {
     setDescription("");
     setPrice("50000");
     setStock("100");
+    const initialSizes: Record<string, number> = {};
+    DEFAULT_SIZES.forEach((sz) => (initialSizes[sz] = 15));
+    setSizeStocks(initialSizes);
     setHasSize(false);
     setIsActive(true);
     setImagePreview(null);
@@ -190,6 +195,11 @@ export default function AdminMerchPage() {
     setDescription(p.description);
     setPrice(String(p.price));
     setStock(String(p.stock ?? 100));
+    const initialSizes: Record<string, number> = {};
+    DEFAULT_SIZES.forEach((sz) => {
+      initialSizes[sz] = p.size_stocks?.[sz] ?? Math.max(0, Math.floor((p.stock ?? 0) / DEFAULT_SIZES.length));
+    });
+    setSizeStocks(initialSizes);
     setHasSize(p.has_size);
     setIsActive(p.is_active);
     setImagePreview(p.image_url);
@@ -206,7 +216,13 @@ export default function AdminMerchPage() {
     fd.append("name", name);
     fd.append("description", description);
     fd.append("price", price);
-    fd.append("stock", stock);
+    if (hasSize) {
+      fd.append("size_stocks", JSON.stringify(sizeStocks));
+      const total = Object.values(sizeStocks).reduce((a, b) => a + Number(b || 0), 0);
+      fd.append("stock", String(total));
+    } else {
+      fd.append("stock", stock);
+    }
     fd.append("has_size", String(hasSize));
     fd.append("is_active", String(isActive));
     if (editingProduct?.image_url) fd.append("existing_image_url", editingProduct.image_url);
@@ -391,7 +407,7 @@ export default function AdminMerchPage() {
                       <div className="flex flex-wrap items-center gap-2 text-[11px] pt-1">
                         {item.stock > 0 ? (
                           <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold">
-                            Stok Tersedia: {item.stock} pcs
+                            Total Stok: {item.stock} pcs
                           </span>
                         ) : (
                           <span className="bg-red-500/20 text-red-300 border-red-500/40 px-2 py-0.5 rounded font-bold">
@@ -409,6 +425,31 @@ export default function AdminMerchPage() {
                           </span>
                         )}
                       </div>
+
+                      {item.has_size && item.size_stocks && (
+                        <div className="pt-2">
+                          <span className="text-[10px] text-gray-400 font-semibold block mb-1">Rincian Stok Per Ukuran:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {DEFAULT_SIZES.map((sz) => {
+                              const q = item.size_stocks?.[sz] ?? 0;
+                              return (
+                                <span
+                                  key={sz}
+                                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                                    q <= 0
+                                      ? "bg-red-500/10 text-red-400 border-red-500/30 font-medium"
+                                      : q <= 5
+                                      ? "bg-amber-500/10 text-amber-300 border-amber-500/30 font-bold"
+                                      : "bg-purple-500/10 text-purple-200 border-purple-500/20"
+                                  }`}
+                                >
+                                  {sz}: <strong className={q <= 0 ? "text-red-400" : q <= 5 ? "text-amber-300" : "text-white"}>{q}</strong>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -838,24 +879,81 @@ export default function AdminMerchPage() {
                   </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="p-stock" className="text-xs font-semibold text-gray-200">
-                    Stok Tersedia (Pcs) *
-                  </Label>
-                  <Input
-                    id="p-stock"
-                    type="number"
-                    value={stock}
-                    onChange={(e) => setStock(e.target.value)}
-                    placeholder="Contoh: 100"
-                    className="bg-black/50 border-white/20 text-white font-mono"
-                    required
-                  />
-                  <p className="text-[10px] text-emerald-400 font-bold mt-1">
-                    Format: {Number(stock || 0).toLocaleString("id-ID")} Pcs
-                  </p>
-                </div>
+                {!hasSize ? (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="p-stock" className="text-xs font-semibold text-gray-200">
+                      Stok Tersedia (Pcs) *
+                    </Label>
+                    <Input
+                      id="p-stock"
+                      type="number"
+                      value={stock}
+                      onChange={(e) => setStock(e.target.value)}
+                      placeholder="Contoh: 100"
+                      className="bg-black/50 border-white/20 text-white font-mono"
+                      required
+                    />
+                    <p className="text-[10px] text-emerald-400 font-bold mt-1">
+                      Format: {Number(stock || 0).toLocaleString("id-ID")} Pcs
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-gray-200">
+                      Total Stok Terhitung
+                    </Label>
+                    <div className="h-10 px-3 flex items-center bg-black/50 border border-white/20 rounded-md">
+                      <span className="font-mono font-bold text-emerald-400 text-sm">
+                        {Object.values(sizeStocks).reduce((a, b) => a + (Number(b) || 0), 0)} Pcs
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-purple-300 font-medium mt-1">
+                      Dihitung otomatis dari rincian ukuran di bawah.
+                    </p>
+                  </div>
+                )}
               </div>
+
+              {/* Per-Size Stock Inputs if hasSize is enabled */}
+              {hasSize && (
+                <div className="p-3.5 bg-purple-950/25 rounded-xl border border-purple-500/25 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+                      <Shirt className="w-3.5 h-3.5 text-purple-400" /> Masukkan Stok Per Ukuran Kaos:
+                    </Label>
+                    <span className="text-[10px] font-mono font-bold text-[#D4AF37] bg-black/40 px-2 py-0.5 rounded border border-[#D4AF37]/30">
+                      Total: {Object.values(sizeStocks).reduce((a, b) => a + (Number(b) || 0), 0)} Pcs
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    {DEFAULT_SIZES.map((sz) => (
+                      <div key={sz} className="space-y-1 bg-black/30 p-2 rounded-lg border border-purple-500/15">
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor={`size-stock-${sz}`} className="text-[11px] font-bold text-gray-200">
+                            Size {sz}
+                          </Label>
+                          {getSizeSurcharge(sz) > 0 && (
+                            <span className="text-[9px] text-[#D4AF37] font-semibold">
+                              +{getSizeSurcharge(sz) / 1000}k
+                            </span>
+                          )}
+                        </div>
+                        <Input
+                          id={`size-stock-${sz}`}
+                          type="number"
+                          min="0"
+                          value={sizeStocks[sz] ?? 0}
+                          onChange={(e) => {
+                            const val = Math.max(0, parseInt(e.target.value, 10) || 0);
+                            setSizeStocks((prev) => ({ ...prev, [sz]: val }));
+                          }}
+                          className="bg-black/60 border-purple-500/30 text-white font-mono text-xs h-8 focus:border-purple-400"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Toggles */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -1290,6 +1388,25 @@ export default function AdminMerchPage() {
                   </span>
                 </div>
               </div>
+
+              {previewProduct.has_size && previewProduct.size_stocks && (
+                <div className="space-y-1.5 bg-black/40 p-4 rounded-xl border border-white/10">
+                  <span className="text-gray-400 font-semibold block">Rincian Stok Per Ukuran Kaos:</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    {DEFAULT_SIZES.map((sz) => {
+                      const q = previewProduct.size_stocks?.[sz] ?? 0;
+                      return (
+                        <div key={sz} className="p-2 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between">
+                          <span className="font-bold text-gray-300">Size {sz}:</span>
+                          <span className={`font-mono font-bold ${q <= 0 ? "text-red-400" : q <= 5 ? "text-amber-300" : "text-emerald-400"}`}>
+                            {q} pcs {q <= 0 ? "(Habis)" : ""}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-1 bg-black/40 p-4 rounded-xl border border-white/10">
                 <span className="text-gray-400 font-semibold block">Deskripsi &amp; Spesifikasi:</span>

@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
+import { DEFAULT_SIZES, parseOrderItemType, parseSizeStocks, serializeSizeStocksToArray, SizeStockMap } from "@/lib/utils";
 
 async function ensureBucket() {
   try {
@@ -25,14 +26,18 @@ export async function fetchMerchProducts(onlyActive = false) {
       console.error("Fetch merch products error:", error);
       return { success: false, data: [] };
     }
-    const cleaned = (data || []).map((p: any) => ({
-      ...p,
-      name: p.name
-        ?.replaceAll("&amp;", "&")
-        .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
-        .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
-      description: p.description?.replaceAll("&amp;", "&"),
-    }));
+    const cleaned = (data || []).map((p: any) => {
+      const sizeStocks = p.has_size ? parseSizeStocks(p.available_sizes, p.stock, (p as any).size_stocks) : {};
+      return {
+        ...p,
+        name: p.name
+          ?.replaceAll("&amp;", "&")
+          .replaceAll("Pouch & Goodie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial")
+          .replaceAll("Pouch & Googie Bag Edisi Spesial", "Pouch & Bag Edisi Spesial"),
+        description: p.description?.replaceAll("&amp;", "&"),
+        size_stocks: sizeStocks,
+      };
+    });
     return { success: true, data: cleaned };
   } catch (err) {
     return { success: false, data: [] };
@@ -50,6 +55,7 @@ export async function saveMerchProduct(formData: FormData) {
     const stock = parseInt((formData.get("stock") as string) || "100");
     const has_size = formData.get("has_size") === "true";
     const is_active = formData.get("is_active") === "true";
+    const size_stocks_raw = (formData.get("size_stocks") as string) || "{}";
     const imageFile = formData.get("image") as File | null;
     let image_url = (formData.get("existing_image_url") as string) || "";
 
@@ -83,12 +89,34 @@ export async function saveMerchProduct(formData: FormData) {
       image_url = "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80";
     }
 
-    const payload = {
+    let finalStock = Math.max(0, stock);
+    let available_sizes: string[] = [];
+
+    if (has_size) {
+      try {
+        const parsedSizes = JSON.parse(size_stocks_raw) as SizeStockMap;
+        const cleanSizeStocks: SizeStockMap = {};
+        let computedTotal = 0;
+        DEFAULT_SIZES.forEach((sz) => {
+          const qty = Math.max(0, parseInt(String(parsedSizes[sz] ?? 0), 10) || 0);
+          cleanSizeStocks[sz] = qty;
+          computedTotal += qty;
+        });
+        finalStock = computedTotal;
+        available_sizes = serializeSizeStocksToArray(cleanSizeStocks);
+      } catch (e) {
+        // Fallback to distribute stock
+        available_sizes = DEFAULT_SIZES.map(sz => `${sz}:${Math.max(0, Math.floor(finalStock / DEFAULT_SIZES.length))}`);
+      }
+    }
+
+    const payload: any = {
       name,
       description,
       price,
-      stock: Math.max(0, stock),
+      stock: finalStock,
       has_size,
+      available_sizes,
       is_active,
       image_url,
     };
@@ -139,6 +167,62 @@ export async function deleteMerchProduct(id: string) {
   }
 }
 
+export async function adjustProductStockFromItems(orderItemTypeStr: string, mode: "deduct" | "restore") {
+  try {
+    if (!orderItemTypeStr) return;
+    const parsedItems = parseOrderItemType(orderItemTypeStr);
+    if (!parsedItems || parsedItems.length === 0) return;
+
+    const { data: allProducts } = await supabaseAdmin.from("merch_products").select("*");
+    if (!allProducts || allProducts.length === 0) return;
+
+    for (const item of parsedItems) {
+      const cleanItemName = item.name.toLowerCase().trim();
+      const product = allProducts.find(
+        (p) => p.name.toLowerCase().trim() === cleanItemName
+      );
+
+      if (!product) continue;
+
+      if (product.has_size && item.size) {
+        const cleanSize = item.size.trim().toUpperCase();
+        const currentSizeStocks = parseSizeStocks(product.available_sizes, product.stock, (product as any).size_stocks);
+
+        if (mode === "deduct") {
+          currentSizeStocks[cleanSize] = Math.max(0, (currentSizeStocks[cleanSize] || 0) - item.quantity);
+        } else {
+          currentSizeStocks[cleanSize] = (currentSizeStocks[cleanSize] || 0) + item.quantity;
+        }
+
+        const newStock = Object.values(currentSizeStocks).reduce((a, b) => a + b, 0);
+        const newAvailableSizes = serializeSizeStocksToArray(currentSizeStocks);
+
+        await supabaseAdmin
+          .from("merch_products")
+          .update({
+            stock: newStock,
+            available_sizes: newAvailableSizes,
+          })
+          .eq("id", product.id);
+      } else {
+        let newStock = product.stock || 0;
+        if (mode === "deduct") {
+          newStock = Math.max(0, newStock - item.quantity);
+        } else {
+          newStock = newStock + item.quantity;
+        }
+
+        await supabaseAdmin
+          .from("merch_products")
+          .update({ stock: newStock })
+          .eq("id", product.id);
+      }
+    }
+  } catch (err) {
+    console.error("Error in adjustProductStockFromItems:", err);
+  }
+}
+
 export async function fetchMerchOrders() {
   try {
     const { data, error } = await supabaseAdmin
@@ -172,6 +256,20 @@ export async function fetchMerchOrders() {
 
 export async function deleteMerchOrder(id: string) {
   try {
+    const { data: order, error: fetchErr } = await supabaseAdmin
+      .from("merch_orders")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (fetchErr) return { success: false, error: fetchErr.message };
+    if (!order) return { success: false, error: "Pesanan tidak ditemukan." };
+
+    // If order was not rejected, rollback stock on deletion
+    if (order.payment_status !== "rejected" && order.item_type) {
+      await adjustProductStockFromItems(order.item_type, "restore");
+    }
+
     const { error } = await supabaseAdmin
       .from("merch_orders")
       .delete()
@@ -180,6 +278,7 @@ export async function deleteMerchOrder(id: string) {
     if (error) return { success: false, error: error.message };
 
     revalidatePath("/admin/merch");
+    revalidatePath("/merch");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal menghapus pembelian." };
@@ -194,6 +293,31 @@ export async function updateMerchOrderStatus(id: string, status: string, notes: 
     if (!id) return { success: false, error: "ID pembelian tidak valid." };
     if (!["pending", "verified", "rejected"].includes(cleanStatus)) {
       return { success: false, error: "Status pembayaran tidak valid." };
+    }
+
+    const { data: existingOrder, error: fetchErr } = await supabaseAdmin
+      .from("merch_orders")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (fetchErr || !existingOrder) {
+      return { success: false, error: "Data pesanan tidak ditemukan." };
+    }
+
+    const prevStatus = existingOrder.payment_status || "pending";
+
+    // If changing to 'rejected' from non-rejected: RESTORE stock
+    if (prevStatus !== "rejected" && cleanStatus === "rejected") {
+      if (existingOrder.item_type) {
+        await adjustProductStockFromItems(existingOrder.item_type, "restore");
+      }
+    }
+    // If changing FROM 'rejected' to non-rejected: DEDUCT stock again
+    else if (prevStatus === "rejected" && cleanStatus !== "rejected") {
+      if (existingOrder.item_type) {
+        await adjustProductStockFromItems(existingOrder.item_type, "deduct");
+      }
     }
 
     const { data, error } = await supabaseAdmin
@@ -218,3 +342,4 @@ export async function updateMerchOrderStatus(id: string, status: string, notes: 
     return { success: false, error: err.message || "Terjadi kesalahan server" };
   }
 }
+

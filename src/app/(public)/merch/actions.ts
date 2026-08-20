@@ -2,6 +2,8 @@
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
+import { parseSizeStocks, serializeSizeStocksToArray } from "@/lib/utils";
+import { adjustProductStockFromItems } from "@/app/(admin)/admin/merch/actions";
 
 function sanitizeText(str: string): string {
   if (!str) return "";
@@ -42,6 +44,7 @@ export async function lookupRegistrationForMerch(code: string) {
 }
 
 export type CartItemInput = {
+  productId?: string;
   name: string;
   price: number;
   size?: string;
@@ -91,7 +94,55 @@ export async function submitMerchOrder(formData: FormData) {
       return { success: false, error: "Silakan pilih minimal 1 item merchandise." };
     }
 
-    // 2. Build multi-item summary strings
+    // 2. Fetch active products for strict stock validation
+    const { data: allProducts, error: prodErr } = await supabaseAdmin
+      .from("merch_products")
+      .select("*")
+      .eq("is_active", true);
+
+    if (prodErr || !allProducts) {
+      return { success: false, error: "Gagal memverifikasi stok merchandise." };
+    }
+
+    // 3. Validate stock availability for each item
+    for (const item of items) {
+      const cleanItemName = sanitizeText(item.name).toLowerCase().trim();
+      const product = allProducts.find(
+        (p) => (item.productId && p.id === item.productId) || p.name.toLowerCase().trim() === cleanItemName
+      );
+
+      if (!product) {
+        return { success: false, error: `Produk "${item.name}" tidak ditemukan atau sudah tidak aktif.` };
+      }
+
+      const q = Math.max(1, Math.min(50, item.quantity || 1));
+
+      if (product.has_size) {
+        if (!item.size) {
+          return { success: false, error: `Ukuran untuk produk "${product.name}" wajib dipilih.` };
+        }
+        const cleanSize = item.size.trim().toUpperCase();
+        const sizeStocks = parseSizeStocks(product.available_sizes, product.stock, (product as any).size_stocks);
+        const availableForSize = sizeStocks[cleanSize] ?? 0;
+
+        if (availableForSize <= 0) {
+          return { success: false, error: `Maaf, stok "${product.name}" untuk ukuran ${cleanSize} saat ini telah habis.` };
+        }
+        if (availableForSize < q) {
+          return { success: false, error: `Maaf, stok "${product.name}" ukuran ${cleanSize} hanya tersisa ${availableForSize} pcs (Anda memesan ${q} pcs).` };
+        }
+      } else {
+        const availableStock = product.stock ?? 0;
+        if (availableStock <= 0) {
+          return { success: false, error: `Maaf, stok untuk "${product.name}" saat ini telah habis.` };
+        }
+        if (availableStock < q) {
+          return { success: false, error: `Maaf, stok "${product.name}" hanya tersisa ${availableStock} pcs (Anda memesan ${q} pcs).` };
+        }
+      }
+    }
+
+    // 4. Build multi-item summary strings
     const itemSummaries: string[] = [];
     const sizesList: string[] = [];
     let totalQty = 0;
@@ -113,7 +164,7 @@ export async function submitMerchOrder(formData: FormData) {
     const cleanItemType = itemSummaries.join("; ");
     const cleanSize = sizesList.length > 0 ? sizesList.join("; ") : null;
 
-    // 3. Upload Payment Proof
+    // 5. Upload Payment Proof
     let payment_proof_url: string | null = null;
     try {
       const ext = paymentProofFile.name.split(".").pop() || "jpg";
@@ -143,7 +194,36 @@ export async function submitMerchOrder(formData: FormData) {
       return { success: false, error: "Terjadi kesalahan saat mengunggah bukti bayar." };
     }
 
-    // 4. Insert into Supabase DB merch_orders
+    // 6. Deduct stocks in database
+    for (const item of items) {
+      const cleanItemName = sanitizeText(item.name).toLowerCase().trim();
+      const product = allProducts.find(
+        (p) => (item.productId && p.id === item.productId) || p.name.toLowerCase().trim() === cleanItemName
+      );
+      if (!product) continue;
+      const q = Math.max(1, Math.min(50, item.quantity || 1));
+
+      if (product.has_size && item.size) {
+        const cleanSize = item.size.trim().toUpperCase();
+        const sizeStocks = parseSizeStocks(product.available_sizes, product.stock, (product as any).size_stocks);
+        sizeStocks[cleanSize] = Math.max(0, (sizeStocks[cleanSize] || 0) - q);
+        const newStock = Object.values(sizeStocks).reduce((a, b) => a + b, 0);
+        const newAvailableSizes = serializeSizeStocksToArray(sizeStocks);
+
+        await supabaseAdmin
+          .from("merch_products")
+          .update({ stock: newStock, available_sizes: newAvailableSizes })
+          .eq("id", product.id);
+      } else {
+        const newStock = Math.max(0, (product.stock || 0) - q);
+        await supabaseAdmin
+          .from("merch_products")
+          .update({ stock: newStock })
+          .eq("id", product.id);
+      }
+    }
+
+    // 7. Insert into Supabase DB merch_orders
     const { data, error } = await supabaseAdmin
       .from("merch_orders")
       .insert({
@@ -164,6 +244,8 @@ export async function submitMerchOrder(formData: FormData) {
 
     if (error) {
       console.error("Insert Merch Order Error:", error);
+      // Rollback stocks on insert failure
+      await adjustProductStockFromItems(cleanItemType, "restore");
       return { success: false, error: `Gagal menyimpan pembelian: ${error.message}` };
     }
 

@@ -46,15 +46,15 @@ const puncakRundown = [
 const servicesData = [
   {
     title: "Pendaftaran Peserta",
-    subtitle: "Portal Registrasi Acara",
-    desc: "Daftar secara perorangan maupun rombongan utusan jemaat GPIB untuk menghadiri Ibadah Syukur Agung dan Perayaan HUT ke-16 PKLU.",
-    href: "/daftar",
-    badge: "Resmi",
-    btnText: "Mulai Registrasi Peserta",
+    subtitle: "Status: Kuota Terpenuhi",
+    desc: "Pendaftaran peserta telah resmi ditutup karena kapasitas gedung dan kuota telah terpenuhi. Bagi yang sudah mendaftar, silakan cek verifikasi data dan unduh E-Ticket / QR Code Anda.",
+    href: "/cek",
+    badge: "Kuota Terpenuhi",
+    btnText: "Cek E-Ticket / Status Pendaftaran",
     specs: [
-      { label: "Metode Pendaftaran", value: "Online (Mandiri / Rombongan)" },
-      { label: "Sasaran Peserta", value: "Anggota Pelkat PKLU GPIB se-Indonesia" },
-      { label: "Fasilitas Acara", value: "Seminar Kit, Konsumsi & ID Card" },
+      { label: "Status Pendaftaran", value: "Ditutup (Kuota Telah Terpenuhi)" },
+      { label: "Pengecekan Tiket", value: "Buka 24 Jam via Portal Cek Status" },
+      { label: "Fasilitas Peserta", value: "Seminar Kit, Konsumsi & ID Card" },
       { label: "Bukti Keikutsertaan", value: "E-Ticket dengan QR Code Verifikasi" }
     ]
   },
@@ -74,14 +74,14 @@ const servicesData = [
   },
   {
     title: "Pembelian Merchandise",
-    subtitle: "Souvenir & Atribut Resmi",
-    desc: "Miliki kaos edisi khusus, topi, pin logam, mug, dan goodie bag souvenir eksklusif sebagai kenang-kenangan perayaan HUT ke-16.",
+    subtitle: "Souvenir & Atribut Resmi (s/d 31 Agust)",
+    desc: "Miliki kaos edisi khusus, topi, pin logam, mug, dan goodie bag souvenir eksklusif sebagai kenang-kenangan perayaan HUT ke-16. Pre-order dibuka hingga 31 Agustus 2026.",
     href: "/merch",
-    badge: "Souvenir",
+    badge: "Buka s/d 31 Agust",
     btnText: "Beli Merchandise",
     specs: [
       { label: "Pilihan Produk", value: "Kaos Eksklusif, Mug, Topi, Goodie Bag, Pin" },
-      { label: "Bahan Pakaian", value: "Premium Cotton Combed 30s" },
+      { label: "Batas Pemesanan", value: "Hingga 31 Agustus 2026" },
       { label: "Sistem Pembelian", value: "Pre-order online dengan konfirmasi WA" },
       { label: "Distribusi", value: "Pengambilan di lokasi acara / jasa kurir" }
     ]
@@ -105,7 +105,7 @@ const servicesData = [
 const faqData = [
   {
     question: "Bagaimana cara mendaftar sebagai peserta perayaan HUT ke-16 PKLU?",
-    answer: "Pendaftaran dapat dilakukan secara online melalui halaman Pendaftaran. Anda dapat mendaftar sebagai peserta mandiri (perorangan), atau mendaftarkan rombongan utusan jemaat GPIB Anda secara kolektif dengan melampirkan berkas surat mandat jemaat."
+    answer: "Pendaftaran peserta telah resmi ditutup karena kuota kapasitas telah terpenuhi. Bagi peserta atau perwakilan jemaat yang sudah mendaftar sebelumnya, Anda dapat memeriksa status verifikasi dan mengunduh E-Ticket / QR Code melalui menu Cek Status pada website ini."
   },
   {
     question: "Apakah perayaan ini hanya untuk anggota PKLU GPIB Mupel Bekasi?",

@@ -1,10 +1,10 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { MerchOrderForm } from "@/components/MerchOrderForm";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Clock, Sparkles } from "lucide-react";
 
 export const metadata = {
   title: "Merchandise - HUT ke-16 PKLU GPIB",
-  description: "Pembelian souvenir dan merchandise cenderamata edisi khusus HUT ke-16 Persekutuan Kaum Lanjut Usia (PKLU) GPIB 2026.",
+  description: "Pembelian souvenir dan merchandise cenderamata edisi khusus HUT ke-16 Persekutuan Kaum Lanjut Usia (PKLU) GPIB 2026. Pre-order dibuka hingga 31 Agustus 2026.",
 };
 
 export const revalidate = 60;
@@ -29,6 +29,14 @@ export default async function MerchOrderPage() {
           <p className="text-gray-300 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
             Dapatkan koleksi souvenir edisi terbatas HUT ke-16 PKLU GPIB 2026.
           </p>
+
+          {/* Pre-order Deadline Banner */}
+          <div className="pt-2">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs md:text-sm font-semibold shadow-inner">
+              <Clock className="w-4 h-4 text-amber-400 animate-pulse" />
+              <span>Pemesanan Merchandise Resmi Dibuka Hingga <strong>31 Agustus 2026</strong></span>
+            </div>
+          </div>
         </div>
 
         <MerchOrderForm churches={churches || []} />

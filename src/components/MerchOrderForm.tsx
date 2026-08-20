@@ -904,6 +904,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                   src={previewProduct.image_url}
                   alt={previewProduct.name}
                   fill
+                  unoptimized
                   sizes="(max-width: 768px) 100vw, 500px"
                   className="object-cover transition-transform duration-300 group-hover/img:scale-105"
                 />
@@ -1306,6 +1307,7 @@ export function MerchOrderForm({ churches }: MerchOrderFormProps) {
                           src={p.image_url}
                           alt={p.name}
                           fill
+                          unoptimized
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 250px"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />

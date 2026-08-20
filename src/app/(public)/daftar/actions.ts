@@ -22,7 +22,16 @@ async function ensureBucket() {
   }
 }
 
+const IS_REGISTRATION_OPEN = false;
+
 export async function submitRegistration(formData: FormData) {
+  if (!IS_REGISTRATION_OPEN) {
+    return {
+      success: false,
+      error: "Mohon maaf, pendaftaran peserta telah ditutup karena kuota kapasitas telah terpenuhi. Silakan hubungi Humas/Panitia untuk informasi lebih lanjut.",
+    };
+  }
+
   try {
     await ensureBucket();
 
@@ -36,7 +45,7 @@ export async function submitRegistration(formData: FormData) {
     const assignmentFile = formData.get("assignment_letter") as File | null;
     const listFile = formData.get("participant_list") as File | null;
 
-    if (category !== "Tuan Rumah" && (!proofFile || proofFile.size === 0)) {
+    if (category !== "Tuan Rumah" && (!proofFile || !proofFile.size || proofFile.name === "undefined")) {
       return { success: false, error: "Bukti transfer wajib diunggah" };
     }
 
@@ -44,7 +53,7 @@ export async function submitRegistration(formData: FormData) {
 
     // 1. Upload Bukti Transfer (jika ada)
     let proof_of_transfer_url: string | null = null;
-    if (proofFile && proofFile.size > 0) {
+    if (proofFile && proofFile.size > 0 && proofFile.name !== "undefined") {
       const proofExt = proofFile.name.split(".").pop();
       const proofPath = `proofs/${code}_${Date.now()}.${proofExt}`;
       const { error: proofErr } = await supabaseAdmin.storage
@@ -67,7 +76,7 @@ export async function submitRegistration(formData: FormData) {
 
     // 2. Upload Surat Tugas (jika ada)
     let assignment_letter_url: string | null = null;
-    if (assignmentFile && assignmentFile.size > 0) {
+    if (assignmentFile && assignmentFile.size > 0 && assignmentFile.name !== "undefined") {
       const assignExt = assignmentFile.name.split(".").pop();
       const assignPath = `assignments/${code}_${Date.now()}.${assignExt}`;
       const { error: assignErr } = await supabaseAdmin.storage
@@ -77,17 +86,20 @@ export async function submitRegistration(formData: FormData) {
           upsert: true,
         });
 
-      if (!assignErr) {
-        const { data: assignUrlData } = supabaseAdmin.storage
-          .from("registrations")
-          .getPublicUrl(assignPath);
-        assignment_letter_url = assignUrlData.publicUrl;
+      if (assignErr) {
+        console.error("Upload assignment letter error:", assignErr);
+        return { success: false, error: `Gagal mengunggah surat tugas: ${assignErr.message}` };
       }
+
+      const { data: assignUrlData } = supabaseAdmin.storage
+        .from("registrations")
+        .getPublicUrl(assignPath);
+      assignment_letter_url = assignUrlData.publicUrl;
     }
 
     // 3. Upload File Daftar Nama (jika rombongan)
     let participant_list_url: string | null = null;
-    if (listFile && listFile.size > 0) {
+    if (listFile && listFile.size > 0 && listFile.name !== "undefined") {
       const listExt = listFile.name.split(".").pop();
       const listPath = `lists/${code}_${Date.now()}.${listExt}`;
       const { error: listErr } = await supabaseAdmin.storage
